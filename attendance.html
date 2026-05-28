@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Attendance & Work Report - SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, push, remove, update, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.set = set;
+        window.push = push;
+        window.remove = remove;
+        window.update = update;
+        window.onValue = onValue;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-text h1 { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #fcd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-text p { font-size: 0.6rem; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+        .date-box { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 40px; color: white; font-weight: 500; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; transition: all 0.3s; }
+        .nav-btn:hover { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 { font-size: 0.7rem; color: #64748b; margin-bottom: 5px; }
+        .stat-card .value { font-size: 1.6rem; font-weight: 800; color: #f59e0b; }
+        
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .form-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+            border-left: 4px solid #f59e0b;
+            padding-left: 12px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .input-group label { display: block; font-size: 0.7rem; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 0.9rem; transition: all 0.3s;
+        }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: #f59e0b; }
+        
+        .autocomplete-container {
+            position: relative;
+            width: 100%;
+        }
+        .autocomplete-input {
+            width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 0.9rem; transition: all 0.3s;
+        }
+        .autocomplete-input:focus { outline: none; border-color: #f59e0b; }
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .suggestions-dropdown.show { display: block; }
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f2f5;
+            transition: all 0.2s;
+        }
+        .suggestion-item:hover { background: #fef3c7; }
+        .suggestion-name { font-weight: 600; color: #1e293b; }
+        .suggestion-id { font-size: 0.7rem; color: #f59e0b; font-family: monospace; }
+        .suggestion-detail { font-size: 0.7rem; color: #64748b; }
+        
+        .selected-worker-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fef3c7;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .selected-worker-info.show { display: flex; }
+        .clear-selection {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .dual-input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white; border: none; padding: 10px 20px;
+            border-radius: 40px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
+        .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        
+        /* Search Section with Download Button */
+        .search-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-bar {
+            flex: 1;
+            background: white;
+            border-radius: 50px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .search-bar i { color: #94a3b8; }
+        .search-bar input {
+            flex: 1;
+            border: none;
+            padding: 12px 0;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+        .search-bar input:focus { outline: none; }
+        .clear-btn { background: none; border: none; color: #94a3b8; cursor: pointer; }
+        .download-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(34,197,94,0.3);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; font-weight: 600; color: #475569; font-size: 0.75rem; }
+        td { font-size: 0.8rem; }
+        .worker-info { display: flex; flex-direction: column; }
+        .worker-name { font-weight: 600; color: #1e293b; }
+        .worker-id { font-size: 0.65rem; color: #f59e0b; font-family: monospace; }
+        .badge-present { background: #22c55e15; color: #15803d; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
+        .badge-absent { background: #ef444415; color: #b91c1c; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
+        .badge-halfday { background: #f59e0b15; color: #d97706; padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
+        .action-btns { display: flex; gap: 5px; }
+        .edit-btn { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.7rem; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.7rem; }
+        
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white; border-radius: 32px; padding: 24px; max-width: 500px; width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 { margin-bottom: 20px; color: #1e293b; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 12px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
+        
+        /* Report Modal */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        .report-modal.show {
+            display: flex;
+        }
+        .report-modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .report-modal-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+            border-left: 4px solid #f59e0b;
+            padding-left: 12px;
+        }
+        .report-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .report-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .report-option:hover {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        .report-option.selected {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        .report-option input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .report-option label {
+            flex: 1;
+            cursor: pointer;
+            font-weight: 500;
+            color: #334155;
+        }
+        .date-range-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+        .date-range-group input {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        
+        .loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 999; }
+        .loading.show { display: flex; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .error-msg { background: #ef444415; color: #b91c1c; padding: 12px; border-radius: 16px; margin-bottom: 20px; display: none; font-size: 0.8rem; }
+        .success-msg { background: #22c55e15; color: #15803d; padding: 12px; border-radius: 16px; margin-bottom: 20px; display: none; font-size: 0.8rem; }
+        .error-msg.show, .success-msg.show { display: block; }
+        
+        .summary-row { background: #fef3c7; font-weight: 600; }
+        .summary-row td { background: #fef3c7; }
+        .action-buttons-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+        
+        /* Filter info bar */
+        .filter-info {
+            background: #e0f2fe;
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+        .filter-info.show { display: flex; }
+        .clear-filter {
+            background: none;
+            border: none;
+            color: #0284c7;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .dual-input-row { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .search-section { flex-direction: column; }
+            .download-btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<!-- Add New User Modal -->
+<div class="modal" id="addUserModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-user-plus"></i> Add New Worker</h3>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label>First Name</label>
+            <input type="text" id="newFirstName" placeholder="Enter first name">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label>Last Name</label>
+            <input type="text" id="newLastName" placeholder="Enter last name">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label>Phone Number</label>
+            <input type="text" id="newPhone" placeholder="Enter phone number">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label>Email Address</label>
+            <input type="email" id="newEmail" placeholder="Enter email address">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label>Date of Birth</label>
+            <input type="date" id="newDob">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn btn-success" onclick="saveNewUser()"><i class="fas fa-save"></i> Save Worker</button>
+            <button class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Attendance Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <h3>Edit Attendance Record</h3>
+        <div class="form-grid">
+            <div class="input-group"><label>Worker Name</label><input type="text" id="editName" readonly style="background:#f1f5f9;"></div>
+            <div class="input-group"><label>Worker ID</label><input type="text" id="editWorkerId" readonly style="background:#f1f5f9;"></div>
+            <div class="input-group"><label>Date</label><input type="date" id="editDate"></div>
+            <div class="input-group"><label>Status</label>
+                <select id="editStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select>
+            </div>
+            <div class="input-group"><label>Work Hours</label><input type="number" id="editHours" step="0.5" placeholder="Hours worked"></div>
+            <div class="input-group"><label>Daily Rate (TK)</label><input type="number" id="editRate" placeholder="Rate per day"></div>
+            <div class="input-group"><label>Work Description</label><input type="text" id="editWork" placeholder="What work done"></div>
+            <div class="input-group"><label>Payment Given (TK)</label><input type="number" id="editPaid" placeholder="Amount paid"></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn" onclick="saveEdit()">Save Changes</button>
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Report Download Modal -->
+<div class="report-modal" id="reportModal">
+    <div class="report-modal-content">
+        <h3><i class="fas fa-file-pdf"></i> Download Attendance Report</h3>
+        <div class="report-options">
+            <div class="report-option" onclick="selectReportOption('today', this)">
+                <input type="radio" name="reportType" id="opt_today" value="today" checked>
+                <label for="opt_today">📅 Today's Report</label>
+            </div>
+            <div class="report-option" onclick="selectReportOption('week', this)">
+                <input type="radio" name="reportType" id="opt_week" value="week">
+                <label for="opt_week">📆 This Week Report</label>
+            </div>
+            <div class="report-option" onclick="selectReportOption('month', this)">
+                <input type="radio" name="reportType" id="opt_month" value="month">
+                <label for="opt_month">📊 This Month Report</label>
+            </div>
+            <div class="report-option" onclick="selectReportOption('3months', this)">
+                <input type="radio" name="reportType" id="opt_3months" value="3months">
+                <label for="opt_3months">🗓️ Last 3 Months Report</label>
+            </div>
+            <div class="report-option" onclick="selectReportOption('6months', this)">
+                <input type="radio" name="reportType" id="opt_6months" value="6months">
+                <label for="opt_6months">📅 Last 6 Months Report</label>
+            </div>
+            <div class="report-option" onclick="selectReportOption('year', this)">
+                <input type="radio" name="reportType" id="opt_year" value="year">
+                <label for="opt_year">📆 This Year Report</label>
+            </div>
+            <div class="report-option" onclick="selectReportOption('custom', this)">
+                <input type="radio" name="reportType" id="opt_custom" value="custom">
+                <label for="opt_custom">⚙️ Custom Date Range</label>
+            </div>
+        </div>
+        
+        <div id="customDateRange" style="display: none;">
+            <div class="date-range-group">
+                <div>
+                    <label style="font-size:0.7rem;">From Date</label>
+                    <input type="date" id="fromDate">
+                </div>
+                <div>
+                    <label style="font-size:0.7rem;">To Date</label>
+                    <input type="date" id="toDate">
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn" onclick="generatePDFReport()"><i class="fas fa-file-pdf"></i> Generate PDF</button>
+            <button class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>ATTENDANCE & WORK REPORT</p></div>
+        </div>
+        <div class="date-box" id="currentDate"></div>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="window.location.href='dashboard.html'">🏠 Home</button>
+            <button class="nav-btn" onclick="window.location.href='profile.html'">👤 Profile</button>
+        </div>
+    </div>
+    
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="successMsg" class="success-msg"></div>
+    
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Total Workers</h3><div class="value" id="totalWorkers">0</div></div>
+        <div class="stat-card"><h3>Present Today</h3><div class="value" id="presentToday">0</div></div>
+        <div class="stat-card"><h3>Total Hours</h3><div class="value" id="totalHours">0</div></div>
+        <div class="stat-card"><h3>Total Earnings</h3><div class="value" id="totalEarnings">0</div></div>
+        <div class="stat-card"><h3>Total Paid</h3><div class="value" id="totalPaid">0</div></div>
+        <div class="stat-card"><h3>Balance Due</h3><div class="value" id="totalDue">0</div></div>
+    </div>
+    
+    <div class="form-card">
+        <div class="form-title"><i class="fas fa-plus-circle"></i> Add New Attendance Record</div>
+        
+        <div class="dual-input-row">
+            <div class="input-group">
+                <label>Worker Name</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="nameSearchInput" class="autocomplete-input" placeholder="Type worker name..." autocomplete="off">
+                    <div id="nameSuggestions" class="suggestions-dropdown"></div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Worker ID</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="idSearchInput" class="autocomplete-input" placeholder="Type worker ID (8 digit number)..." autocomplete="off">
+                    <div id="idSuggestions" class="suggestions-dropdown"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="selectedWorkerInfo" class="selected-worker-info">
+            <span><i class="fas fa-check-circle" style="color: #22c55e;"></i> <strong id="selectedWorkerName">-</strong> <span id="selectedWorkerIdDisplay" style="color:#f59e0b; font-size:0.7rem;"></span></span>
+            <button type="button" class="clear-selection" onclick="clearSelectedWorker()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+        
+        <div class="form-grid" style="margin-top: 15px;">
+            <div class="input-group"><label>Date</label><input type="date" id="workDate"></div>
+            <div class="input-group"><label>Status</label>
+                <select id="status"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select>
+            </div>
+            <div class="input-group"><label>Work Hours</label><input type="number" id="hours" step="0.5" placeholder="Hours worked"></div>
+            <div class="input-group"><label>Daily Rate (TK)</label><input type="number" id="rate" placeholder="Rate per day"></div>
+            <div class="input-group"><label>Work Description</label><input type="text" id="workDesc" placeholder="e.g., Brick work, Plastering"></div>
+            <div class="input-group"><label>Payment Given (TK)</label><input type="number" id="paid" placeholder="Amount paid today"></div>
+        </div>
+        
+        <div class="action-buttons-row">
+            <button class="btn" onclick="addAttendance()"><i class="fas fa-save"></i> Save Record</button>
+            <button class="btn btn-secondary" onclick="clearForm()"><i class="fas fa-eraser"></i> Clear</button>
+            <button class="btn btn-success" onclick="openAddUserModal()"><i class="fas fa-user-plus"></i> Add New Worker</button>
+        </div>
+    </div>
+    
+    <!-- Search Section with Download Button -->
+    <div class="search-section">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchRecords" placeholder="Search by Name, Email, Phone or User ID..." onkeyup="filterRecordsByGlobalSearch()">
+            <button class="clear-btn" onclick="clearGlobalSearch()"><i class="fas fa-times"></i></button>
+        </div>
+        <button class="download-btn" onclick="openReportModal()">
+            <i class="fas fa-download"></i> Download Report
+        </button>
+    </div>
+    
+    <!-- Filter Info Bar -->
+    <div id="filterInfo" class="filter-info">
+        <span><i class="fas fa-filter"></i> <strong id="filterText">Filtered by:</strong> <span id="filterValue">-</span></span>
+        <button class="clear-filter" onclick="clearGlobalSearch()"><i class="fas fa-times-circle"></i> Clear Filter</button>
+    </div>
+    
+    <div class="table-container">
+        <table id="attendanceTable">
+            <thead><tr><th>Date</th><th>Worker Info</th><th>Status</th><th>Hours</th><th>Rate (TK)</th><th>Earnings (TK)</th><th>Paid (TK)</th><th>Due (TK)</th><th>Work Description</th><th>Actions</th></tr></thead>
+            <tbody id="tableBody"><tr><td colspan="10" style="text-align:center;">Loading records...<\/td></tr></tbody>
+            <tfoot id="tableFooter"></tfoot>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+    let allRecords = [];
+    let allUsers = [];
+    let editRecordId = null;
+    let selectedWorker = null;
+    let selectedReportType = 'today';
+    let globalFilter = null; // { type: 'name' or 'id' or 'email' or 'phone', value: string, userId: string }
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('workDate').value = today;
+    document.getElementById('currentDate').innerHTML = `<i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+    
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('show', show);
+    }
+    
+    function showError(message) {
+        const el = document.getElementById('errorMsg');
+        el.textContent = message;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 5000);
+    }
+    
+    function showSuccess(message) {
+        const el = document.getElementById('successMsg');
+        el.textContent = message;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('show');
+        editRecordId = null;
+    }
+    
+    function closeAddUserModal() {
+        document.getElementById('addUserModal').classList.remove('show');
+        document.getElementById('newFirstName').value = '';
+        document.getElementById('newLastName').value = '';
+        document.getElementById('newPhone').value = '';
+        document.getElementById('newEmail').value = '';
+        document.getElementById('newDob').value = '';
+    }
+    
+    function openAddUserModal() {
+        document.getElementById('addUserModal').classList.add('show');
+    }
+    
+    function openReportModal() {
+        document.getElementById('reportModal').classList.add('show');
+        const todayDate = new Date().toISOString().split('T')[0];
+        document.getElementById('fromDate').value = todayDate;
+        document.getElementById('toDate').value = todayDate;
+    }
+    
+    function closeReportModal() {
+        document.getElementById('reportModal').classList.remove('show');
+    }
+    
+    window.selectReportOption = function(type, element) {
+        selectedReportType = type;
+        document.querySelectorAll('.report-option').forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+        document.getElementById(`opt_${type}`).checked = true;
+        
+        const customRange = document.getElementById('customDateRange');
+        if (type === 'custom') {
+            customRange.style.display = 'block';
+        } else {
+            customRange.style.display = 'none';
+        }
+    };
+    
+    function getDateRange() {
+        const todayDate = new Date();
+        const endDate = new Date();
+        let startDate = new Date();
+        
+        switch(selectedReportType) {
+            case 'today':
+                startDate = new Date();
+                endDate = new Date();
+                break;
+            case 'week':
+                startDate = new Date(todayDate);
+                startDate.setDate(todayDate.getDate() - todayDate.getDay());
+                endDate = new Date(todayDate);
+                break;
+            case 'month':
+                startDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+                endDate = new Date(todayDate);
+                break;
+            case '3months':
+                startDate = new Date(todayDate);
+                startDate.setMonth(todayDate.getMonth() - 3);
+                endDate = new Date(todayDate);
+                break;
+            case '6months':
+                startDate = new Date(todayDate);
+                startDate.setMonth(todayDate.getMonth() - 6);
+                endDate = new Date(todayDate);
+                break;
+            case 'year':
+                startDate = new Date(todayDate.getFullYear(), 0, 1);
+                endDate = new Date(todayDate);
+                break;
+            case 'custom':
+                startDate = new Date(document.getElementById('fromDate').value);
+                endDate = new Date(document.getElementById('toDate').value);
+                break;
+            default:
+                startDate = new Date();
+                endDate = new Date();
+        }
+        
+        // Adjust end date to include the full day
+        endDate.setHours(23, 59, 59, 999);
+        
+        return {
+            start: startDate.toISOString().split('T')[0],
+            end: endDate.toISOString().split('T')[0]
+        };
+    }
+    
+    // Filter records by global search (name, email, phone, user ID)
+    function filterRecordsByGlobalSearch() {
+        const searchTerm = document.getElementById('searchRecords').value.toLowerCase().trim();
+        
+        if (!searchTerm) {
+            globalFilter = null;
+            document.getElementById('filterInfo').classList.remove('show');
+            renderTableData(allRecords);
+            updateStats();
+            return;
+        }
+        
+        // First, find which user matches the search term
+        const matchedUser = allUsers.find(user => {
+            const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const phone = (user.mobile || '').toLowerCase();
+            const userId = (user.userId || '').toLowerCase();
+            
+            return fullName.includes(searchTerm) || 
+                   email.includes(searchTerm) || 
+                   phone.includes(searchTerm) || 
+                   userId.includes(searchTerm);
+        });
+        
+        if (matchedUser) {
+            globalFilter = {
+                type: 'user',
+                value: searchTerm,
+                userId: matchedUser.userId,
+                userName: `${matchedUser.firstName} ${matchedUser.lastName}`
+            };
+            document.getElementById('filterText').innerHTML = 'Filtered by:';
+            document.getElementById('filterValue').innerHTML = `${matchedUser.firstName} ${matchedUser.lastName} (ID: ${matchedUser.userId})`;
+            document.getElementById('filterInfo').classList.add('show');
+            
+            // Filter records by this user
+            const filteredRecords = allRecords.filter(record => record.workerId === matchedUser.userId);
+            renderTableData(filteredRecords);
+            updateStatsForFilteredData(filteredRecords);
+        } else {
+            globalFilter = { type: 'no-match', value: searchTerm };
+            document.getElementById('filterText').innerHTML = 'No matching user found for:';
+            document.getElementById('filterValue').innerHTML = searchTerm;
+            document.getElementById('filterInfo').classList.add('show');
+            renderTableData([]);
+            updateStatsForFilteredData([]);
+        }
+    }
+    
+    function clearGlobalSearch() {
+        document.getElementById('searchRecords').value = '';
+        globalFilter = null;
+        document.getElementById('filterInfo').classList.remove('show');
+        renderTableData(allRecords);
+        updateStats();
+    }
+    
+    function updateStatsForFilteredData(records) {
+        let totalEarnings = 0, totalPaid = 0, totalDue = 0, totalHours = 0;
+        records.forEach(record => {
+            totalEarnings += record.earnings || 0;
+            totalPaid += record.paid || 0;
+            totalDue += (record.earnings - record.paid) || 0;
+            totalHours += record.hours || 0;
+        });
+        
+        const uniqueWorkers = new Set(records.map(r => r.workerId));
+        document.getElementById('totalWorkers').textContent = uniqueWorkers.size;
+        document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+        document.getElementById('totalEarnings').textContent = totalEarnings.toFixed(0);
+        document.getElementById('totalPaid').textContent = totalPaid.toFixed(0);
+        document.getElementById('totalDue').textContent = totalDue.toFixed(0);
+        
+        // Present today count
+        const today = new Date().toISOString().split('T')[0];
+        const presentToday = records.filter(r => r.date === today && r.status === 'present').length;
+        document.getElementById('presentToday').textContent = presentToday;
+    }
+    
+    window.generatePDFReport = async function() {
+        const dateRange = getDateRange();
+        
+        // Determine which records to include in PDF
+        let recordsToInclude = [];
+        
+        if (globalFilter && globalFilter.type === 'user') {
+            // Filter by specific user
+            recordsToInclude = allRecords.filter(record => 
+                record.workerId === globalFilter.userId &&
+                record.date >= dateRange.start && 
+                record.date <= dateRange.end
+            );
+        } else {
+            // All records
+            recordsToInclude = allRecords.filter(record => 
+                record.date >= dateRange.start && 
+                record.date <= dateRange.end
+            );
+        }
+        
+        if (recordsToInclude.length === 0) {
+            showError('No records found for the selected criteria!');
+            return;
+        }
+        
+        showLoading(true);
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Header
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 45, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.text("SP CONSTRUCTION", 105, 15, { align: "center" });
+            
+            doc.setFontSize(10);
+            doc.setTextColor(253, 186, 116);
+            doc.text("BUILDING DREAMS", 105, 23, { align: "center" });
+            
+            doc.setTextColor(100, 116, 139);
+            doc.setFontSize(9);
+            doc.text(`Attendance Report`, 105, 32, { align: "center" });
+            doc.text(`Period: ${dateRange.start} to ${dateRange.end}`, 105, 38, { align: "center" });
+            
+            // Add filter info if any
+            if (globalFilter && globalFilter.type === 'user') {
+                doc.setTextColor(245, 158, 11);
+                doc.setFontSize(8);
+                doc.text(`Filtered by: ${globalFilter.userName} (ID: ${globalFilter.userId})`, 105, 43, { align: "center" });
+            }
+            
+            // Table Header
+            let startY = (globalFilter && globalFilter.type === 'user') ? 52 : 48;
+            doc.setFillColor(245, 158, 11);
+            doc.rect(10, startY, 190, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            
+            const headers = ["Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate", "Earnings", "Paid", "Due"];
+            const colWidths = [25, 35, 28, 20, 12, 12, 18, 18, 18];
+            let xPos = 10;
+            
+            headers.forEach((header, i) => {
+                doc.text(header, xPos + 2, startY + 6);
+                xPos += colWidths[i];
+            });
+            
+            // Table Data
+            doc.setTextColor(51, 65, 85);
+            doc.setFont("helvetica", "normal");
+            let yPos = startY + 14;
+            let totalEarnings = 0, totalPaid = 0, totalDue = 0, totalHours = 0;
+            
+            for (const record of recordsToInclude) {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                    
+                    // Re-add header on new page
+                    doc.setFillColor(15, 23, 42);
+                    doc.rect(0, 0, 210, 40, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(20);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("SP CONSTRUCTION", 105, 15, { align: "center" });
+                    doc.setFontSize(10);
+                    doc.setTextColor(253, 186, 116);
+                    doc.text("BUILDING DREAMS", 105, 23, { align: "center" });
+                    doc.setTextColor(100, 116, 139);
+                    doc.setFontSize(9);
+                    doc.text(`Attendance Report (Continued)`, 105, 32, { align: "center" });
+                    doc.text(`Period: ${dateRange.start} to ${dateRange.end}`, 105, 38, { align: "center" });
+                    
+                    doc.setFillColor(245, 158, 11);
+                    doc.rect(10, 48, 190, 10, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(8);
+                    doc.setFont("helvetica", "bold");
+                    xPos = 10;
+                    headers.forEach((header, i) => {
+                        doc.text(header, xPos + 2, 54);
+                        xPos += colWidths[i];
+                    });
+                    yPos = 62;
+                    doc.setTextColor(51, 65, 85);
+                    doc.setFont("helvetica", "normal");
+                }
+                
+                const due = (record.earnings - record.paid) || 0;
+                totalEarnings += record.earnings || 0;
+                totalPaid += record.paid || 0;
+                totalDue += due;
+                totalHours += record.hours || 0;
+                
+                let statusText = record.status === 'present' ? 'Present' : (record.status === 'absent' ? 'Absent' : 'Half Day');
+                
+                const rowData = [
+                    record.date,
+                    record.workerName,
+                    record.workerId,
+                    statusText,
+                    (record.hours || 0).toString(),
+                    (record.rate || 0).toString(),
+                    (record.earnings || 0).toFixed(2),
+                    (record.paid || 0).toFixed(2),
+                    due.toFixed(2)
+                ];
+                
+                xPos = 10;
+                for (let i = 0; i < rowData.length; i++) {
+                    doc.text(rowData[i].toString(), xPos + 2, yPos);
+                    xPos += colWidths[i];
+                }
+                
+                yPos += 7;
+            }
+            
+            // Summary
+            yPos += 5;
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(0.5);
+            doc.line(10, yPos - 3, 200, yPos - 3);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(245, 158, 11);
+            doc.text(`Total Hours: ${totalHours.toFixed(1)}`, 10, yPos);
+            doc.text(`Total Earnings: ৳${totalEarnings.toFixed(2)}`, 80, yPos);
+            doc.text(`Total Paid: ৳${totalPaid.toFixed(2)}`, 130, yPos);
+            doc.text(`Balance Due: ৳${totalDue.toFixed(2)}`, 170, yPos);
+            
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor(148, 163, 184);
+                doc.setFontSize(7);
+                doc.text(`Generated on: ${new Date().toLocaleString()} | SP Construction Management System`, 105, 290, { align: "center" });
+            }
+            
+            let fileName = `Attendance_Report_${dateRange.start}_to_${dateRange.end}`;
+            if (globalFilter && globalFilter.type === 'user') {
+                fileName += `_${globalFilter.userId}`;
+            }
+            doc.save(`${fileName}.pdf`);
+            closeReportModal();
+            showSuccess('PDF report downloaded successfully!');
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            showError('Failed to generate PDF: ' + error.message);
+        }
+        
+        showLoading(false);
+    };
+    
+    function generateUserId() {
+        return Math.floor(10000000 + Math.random() * 90000000).toString();
+    }
+    
+    window.saveNewUser = async function() {
+        const firstName = document.getElementById('newFirstName').value.trim();
+        const lastName = document.getElementById('newLastName').value.trim();
+        const phone = document.getElementById('newPhone').value.trim();
+        const email = document.getElementById('newEmail').value.trim();
+        const dob = document.getElementById('newDob').value;
+        
+        if (!firstName || !lastName) {
+            showError('Please enter first name and last name');
+            return;
+        }
+        
+        const userId = generateUserId();
+        const fullName = `${firstName} ${lastName}`;
+        
+        const newUser = {
+            userId: userId,
+            firstName: firstName,
+            lastName: lastName,
+            fullName: fullName,
+            mobile: phone || 'N/A',
+            email: email || 'N/A',
+            dob: dob || 'N/A',
+            registeredAt: new Date().toISOString(),
+            emailVerified: false,
+            profileCompleted: false
+        };
+        
+        showLoading(true);
+        try {
+            const newRef = window.push(window.ref(window.db, 'users'));
+            await window.set(newRef, newUser);
+            showSuccess(`Worker "${fullName}" added successfully! ID: ${userId}`);
+            closeAddUserModal();
+            await loadUsers();
+        } catch (error) {
+            console.error("Error adding user:", error);
+            showError('Failed to add worker: ' + error.message);
+        }
+        showLoading(false);
+    };
+    
+    window.clearSelectedWorker = function() {
+        selectedWorker = null;
+        document.getElementById('nameSearchInput').value = '';
+        document.getElementById('idSearchInput').value = '';
+        document.getElementById('selectedWorkerInfo').classList.remove('show');
+        document.getElementById('nameSuggestions').classList.remove('show');
+        document.getElementById('idSuggestions').classList.remove('show');
+    };
+    
+    function displaySelectedWorker() {
+        if (selectedWorker) {
+            document.getElementById('selectedWorkerName').textContent = selectedWorker.fullName || `${selectedWorker.firstName} ${selectedWorker.lastName}`;
+            document.getElementById('selectedWorkerIdDisplay').textContent = `ID: ${selectedWorker.userId}`;
+            document.getElementById('selectedWorkerInfo').classList.add('show');
+        } else {
+            document.getElementById('selectedWorkerInfo').classList.remove('show');
+        }
+    }
+    
+    window.selectWorkerFromSearch = function(userId, fullName, firstName, lastName) {
+        selectedWorker = { 
+            userId: userId, 
+            fullName: fullName,
+            firstName: firstName,
+            lastName: lastName
+        };
+        document.getElementById('nameSearchInput').value = fullName;
+        document.getElementById('idSearchInput').value = userId;
+        displaySelectedWorker();
+        document.getElementById('nameSuggestions').classList.remove('show');
+        document.getElementById('idSuggestions').classList.remove('show');
+    };
+    
+    function setupNameAutoSuggest() {
+        const nameInput = document.getElementById('nameSearchInput');
+        const nameDropdown = document.getElementById('nameSuggestions');
+        
+        nameInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            if (!query) {
+                nameDropdown.classList.remove('show');
+                return;
+            }
+            const filtered = allUsers.filter(user => {
+                const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+                return fullName.includes(query);
+            });
+            if (filtered.length === 0) {
+                nameDropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found. <a href="#" onclick="openAddUserModal(); return false;">Click here to add new worker</a></div>';
+                nameDropdown.classList.add('show');
+                return;
+            }
+            nameDropdown.innerHTML = filtered.map(user => {
+                const fullName = `${user.firstName} ${user.lastName}`;
+                return `
+                    <div class="suggestion-item" onclick="selectWorkerFromSearch('${user.userId}', '${escapeHtml(fullName)}', '${escapeHtml(user.firstName)}', '${escapeHtml(user.lastName)}')">
+                        <div class="suggestion-name">${escapeHtml(fullName)}</div>
+                        <div class="suggestion-id">ID: ${user.userId}</div>
+                        <div class="suggestion-detail">📞 ${user.mobile || 'N/A'} | 📧 ${user.email || 'N/A'}</div>
+                    </div>
+                `;
+            }).join('');
+            nameDropdown.classList.add('show');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!nameInput.contains(e.target) && !nameDropdown.contains(e.target)) {
+                nameDropdown.classList.remove('show');
+            }
+        });
+    }
+    
+    function setupIdAutoSuggest() {
+        const idInput = document.getElementById('idSearchInput');
+        const idDropdown = document.getElementById('idSuggestions');
+        
+        idInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            if (!query) {
+                idDropdown.classList.remove('show');
+                return;
+            }
+            const filtered = allUsers.filter(user => user.userId?.toLowerCase().includes(query));
+            if (filtered.length === 0) {
+                idDropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found with this ID. <a href="#" onclick="openAddUserModal(); return false;">Click here to add new worker</a></div>';
+                idDropdown.classList.add('show');
+                return;
+            }
+            idDropdown.innerHTML = filtered.map(user => {
+                const fullName = `${user.firstName} ${user.lastName}`;
+                return `
+                    <div class="suggestion-item" onclick="selectWorkerFromSearch('${user.userId}', '${escapeHtml(fullName)}', '${escapeHtml(user.firstName)}', '${escapeHtml(user.lastName)}')">
+                        <div class="suggestion-name">${escapeHtml(fullName)}</div>
+                        <div class="suggestion-id">ID: ${user.userId}</div>
+                        <div class="suggestion-detail">📞 ${user.mobile || 'N/A'} | 📧 ${user.email || 'N/A'}</div>
+                    </div>
+                `;
+            }).join('');
+            idDropdown.classList.add('show');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!idInput.contains(e.target) && !idDropdown.contains(e.target)) {
+                idDropdown.classList.remove('show');
+            }
+        });
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    async function loadUsers() {
+        showLoading(true);
+        try {
+            const usersRef = window.ref(window.db, 'users');
+            const snapshot = await window.get(usersRef);
+            if (snapshot.exists()) {
+                allUsers = Object.values(snapshot.val());
+            } else {
+                allUsers = [];
+            }
+            setupNameAutoSuggest();
+            setupIdAutoSuggest();
+        } catch (error) {
+            console.error("Error loading users:", error);
+        }
+        showLoading(false);
+    }
+    
+    function clearForm() {
+        selectedWorker = null;
+        document.getElementById('nameSearchInput').value = '';
+        document.getElementById('idSearchInput').value = '';
+        document.getElementById('selectedWorkerInfo').classList.remove('show');
+        document.getElementById('workDate').value = today;
+        document.getElementById('status').value = 'present';
+        document.getElementById('hours').value = '';
+        document.getElementById('rate').value = '';
+        document.getElementById('workDesc').value = '';
+        document.getElementById('paid').value = '';
+    }
+    
+    function calculateEarnings(status, hours, rate) {
+        if (status === 'absent') return 0;
+        if (status === 'halfday') return rate / 2;
+        if (hours && hours > 0) return hours * (rate / 8);
+        return rate;
+    }
+    
+    async function loadRecords() {
+        showLoading(true);
+        try {
+            const recordsRef = window.ref(window.db, 'attendance');
+            const snapshot = await window.get(recordsRef);
+            if (snapshot.exists()) {
+                allRecords = Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }));
+                allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else {
+                allRecords = [];
+            }
+            renderTableData(allRecords);
+            updateStats();
+        } catch (error) {
+            console.error("Error loading records:", error);
+            showError('Failed to load records: ' + error.message);
+        }
+        showLoading(false);
+    }
+    
+    window.addAttendance = async function() {
+        if (!selectedWorker) {
+            showError('Please select a worker by typing name or ID first');
+            return;
+        }
+        
+        const date = document.getElementById('workDate').value;
+        const status = document.getElementById('status').value;
+        const hours = parseFloat(document.getElementById('hours').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const workDesc = document.getElementById('workDesc').value.trim() || '-';
+        const paid = parseFloat(document.getElementById('paid').value) || 0;
+        
+        if (!date) {
+            showError('Please select date');
+            return;
+        }
+        if (rate <= 0) {
+            showError('Please enter daily rate');
+            return;
+        }
+        
+        const earnings = calculateEarnings(status, hours, rate);
+        const due = earnings - paid;
+        
+        const newRecord = {
+            workerId: selectedWorker.userId,
+            workerName: selectedWorker.fullName,
+            date: date,
+            status: status,
+            hours: status === 'absent' ? 0 : hours,
+            rate: rate,
+            earnings: earnings,
+            paid: paid,
+            due: due,
+            workDesc: workDesc,
+            createdAt: new Date().toISOString()
+        };
+        
+        showLoading(true);
+        try {
+            const newRef = window.push(window.ref(window.db, 'attendance'));
+            await window.set(newRef, newRecord);
+            showSuccess('Record added successfully!');
+            clearForm();
+            await loadRecords();
+        } catch (error) {
+            console.error("Error adding record:", error);
+            showError('Failed to add record: ' + error.message);
+        }
+        showLoading(false);
+    };
+    
+    window.editRecord = function(id) {
+        const record = allRecords.find(r => r.id === id);
+        if (!record) return;
+        
+        editRecordId = id;
+        document.getElementById('editName').value = record.workerName;
+        document.getElementById('editWorkerId').value = record.workerId;
+        document.getElementById('editDate').value = record.date;
+        document.getElementById('editStatus').value = record.status;
+        document.getElementById('editHours').value = record.hours;
+        document.getElementById('editRate').value = record.rate;
+        document.getElementById('editWork').value = record.workDesc;
+        document.getElementById('editPaid').value = record.paid;
+        
+        document.getElementById('editModal').classList.add('show');
+    };
+    
+    window.saveEdit = async function() {
+        const date = document.getElementById('editDate').value;
+        const status = document.getElementById('editStatus').value;
+        const hours = parseFloat(document.getElementById('editHours').value) || 0;
+        const rate = parseFloat(document.getElementById('editRate').value) || 0;
+        const workDesc = document.getElementById('editWork').value.trim() || '-';
+        const paid = parseFloat(document.getElementById('editPaid').value) || 0;
+        
+        const earnings = calculateEarnings(status, hours, rate);
+        const due = earnings - paid;
+        
+        const originalRecord = allRecords.find(r => r.id === editRecordId);
+        
+        const updatedRecord = {
+            workerId: originalRecord.workerId,
+            workerName: originalRecord.workerName,
+            date: date,
+            status: status,
+            hours: status === 'absent' ? 0 : hours,
+            rate: rate,
+            earnings: earnings,
+            paid: paid,
+            due: due,
+            workDesc: workDesc,
+            createdAt: originalRecord.createdAt,
+            updatedAt: new Date().toISOString()
+        };
+        
+        showLoading(true);
+        try {
+            const recordRef = window.ref(window.db, `attendance/${editRecordId}`);
+            await window.update(recordRef, updatedRecord);
+            showSuccess('Record updated successfully!');
+            closeEditModal();
+            await loadRecords();
+        } catch (error) {
+            console.error("Error updating record:", error);
+            showError('Failed to update record: ' + error.message);
+        }
+        showLoading(false);
+    };
+    
+    window.deleteRecord = async function(id) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            showLoading(true);
+            try {
+                const recordRef = window.ref(window.db, `attendance/${id}`);
+                await window.remove(recordRef);
+                showSuccess('Record deleted successfully!');
+                await loadRecords();
+            } catch (error) {
+                console.error("Error deleting record:", error);
+                showError('Failed to delete record: ' + error.message);
+            }
+            showLoading(false);
+        }
+    };
+    
+    function renderTableData(records) {
+        const tbody = document.getElementById('tableBody');
+        const tfoot = document.getElementById('tableFooter');
+        
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">No records found. Add your first attendance record. </td></tr>';
+            tfoot.innerHTML = '';
+            return;
+        }
+        
+        let totalEarnings = 0, totalPaid = 0, totalDue = 0, totalHours = 0;
+        
+        tbody.innerHTML = records.map(record => {
+            totalEarnings += record.earnings || 0;
+            totalPaid += record.paid || 0;
+            totalDue += (record.earnings - record.paid) || 0;
+            totalHours += record.hours || 0;
+            
+            let statusClass = '', statusText = '';
+            switch(record.status) {
+                case 'present': statusClass = 'badge-present'; statusText = 'Present'; break;
+                case 'absent': statusClass = 'badge-absent'; statusText = 'Absent'; break;
+                case 'halfday': statusClass = 'badge-halfday'; statusText = 'Half Day'; break;
+                default: statusClass = ''; statusText = record.status;
+            }
+            
+            const due = (record.earnings - record.paid) || 0;
+            const dueColor = due < 0 ? '#dc2626' : '#15803d';
+            
+            return `
+                <tr>
+                    <td>${record.date}</td>
+                    <td class="worker-info">
+                        <span class="worker-name">${escapeHtml(record.workerName)}</span>
+                        <span class="worker-id">ID: ${record.workerId}</span>
+                    </td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>${record.hours || 0}</td>
+                    <td>${record.rate || 0}</td>
+                    <td>${(record.earnings || 0).toFixed(2)}</td>
+                    <td>${(record.paid || 0).toFixed(2)}</td>
+                    <td style="color: ${dueColor}">${due.toFixed(2)}</td>
+                    <td>${escapeHtml(record.workDesc || '-')}</td>
+                    <td class="action-btns">
+                        <button class="edit-btn" onclick="editRecord('${record.id}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="deleteRecord('${record.id}')"><i class="fas fa-trash"></i> Del</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        tfoot.innerHTML = `
+            <tr class="summary-row">
+                <td colspan="4"><strong>TOTAL</strong></td>
+                <td><strong>${totalHours.toFixed(1)}</strong></td>
+                <td><strong>${totalEarnings.toFixed(2)}</strong></td>
+                <td><strong>${totalPaid.toFixed(2)}</strong></td>
+                <td style="color: ${totalDue < 0 ? '#dc2626' : '#15803d'}"><strong>${totalDue.toFixed(2)}</strong></td>
+                <td colspan="3"></td>
+            </tr>
+        `;
+    }
+    
+    function updateStats() {
+        const uniqueWorkers = new Set(allRecords.map(r => r.workerId));
+        document.getElementById('totalWorkers').textContent = uniqueWorkers.size;
+        
+        let totalEarnings = 0, totalPaid = 0, totalDue = 0, totalHours = 0;
+        allRecords.forEach(record => {
+            totalEarnings += record.earnings || 0;
+            totalPaid += record.paid || 0;
+            totalDue += (record.earnings - record.paid) || 0;
+            totalHours += record.hours || 0;
+        });
+        
+        document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+        document.getElementById('totalEarnings').textContent = totalEarnings.toFixed(0);
+        document.getElementById('totalPaid').textContent = totalPaid.toFixed(0);
+        document.getElementById('totalDue').textContent = totalDue.toFixed(0);
+        
+        const today = new Date().toISOString().split('T')[0];
+        const presentToday = allRecords.filter(r => r.date === today && r.status === 'present').length;
+        document.getElementById('presentToday').textContent = presentToday;
+    }
+    
+    window.onAuthStateChanged(window.auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            loadUsers();
+            loadRecords();
+        }
+    });
+    
+    function listenForUpdates() {
+        const recordsRef = window.ref(window.db, 'attendance');
+        window.onValue(recordsRef, (snapshot) => {
+            if (snapshot.exists()) {
+                allRecords = Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }));
+                allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else {
+                allRecords = [];
+            }
+            renderTableData(allRecords);
+            updateStats();
+        });
+    }
+    
+    setTimeout(() => {
+        if (window.auth.currentUser) {
+            listenForUpdates();
+        }
+    }, 1000);
+</script>
+</body>
+</html>
