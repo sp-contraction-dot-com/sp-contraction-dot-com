@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ড্যাশবোর্ড - এসপি কনস্ট্রাকশন</title>
+    <title>Dashboard | SP Construction</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
@@ -50,7 +50,7 @@
             min-height: 100vh;
         }
         
-        /* সাইডবার স্টাইল */
+        /* Sidebar Styles */
         .sidebar {
             position: fixed;
             left: 0;
@@ -117,7 +117,7 @@
             min-height: 100vh;
         }
         
-        /* টপবার */
+        /* Topbar */
         .topbar {
             background: white;
             border-radius: 24px;
@@ -167,7 +167,7 @@
         }
         .logout-btn:hover { background: #dc2626; transform: translateY(-2px); }
         
-        /* স্ট্যাটস গ্রিড */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -188,7 +188,7 @@
         .stat-number { font-size: 1.8rem; font-weight: 800; }
         .stat-icon { width: 55px; height: 55px; background: rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
         
-        /* কার্ডের ব্যাকগ্রাউন্ড কালার */
+        /* Card Background Colors */
         .card-1 { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
         .card-2 { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
         .card-3 { background: linear-gradient(135deg, #10b981, #059669); color: white; }
@@ -197,7 +197,7 @@
         .card-6 { background: linear-gradient(135deg, #ec489a, #be185d); color: white; }
         .card-7 { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
         
-        /* চার্ট সেকশন - সম্পূর্ণ রেস্পন্সিভ */
+        /* Charts Section - Fully Responsive */
         .charts-row {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -205,12 +205,8 @@
             margin-bottom: 30px;
         }
         
-        /* মোবাইলের জন্য সিঙ্গেল কলাম */
         @media (max-width: 768px) {
-            .charts-row {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
+            .charts-row { grid-template-columns: 1fr; gap: 20px; }
         }
         
         .chart-card {
@@ -235,7 +231,6 @@
             gap: 8px;
         }
         
-        /* ক্যানভাস র‍্যাপার - রেস্পন্সিভের জন্য গুরুত্বপূর্ণ */
         .canvas-wrapper {
             position: relative;
             width: 100%;
@@ -248,20 +243,12 @@
             min-height: 200px;
         }
         
-        /* ছোট স্ক্রিনে ক্যানভাসের উচ্চতা কমানো */
         @media (max-width: 480px) {
-            .canvas-wrapper {
-                min-height: 200px;
-            }
-            .chart-card {
-                padding: 15px;
-            }
-            .chart-card h3 {
-                font-size: 0.9rem;
-            }
+            .canvas-wrapper { min-height: 200px; }
+            .chart-card { padding: 15px; }
+            .chart-card h3 { font-size: 0.9rem; }
         }
         
-        /* সেকশন টাইটেল */
         .section-title {
             display: flex;
             align-items: center;
@@ -274,31 +261,16 @@
             font-weight: 700;
             color: #1e293b;
         }
-        .section-title i {
-            font-size: 1.3rem;
-            color: #f59e0b;
-        }
+        .section-title i { font-size: 1.3rem; color: #f59e0b; }
         
-        /* কোম্পানি পেমেন্ট টেবিল */
-        .payment-section {
+        .payment-section, .attendance-section {
             background: white;
             border-radius: 24px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 25px;
         }
-        
-        /* অ্যাটেনডেন্স টেবিল */
-        .attendance-section {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        .table-container {
-            overflow-x: auto;
-        }
+        .table-container { overflow-x: auto; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -343,7 +315,6 @@
             display: inline-block;
         }
         
-        /* কুইক অ্যাকশন */
         .quick-actions {
             display: flex;
             gap: 15px;
@@ -368,7 +339,6 @@
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         }
         
-        /* লোডিং */
         .loading {
             display: none;
             position: fixed;
@@ -394,7 +364,7 @@
 
 <div class="loading" id="loading"><div class="spinner"></div></div>
 
-<!-- সাইডবার -->
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo"><span>SP</span></div>
@@ -402,32 +372,32 @@
         <p>BUILDING DREAMS</p>
     </div>
     <div class="sidebar-menu">
-        <a href="#" class="menu-item active" onclick="return false;"><i class="fas fa-chart-line"></i><span>ড্যাশবোর্ড</span></a>
-        <a href="attendance.html" class="menu-item"><i class="fas fa-calendar-check"></i><span>অ্যাটেনডেন্স</span></a>
-        <a href="financial-report.html" class="menu-item"><i class="fas fa-money-bill-wave"></i><span>পেমেন্ট রিপোর্ট</span></a>
-        <a href="profile.html" class="menu-item"><i class="fas fa-user"></i><span>প্রোফাইল</span></a>
+        <a href="#" class="menu-item active" onclick="return false;"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+        <a href="attendance.html" class="menu-item"><i class="fas fa-calendar-check"></i><span>Attendance</span></a>
+        <a href="financial-report.html" class="menu-item"><i class="fas fa-money-bill-wave"></i><span>Payment Report</span></a>
+        <a href="profile.html" class="menu-item"><i class="fas fa-user"></i><span>Profile</span></a>
     </div>
 </div>
 
-<!-- প্রধান কন্টেন্ট -->
+<!-- Main Content -->
 <div class="main-content">
     <div class="topbar">
         <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
         <div class="welcome-text">
-            <h2 id="welcomeName">স্বাগতম!</h2>
-            <p id="userRole">ঠিকাদার · এসপি কনস্ট্রাকশন</p>
+            <h2 id="welcomeName">Welcome!</h2>
+            <p id="userRole">Contractor · SP Construction</p>
         </div>
         <div class="user-info">
             <div class="user-avatar" id="userAvatar">SP</div>
-            <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> লগআউট</button>
+            <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
     </div>
     
-    <!-- ৭টি কার্ডের গ্রিড -->
+    <!-- 7 Cards Grid -->
     <div class="stats-grid">
         <div class="stat-card card-1">
             <div class="stat-info">
-                <h4><i class="fas fa-users"></i> মোট রেজিস্ট্রেশন (ইউজার)</h4>
+                <h4><i class="fas fa-users"></i> Total Registered Users</h4>
                 <div class="stat-number" id="totalRegisteredUsers">0</div>
             </div>
             <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
@@ -435,7 +405,7 @@
         
         <div class="stat-card card-2">
             <div class="stat-info">
-                <h4><i class="fas fa-hard-hat"></i> মোট কর্মী</h4>
+                <h4><i class="fas fa-hard-hat"></i> Total Workers</h4>
                 <div class="stat-number" id="totalWorkers">0</div>
             </div>
             <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
@@ -443,7 +413,7 @@
         
         <div class="stat-card card-3">
             <div class="stat-info">
-                <h4><i class="fas fa-check-circle"></i> আজ উপস্থিত</h4>
+                <h4><i class="fas fa-check-circle"></i> Present Today</h4>
                 <div class="stat-number" id="presentToday">0</div>
             </div>
             <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
@@ -451,47 +421,47 @@
         
         <div class="stat-card card-4">
             <div class="stat-info">
-                <h4><i class="fas fa-chart-line"></i> মোট কাজের পরিমাণ</h4>
-                <div class="stat-number" id="totalEarnings">৳ 0</div>
+                <h4><i class="fas fa-chart-line"></i> Total Earnings</h4>
+                <div class="stat-number" id="totalEarnings">₹0</div>
             </div>
-            <div class="stat-icon"><i class="fas fa-taka-sign"></i></div>
+            <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
         </div>
         
         <div class="stat-card card-5">
             <div class="stat-info">
-                <h4><i class="fas fa-hand-holding-usd"></i> ইউজারকে মোট দেওয়া</h4>
-                <div class="stat-number" id="totalPaidToUser">৳ 0</div>
+                <h4><i class="fas fa-hand-holding-usd"></i> Total Paid to Workers</h4>
+                <div class="stat-number" id="totalPaidToUser">₹0</div>
             </div>
             <div class="stat-icon"><i class="fas fa-user-check"></i></div>
         </div>
         
         <div class="stat-card card-6">
             <div class="stat-info">
-                <h4><i class="fas fa-building"></i> কোম্পানি মোট দিয়েছে</h4>
-                <div class="stat-number" id="totalCompanyPaid">৳ 0</div>
+                <h4><i class="fas fa-building"></i> Total Company Paid</h4>
+                <div class="stat-number" id="totalCompanyPaid">₹0</div>
             </div>
             <div class="stat-icon"><i class="fas fa-church"></i></div>
         </div>
         
         <div class="stat-card card-7">
             <div class="stat-info">
-                <h4><i class="fas fa-clock"></i> কোম্পানি বাকি রেখেছে</h4>
-                <div class="stat-number" id="totalCompanyDue">৳ 0</div>
+                <h4><i class="fas fa-clock"></i> Total Company Due</h4>
+                <div class="stat-number" id="totalCompanyDue">₹0</div>
             </div>
             <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
         </div>
     </div>
     
-    <!-- লাইভ চার্ট সেকশন - রেস্পন্সিভ ক্যানভাস -->
+    <!-- Live Charts Section - Responsive -->
     <div class="charts-row">
         <div class="chart-card">
-            <h3><i class="fas fa-chart-line" style="color: #f59e0b;"></i> সাপ্তাহিক উপস্থিতির হার (%)</h3>
+            <h3><i class="fas fa-chart-line" style="color: #f59e0b;"></i> Weekly Attendance Rate (%)</h3>
             <div class="canvas-wrapper">
                 <canvas id="attendanceRateChart"></canvas>
             </div>
         </div>
         <div class="chart-card">
-            <h3><i class="fas fa-chart-bar" style="color: #10b981;"></i> সাপ্তাহিক পেমেন্ট ট্রেন্ড (৳)</h3>
+            <h3><i class="fas fa-chart-bar" style="color: #10b981;"></i> Weekly Payment Trend (₹)</h3>
             <div class="canvas-wrapper">
                 <canvas id="weeklyPaymentChart"></canvas>
             </div>
@@ -500,75 +470,75 @@
     
     <div class="charts-row">
         <div class="chart-card">
-            <h3><i class="fas fa-chart-pie" style="color: #8b5cf6;"></i> কোম্পানি পেমেন্ট vs বাকি</h3>
+            <h3><i class="fas fa-chart-pie" style="color: #8b5cf6;"></i> Company Payment vs Due</h3>
             <div class="canvas-wrapper">
                 <canvas id="paymentPieChart"></canvas>
             </div>
         </div>
         <div class="chart-card">
-            <h3><i class="fas fa-chart-line" style="color: #ec489a;"></i> দৈনিক উপার্জন ট্রেন্ড</h3>
+            <h3><i class="fas fa-chart-line" style="color: #ec489a;"></i> Daily Earnings Trend (₹)</h3>
             <div class="canvas-wrapper">
                 <canvas id="dailyEarningChart"></canvas>
             </div>
         </div>
     </div>
     
-    <!-- কোম্পানি পেমেন্ট রেকর্ড -->
+    <!-- Company Payment Records -->
     <div class="payment-section">
         <div class="section-title">
             <i class="fas fa-building"></i>
-            <h3>কোম্পানি পেমেন্ট রেকর্ড</h3>
+            <h3>Company Payment Records</h3>
         </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>তারিখ</th>
-                        <th>কোম্পানির নাম</th>
-                        <th>মোট শ্রমিক</th>
-                        <th>মোট উপার্জন (৳)</th>
-                        <th>কোম্পানি দিয়েছে (৳)</th>
-                        <th>কোম্পানি বাকি (৳)</th>
+                        <th>Date</th>
+                        <th>Company Name</th>
+                        <th>Total Workers</th>
+                        <th>Total Earnings (₹)</th>
+                        <th>Company Paid (₹)</th>
+                        <th>Company Due (₹)</th>
                     </tr>
                 </thead>
                 <tbody id="companyPaymentTableBody">
-                    <tr><td colspan="6" style="text-align:center;">লোড হচ্ছে...</td></tr>
+                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
     
-    <!-- ওয়ার্কার অ্যাটেনডেন্স টেবিল -->
+    <!-- Worker Attendance Records -->
     <div class="attendance-section">
         <div class="section-title">
             <i class="fas fa-clipboard-list"></i>
-            <h3>ওয়ার্কার অ্যাটেনডেন্স রেকর্ড</h3>
+            <h3>Worker Attendance Records</h3>
         </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>তারিখ</th>
-                        <th>কর্মীর নাম</th>
-                        <th>কর্মীর আইডি</th>
-                        <th>স্ট্যাটাস</th>
-                        <th>ঘন্টা</th>
-                        <th>উপার্জন (৳)</th>
-                        <th>কাজের বিবরণ</th>
+                        <th>Date</th>
+                        <th>Worker Name</th>
+                        <th>Worker ID</th>
+                        <th>Status</th>
+                        <th>Hours</th>
+                        <th>Earnings (₹)</th>
+                        <th>Work Description</th>
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody">
-                    <tr><td colspan="7" style="text-align:center;">লোড হচ্ছে...</td></tr>
+                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
     
-    <!-- কুইক অ্যাকশন বাটন -->
+    <!-- Quick Action Buttons -->
     <div class="quick-actions">
-        <a href="attendance.html" class="action-btn"><i class="fas fa-plus-circle"></i> অ্যাটেনডেন্স যোগ করুন</a>
-        <a href="financial-report.html" class="action-btn action-btn-secondary"><i class="fas fa-file-invoice-dollar"></i> পেমেন্ট রিপোর্ট</a>
-        <a href="profile.html" class="action-btn"><i class="fas fa-user-edit"></i> প্রোফাইল দেখুন</a>
+        <a href="attendance.html" class="action-btn"><i class="fas fa-plus-circle"></i> Add Attendance</a>
+        <a href="financial-report.html" class="action-btn action-btn-secondary"><i class="fas fa-file-invoice-dollar"></i> Payment Report</a>
+        <a href="profile.html" class="action-btn"><i class="fas fa-user-edit"></i> View Profile</a>
     </div>
 </div>
 
@@ -578,11 +548,19 @@
     let allUsers = [];
     let totalRegisteredUsersCount = 0;
     
-    // চার্ট অবজেক্ট
+    // Chart objects
     let attendanceRateChart = null;
     let weeklyPaymentChart = null;
     let paymentPieChart = null;
     let dailyEarningChart = null;
+    
+    function formatNumber(value) {
+        if (value === null || value === undefined) return '0';
+        let num = parseFloat(value);
+        if (isNaN(num)) return '0';
+        num = Math.round(num);
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
     
     function showLoading(show) {
         const loading = document.getElementById('loading');
@@ -640,11 +618,12 @@
                 const userSnap = await window.get(userRef);
                 if (userSnap.exists()) {
                     const userData = userSnap.val();
-                    document.getElementById('welcomeName').innerHTML = `স্বাগতম, ${userData.firstName || userData.fullName || 'ইউজার'}!`;
+                    const displayName = userData.firstName || userData.fullName || 'User';
+                    document.getElementById('welcomeName').innerHTML = `Welcome, ${displayName}!`;
                     const initial = (userData.firstName?.charAt(0) || 'S') + (userData.lastName?.charAt(0) || 'P');
                     document.getElementById('userAvatar').textContent = initial.toUpperCase();
                 } else {
-                    document.getElementById('welcomeName').innerHTML = `স্বাগতম, ${user.email?.split('@')[0] || 'ইউজার'}!`;
+                    document.getElementById('welcomeName').innerHTML = `Welcome, ${user.email?.split('@')[0] || 'User'}!`;
                 }
             }
             
@@ -671,25 +650,25 @@
         allAttendanceRecords.forEach(record => {
             totalEarnings += record.earnings || 0;
         });
-        document.getElementById('totalEarnings').innerHTML = `৳ ${totalEarnings.toLocaleString()}`;
+        document.getElementById('totalEarnings').innerHTML = `₹${formatNumber(totalEarnings)}`;
         
         let totalPaidToUser = 0;
         allAttendanceRecords.forEach(record => {
             totalPaidToUser += record.paid || 0;
         });
-        document.getElementById('totalPaidToUser').innerHTML = `৳ ${totalPaidToUser.toLocaleString()}`;
+        document.getElementById('totalPaidToUser').innerHTML = `₹${formatNumber(totalPaidToUser)}`;
         
         let totalCompanyPaid = 0;
         allPaymentRecords.forEach(payment => {
             totalCompanyPaid += payment.companyPaid || 0;
         });
-        document.getElementById('totalCompanyPaid').innerHTML = `৳ ${totalCompanyPaid.toLocaleString()}`;
+        document.getElementById('totalCompanyPaid').innerHTML = `₹${formatNumber(totalCompanyPaid)}`;
         
         let totalDue = 0;
         allPaymentRecords.forEach(payment => {
             totalDue += (payment.totalEarning - payment.companyPaid) || 0;
         });
-        document.getElementById('totalCompanyDue').innerHTML = `৳ ${totalDue.toLocaleString()}`;
+        document.getElementById('totalCompanyDue').innerHTML = `₹${formatNumber(totalDue)}`;
     }
     
     function updateAttendanceTable() {
@@ -697,7 +676,7 @@
         const recentRecords = allAttendanceRecords.slice(0, 15);
         
         if (recentRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">📭 কোনো অ্যাটেনডেন্স রেকর্ড নেই</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">📭 No attendance records found</td></tr>';
             return;
         }
         
@@ -717,7 +696,7 @@
                     <td style="color:#f59e0b; font-family:monospace;">${record.workerId || 'N/A'}</td>
                     <td><span class="${statusClass}">${statusText}</span></td>
                     <td>${record.hours || 0}</td>
-                    <td>${(record.earnings || 0).toLocaleString()}</td>
+                    <td>${formatNumber(record.earnings || 0)}</td>
                     <td>${record.workDesc || '-'}</td>
                 </tr>
             `;
@@ -729,7 +708,7 @@
         const recentPayments = allPaymentRecords.slice(0, 10);
         
         if (recentPayments.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 কোনো পেমেন্ট রেকর্ড নেই</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 No payment records found</td></tr>';
             return;
         }
         
@@ -741,16 +720,16 @@
                     <td>${payment.date || 'N/A'}</td>
                     <td><strong>${payment.companyName || 'N/A'}</strong></td>
                     <td>${payment.totalWorker || 0}</td>
-                    <td class="amount-positive">৳ ${(payment.totalEarning || 0).toLocaleString()}</td>
-                    <td class="amount-positive">৳ ${(payment.companyPaid || 0).toLocaleString()}</td>
-                    <td style="color:${dueColor}; font-weight:600;">৳ ${due.toLocaleString()}</td>
+                    <td class="amount-positive">₹${formatNumber(payment.totalEarning || 0)}</td>
+                    <td class="amount-positive">₹${formatNumber(payment.companyPaid || 0)}</td>
+                    <td style="color:${dueColor}; font-weight:600;">₹${formatNumber(due)}</td>
                 </tr>
             `;
         }).join('');
     }
     
     function updateCharts() {
-        // গত ৭ দিনের ডাটা তৈরি
+        // Generate last 7 days
         const last7Days = [];
         for (let i = 6; i >= 0; i--) {
             const date = new Date();
@@ -758,7 +737,7 @@
             last7Days.push(date.toISOString().split('T')[0]);
         }
         
-        // সাপ্তাহিক উপস্থিতির হার
+        // Weekly attendance rate
         const attendanceRates = last7Days.map(date => {
             const recordsOnDate = allAttendanceRecords.filter(r => r.date === date);
             if (recordsOnDate.length === 0) return 0;
@@ -766,21 +745,21 @@
             return (presentCount / recordsOnDate.length) * 100;
         });
         
-        // সাপ্তাহিক পেমেন্ট (কোম্পানি দিয়েছে)
+        // Weekly payments (company paid)
         const weeklyPayments = last7Days.map(date => {
             const paymentOnDate = allPaymentRecords.filter(p => p.date === date);
             const total = paymentOnDate.reduce((sum, p) => sum + (p.companyPaid || 0), 0);
             return total;
         });
         
-        // দৈনিক উপার্জন (attendance থেকে)
+        // Daily earnings from attendance
         const dailyEarnings = last7Days.map(date => {
             const earningsOnDate = allAttendanceRecords.filter(r => r.date === date);
             const total = earningsOnDate.reduce((sum, r) => sum + (r.earnings || 0), 0);
             return total;
         });
         
-        // পাই চার্টের জন্য: মোট পেমেন্ট vs মোট বাকি
+        // Pie chart data: total paid vs total due
         let totalPaid = 0, totalDue = 0;
         allPaymentRecords.forEach(p => {
             totalPaid += p.companyPaid || 0;
@@ -797,13 +776,13 @@
         if (paymentPieChart) paymentPieChart.destroy();
         if (dailyEarningChart) dailyEarningChart.destroy();
         
-        // চার্ট 1: লাইন চার্ট - উপস্থিতির হার (রেস্পন্সিভ)
+        // Chart 1: Line Chart - Attendance Rate
         attendanceRateChart = new Chart(ctx1, {
             type: 'line',
             data: {
                 labels: last7Days.map(d => d.slice(5)),
                 datasets: [{
-                    label: 'উপস্থিতির হার (%)',
+                    label: 'Attendance Rate (%)',
                     data: attendanceRates,
                     borderColor: '#f59e0b',
                     backgroundColor: 'rgba(245,158,11,0.1)',
@@ -831,13 +810,13 @@
             }
         });
         
-        // চার্ট 2: বার চার্ট - সাপ্তাহিক পেমেন্ট
+        // Chart 2: Bar Chart - Weekly Payment
         weeklyPaymentChart = new Chart(ctx2, {
             type: 'bar',
             data: {
                 labels: last7Days.map(d => d.slice(5)),
                 datasets: [{
-                    label: 'কোম্পানি পেমেন্ট (৳)',
+                    label: 'Company Payment (₹)',
                     data: weeklyPayments,
                     backgroundColor: 'rgba(16,185,129,0.7)',
                     borderColor: '#10b981',
@@ -851,21 +830,21 @@
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
-                    tooltip: { callbacks: { label: (ctx) => `৳ ${ctx.raw.toLocaleString()}` } },
+                    tooltip: { callbacks: { label: (ctx) => `₹${formatNumber(ctx.raw)}` } },
                     legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
                 },
                 scales: { 
-                    y: { beginAtZero: true, title: { display: true, text: 'টাকা', font: { size: 10 } }, ticks: { font: { size: 10 } } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Rupees', font: { size: 10 } }, ticks: { font: { size: 10 } } },
                     x: { ticks: { font: { size: 10 } } }
                 }
             }
         });
         
-        // চার্ট 3: পাই চার্ট - পেমেন্ট vs বাকি
+        // Chart 3: Doughnut Chart - Payment vs Due
         paymentPieChart = new Chart(ctx3, {
             type: 'doughnut',
             data: {
-                labels: ['কোম্পানি দিয়েছে', 'কোম্পানি বাকি'],
+                labels: ['Company Paid', 'Company Due'],
                 datasets: [{
                     data: [totalPaid, Math.abs(totalDue)],
                     backgroundColor: ['#10b981', '#ef4444'],
@@ -879,19 +858,19 @@
                 maintainAspectRatio: true,
                 plugins: {
                     legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
-                    tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ৳ ${ctx.raw.toLocaleString()}` } }
+                    tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ₹${formatNumber(ctx.raw)}` } }
                 },
                 cutout: '55%'
             }
         });
         
-        // চার্ট 4: লাইন চার্ট - দৈনিক উপার্জন
+        // Chart 4: Line Chart - Daily Earnings
         dailyEarningChart = new Chart(ctx4, {
             type: 'line',
             data: {
                 labels: last7Days.map(d => d.slice(5)),
                 datasets: [{
-                    label: 'দৈনিক উপার্জন (৳)',
+                    label: 'Daily Earnings (₹)',
                     data: dailyEarnings,
                     borderColor: '#ec489a',
                     backgroundColor: 'rgba(236,72,153,0.1)',
@@ -909,11 +888,11 @@
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
-                    tooltip: { callbacks: { label: (ctx) => `৳ ${ctx.raw.toLocaleString()}` } },
+                    tooltip: { callbacks: { label: (ctx) => `₹${formatNumber(ctx.raw)}` } },
                     legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
                 },
                 scales: { 
-                    y: { beginAtZero: true, title: { display: true, text: 'টাকা', font: { size: 10 } }, ticks: { font: { size: 10 } } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Rupees', font: { size: 10 } }, ticks: { font: { size: 10 } } },
                     x: { ticks: { font: { size: 10 } } }
                 }
             }
@@ -930,7 +909,7 @@
         } catch (error) {
             console.error("Logout error:", error);
             showLoading(false);
-            alert('লগআউট ব্যর্থ হয়েছে!');
+            alert('Logout failed!');
         }
     };
     
@@ -938,7 +917,7 @@
         document.getElementById('sidebar').classList.toggle('show');
     });
     
-    // রিসাইজ ইভেন্টে চার্ট রিসাইজ
+    // Resize event to resize charts
     window.addEventListener('resize', function() {
         if (attendanceRateChart) attendanceRateChart.resize();
         if (weeklyPaymentChart) weeklyPaymentChart.resize();
