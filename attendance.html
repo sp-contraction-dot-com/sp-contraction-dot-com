@@ -68,7 +68,7 @@
         .logo-text p { font-size: 0.6rem; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
         .date-box { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 40px; color: white; font-weight: 500; }
         .nav-buttons { display: flex; gap: 12px; }
-        .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; transition: all 0.3s; }
+        .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; transition: all 0.3s; text-decoration: none; }
         .nav-btn:hover { background: linear-gradient(135deg, #f59e0b, #d97706); }
         
         .stats-grid {
@@ -374,9 +374,9 @@
             <div class="input-group"><label>Date</label><input type="date" id="editDate"></div>
             <div class="input-group"><label>Status</label><select id="editStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select></div>
             <div class="input-group"><label>Work Hours</label><input type="number" id="editHours" step="0.5" placeholder="Hours worked"></div>
-            <div class="input-group"><label>Daily Rate (TK)</label><input type="number" id="editRate" placeholder="Rate per day"></div>
+            <div class="input-group"><label>Daily Rate (₹)</label><input type="number" id="editRate" placeholder="Rate per day"></div>
             <div class="input-group"><label>Work Description</label><input type="text" id="editWork" placeholder="What work done"></div>
-            <div class="input-group"><label>Payment Given (TK)</label><input type="number" id="editPaid" placeholder="Amount paid"></div>
+            <div class="input-group"><label>Payment Given (₹)</label><input type="number" id="editPaid" placeholder="Amount paid"></div>
         </div>
         <div class="modal-buttons"><button class="btn" onclick="saveEdit()">Save Changes</button><button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button></div>
     </div>
@@ -427,9 +427,9 @@
             <div class="input-group"><label>Date</label><input type="date" id="workDate"></div>
             <div class="input-group"><label>Status</label><select id="status"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select></div>
             <div class="input-group"><label>Work Hours</label><input type="number" id="hours" step="0.5" placeholder="Hours worked"></div>
-            <div class="input-group"><label>Daily Rate (TK)</label><input type="number" id="rate" placeholder="Rate per day"></div>
+            <div class="input-group"><label>Daily Rate (₹)</label><input type="number" id="rate" placeholder="Rate per day"></div>
             <div class="input-group"><label>Work Description</label><input type="text" id="workDesc" placeholder="e.g., Brick work, Plastering"></div>
-            <div class="input-group"><label>Payment Given (TK)</label><input type="number" id="paid" placeholder="Amount paid today"></div>
+            <div class="input-group"><label>Payment Given (₹)</label><input type="number" id="paid" placeholder="Amount paid today"></div>
         </div>
         
         <div class="action-buttons-row"><button class="btn" onclick="addAttendance()"><i class="fas fa-save"></i> Save Record</button><button class="btn btn-secondary" onclick="clearForm()"><i class="fas fa-eraser"></i> Clear</button><button class="btn btn-success" onclick="openAddUserModal()"><i class="fas fa-user-plus"></i> Add New Worker</button></div>
@@ -445,7 +445,7 @@
     <div class="table-container">
         <table id="attendanceTable">
             <thead>
-                <tr><th style="width:50px;">#</th><th>Date</th><th>Worker Info</th><th>Status</th><th>Hours</th><th>Rate (TK)</th><th>Earnings (TK)</th><th>Paid (TK)</th><th>Due (TK)</th><th>Work Description</th><th>Actions</th></tr>
+                <tr><th style="width:50px;">#</th><th>Date</th><th>Worker Info</th><th>Status</th><th>Hours</th><th>Rate (₹)</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th><th>Work Description</th><th>Actions</th></tr>
             </thead>
             <tbody id="tableBody"><tr><td colspan="11" style="text-align:center;">Loading records...<\/td></tr></tbody>
             <tfoot id="tableFooter"></tfoot>
@@ -466,6 +466,35 @@
     document.getElementById('workDate').value = today;
     document.getElementById('currentDate').innerHTML = `<i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
     
+    // ========== FIXED formatNumber FUNCTION - NO EXTRA "1" ISSUE ==========
+    function formatNumber(value) {
+        if (value === null || value === undefined || value === '') {
+            return '0';
+        }
+        
+        // Force clean number - remove any non-numeric characters except decimal and minus
+        const number = Number(
+            String(value).replace(/[^0-9.-]/g, '')
+        );
+        
+        if (isNaN(number)) {
+            return '0';
+        }
+        
+        // Proper formatting with Indian number system (no decimals for currency)
+        return number.toLocaleString('en-IN', {
+            maximumFractionDigits: 0
+        });
+    }
+    
+    function formatCurrencyForDisplay(value) {
+        if (value === null || value === undefined) return '0';
+        let num = parseFloat(value);
+        if (isNaN(num)) return '0';
+        num = Math.round(num);
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    
     function showLoading(show) { document.getElementById('loading').classList.toggle('show', show); }
     function showError(message) { const el = document.getElementById('errorMsg'); el.textContent = message; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 5000); }
     function showSuccess(message) { const el = document.getElementById('successMsg'); el.textContent = message; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000); }
@@ -481,69 +510,7 @@
     };
     window.closeDownloadModal = function() { document.getElementById('downloadModal').classList.remove('show'); };
     
-    // MAIN SEARCH FUNCTION
-    window.filterRecordsByGlobalSearch = function() {
-        const searchTerm = document.getElementById('searchRecords').value.toLowerCase().trim();
-        currentFilterTerm = searchTerm;
-        
-        if (!searchTerm) {
-            currentFilteredRecords = [...allRecords];
-            currentSearchWorkerId = null;
-            renderTableData(currentFilteredRecords);
-            updateStats(currentFilteredRecords);
-            document.getElementById('filterInfo').classList.remove('show');
-            return;
-        }
-        
-        const matchedUserIds = [];
-        const matchedUserNames = [];
-        let exactMatchUserId = null;
-        
-        for (const user of allUsers) {
-            const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-            const email = (user.email || '').toLowerCase();
-            const phone = (user.mobile || '').toLowerCase();
-            const userId = (user.userId || '').toLowerCase();
-            
-            if (fullName.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm) || userId.includes(searchTerm)) {
-                matchedUserIds.push(user.userId);
-                matchedUserNames.push(`${user.firstName} ${user.lastName}`);
-                if (userId === searchTerm || fullName === searchTerm) exactMatchUserId = user.userId;
-            }
-        }
-        
-        currentSearchWorkerId = exactMatchUserId || (matchedUserIds.length === 1 ? matchedUserIds[0] : null);
-        let filteredRecords = matchedUserIds.length > 0 ? allRecords.filter(record => matchedUserIds.includes(record.workerId)) : [];
-        const additionalRecords = allRecords.filter(record => (record.workerName.toLowerCase().includes(searchTerm) || record.workerId.toLowerCase().includes(searchTerm)) && !matchedUserIds.includes(record.workerId));
-        filteredRecords = [...filteredRecords, ...additionalRecords];
-        filteredRecords = filteredRecords.filter((record, index, self) => index === self.findIndex(r => r.id === record.id));
-        currentFilteredRecords = filteredRecords;
-        
-        if (filteredRecords.length > 0) {
-            document.getElementById('filterText').innerHTML = '🔍 Filtered by:';
-            document.getElementById('filterValue').innerHTML = `"${searchTerm}" - ${filteredRecords.length} record(s) found`;
-            document.getElementById('filterInfo').classList.add('show');
-        } else {
-            document.getElementById('filterText').innerHTML = 'No results for:';
-            document.getElementById('filterValue').innerHTML = `"${searchTerm}"`;
-            document.getElementById('filterInfo').classList.add('show');
-        }
-        
-        renderTableData(filteredRecords);
-        updateStats(filteredRecords);
-    };
-    
-    function clearGlobalSearch() {
-        document.getElementById('searchRecords').value = '';
-        currentFilterTerm = '';
-        currentSearchWorkerId = null;
-        currentFilteredRecords = [...allRecords];
-        renderTableData(allRecords);
-        updateStats(allRecords);
-        document.getElementById('filterInfo').classList.remove('show');
-        showSuccess('Search filter cleared');
-    }
-    
+    // ========== FIXED PDF GENERATION - USING formatNumber() + STRING CONCATENATION ==========
     window.generatePDFReport = async function() {
         const fromDate = document.getElementById('downloadFromDate').value;
         const toDate = document.getElementById('downloadToDate').value;
@@ -555,48 +522,179 @@
             if (recordsToInclude.length === 0) { showError('No records found in the selected date range!'); showLoading(false); return; }
             recordsToInclude.sort((a, b) => new Date(a.date) - new Date(b.date));
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            
             let workerInfo = '', workerNameForFile = '';
             if (currentSearchWorkerId) {
                 const worker = allUsers.find(u => u.userId === currentSearchWorkerId);
-                if (worker) { workerInfo = `${worker.firstName} ${worker.lastName} (ID: ${worker.userId})`; workerNameForFile = `${worker.firstName}_${worker.lastName}`; }
-                else { workerInfo = `Worker ID: ${currentSearchWorkerId}`; workerNameForFile = currentSearchWorkerId; }
+                if (worker) { workerInfo = worker.firstName + ' ' + worker.lastName + ' (ID: ' + worker.userId + ')'; workerNameForFile = worker.firstName + '_' + worker.lastName; }
+                else { workerInfo = 'Worker ID: ' + currentSearchWorkerId; workerNameForFile = currentSearchWorkerId; }
             }
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 50, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(20); doc.setFont("helvetica", "bold"); doc.text("SP CONSTRUCTION", 105, 18, { align: "center" });
-            doc.setFontSize(10); doc.setTextColor(253, 186, 116); doc.text("BUILDING DREAMS", 105, 26, { align: "center" });
-            doc.setTextColor(255, 255, 255); doc.setFontSize(9); doc.text("ATTENDANCE REPORT", 105, 35, { align: "center" });
-            doc.text(`Period: ${fromDate} to ${toDate}`, 105, 42, { align: "center" });
-            if (workerInfo) { doc.setTextColor(253, 186, 116); doc.setFontSize(8); doc.text(`Worker: ${workerInfo}`, 105, 49, { align: "center" }); }
+            
+            // Header
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 297, 45, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.setFont("helvetica", "bold");
+            doc.text("SP CONSTRUCTION", 148.5, 18, { align: "center" });
+            doc.setFontSize(9);
+            doc.setTextColor(253, 186, 116);
+            doc.text("BUILDING DREAMS", 148.5, 26, { align: "center" });
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.text("ATTENDANCE REPORT", 148.5, 35, { align: "center" });
+            doc.text("Period: " + fromDate + " to " + toDate, 148.5, 42, { align: "center" });
+            if (workerInfo) {
+                doc.setTextColor(253, 186, 116);
+                doc.setFontSize(7);
+                doc.text("Worker: " + workerInfo, 148.5, 49, { align: "center" });
+            }
+            
             let startY = workerInfo ? 58 : 54;
-            doc.setFillColor(245, 158, 11); doc.rect(10, startY, 190, 10, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
-            const headers = ["Sl No", "Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate", "Earnings", "Paid", "Due", "Work Description"];
-            const colWidths = [12, 22, 28, 22, 16, 10, 12, 16, 16, 16, 20];
+            
+            // Table Header
+            doc.setFillColor(245, 158, 11);
+            doc.rect(10, startY, 277, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(7);
+            doc.setFont("helvetica", "bold");
+            
+            const headers = ["#", "Date", "Worker Name", "ID", "Status", "Hrs", "Rate", "Earnings", "Paid", "Due", "Work Desc"];
+            const colWidths = [8, 22, 40, 28, 20, 10, 16, 22, 22, 22, 57];
             let xPos = 10;
-            headers.forEach((header, i) => { doc.text(header, xPos + 1, startY + 6); xPos += colWidths[i]; });
-            doc.setTextColor(51, 65, 85); doc.setFont("helvetica", "normal");
-            let yPos = startY + 14, totalEarnings = 0, totalPaid = 0, totalDue = 0, totalHours = 0, serialNo = 1;
-            for (const record of recordsToInclude) {
-                if (yPos > 270) { doc.addPage(); yPos = 20; doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 45, 'F'); doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text("SP CONSTRUCTION", 105, 15, { align: "center" }); doc.setFontSize(9); doc.setTextColor(253,186,116); doc.text("ATTENDANCE REPORT (Continued)", 105, 25, { align: "center" }); doc.setTextColor(255,255,255); doc.text(`Period: ${fromDate} to ${toDate}`, 105, 33, { align: "center" }); doc.setFillColor(245,158,11); doc.rect(10, 42, 190, 10, 'F'); doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont("helvetica","bold"); xPos=10; headers.forEach((header,i)=>{ doc.text(header,xPos+1,48); xPos+=colWidths[i]; }); yPos=56; doc.setTextColor(51,65,85); doc.setFont("helvetica","normal"); }
-                const due = (record.earnings - record.paid) || 0;
-                totalEarnings += record.earnings || 0; totalPaid += record.paid || 0; totalDue += due; totalHours += record.hours || 0;
-                let statusText = record.status === 'present' ? 'Present' : (record.status === 'absent' ? 'Absent' : 'Half Day');
-                const rowData = [serialNo.toString(), record.date, record.workerName.length > 18 ? record.workerName.substring(0,16)+'..' : record.workerName, record.workerId, statusText, (record.hours || 0).toString(), (record.rate || 0).toString(), (record.earnings || 0).toFixed(2), (record.paid || 0).toFixed(2), due.toFixed(2), record.workDesc || '-'];
-                xPos = 10; for (let i = 0; i < rowData.length; i++) { doc.text(rowData[i].toString(), xPos + 1, yPos); xPos += colWidths[i]; }
-                yPos += 7; serialNo++;
+            for (let i = 0; i < headers.length; i++) {
+                doc.text(headers[i], xPos + 1, startY + 5.5);
+                xPos += colWidths[i];
             }
-            yPos += 5; doc.setDrawColor(245,158,11); doc.setLineWidth(0.5); doc.line(10, yPos - 3, 200, yPos - 3);
-            doc.setFont("helvetica","bold"); doc.setTextColor(245,158,11); doc.setFontSize(9);
-            doc.text(`Total Hours: ${totalHours.toFixed(1)}`, 10, yPos); doc.text(`Total Earnings: ৳${totalEarnings.toFixed(2)}`, 70, yPos);
-            doc.text(`Total Paid: ৳${totalPaid.toFixed(2)}`, 130, yPos); doc.text(`Balance Due: ৳${totalDue.toFixed(2)}`, 170, yPos);
+            
+            doc.setTextColor(51, 65, 85);
+            doc.setFont("helvetica", "normal");
+            let yPos = startY + 12;
+            let totalEarnings = 0, totalPaid = 0, totalDue = 0, totalHours = 0, serialNo = 1;
+            
+            for (const record of recordsToInclude) {
+                if (yPos > 190) {
+                    doc.addPage();
+                    yPos = 20;
+                    doc.setFillColor(15, 23, 42);
+                    doc.rect(0, 0, 297, 35, 'F');
+                    doc.setTextColor(255,255,255);
+                    doc.setFontSize(16);
+                    doc.text("SP CONSTRUCTION", 148.5, 14, { align: "center" });
+                    doc.setFontSize(8);
+                    doc.setTextColor(253,186,116);
+                    doc.text("ATTENDANCE REPORT (Continued)", 148.5, 22, { align: "center" });
+                    doc.setTextColor(255,255,255);
+                    doc.text("Period: " + fromDate + " to " + toDate, 148.5, 29, { align: "center" });
+                    doc.setFillColor(245,158,11);
+                    doc.rect(10, 35, 277, 8, 'F');
+                    doc.setTextColor(255,255,255);
+                    doc.setFontSize(7);
+                    doc.setFont("helvetica","bold");
+                    xPos = 10;
+                    for (let i = 0; i < headers.length; i++) {
+                        doc.text(headers[i], xPos + 1, 40.5);
+                        xPos += colWidths[i];
+                    }
+                    yPos = 47;
+                    doc.setTextColor(51,65,85);
+                    doc.setFont("helvetica","normal");
+                }
+                
+                const earningsVal = record.earnings || 0;
+                const paidVal = record.paid || 0;
+                const dueVal = earningsVal - paidVal;
+                const hoursVal = record.hours || 0;
+                const rateVal = record.rate || 0;
+                
+                totalEarnings += earningsVal;
+                totalPaid += paidVal;
+                totalDue += dueVal;
+                totalHours += hoursVal;
+                
+                let statusText = record.status === 'present' ? 'Present' : (record.status === 'absent' ? 'Absent' : 'Half Day');
+                let workerNameDisplay = record.workerName || '';
+                if (workerNameDisplay.length > 18) workerNameDisplay = workerNameDisplay.substring(0, 16) + '..';
+                let workDescDisplay = record.workDesc || '-';
+                if (workDescDisplay.length > 22) workDescDisplay = workDescDisplay.substring(0, 20) + '..';
+                
+                // IMPORTANT: Using string concatenation, NOT template literals!
+                const serialStr = String(serialNo);
+                const dateStr = record.date || '';
+                const nameStr = workerNameDisplay;
+                const idStr = record.workerId || '';
+                const statusStr = statusText;
+                const hoursStr = String(Math.round(hoursVal * 10) / 10);
+                const rateStr = 'Rs ' + formatNumber(rateVal);
+                const earningsStr = 'Rs ' + formatNumber(earningsVal);
+                const paidStr = 'Rs ' + formatNumber(paidVal);
+                const dueStr = 'Rs ' + formatNumber(dueVal);
+                const workStr = workDescDisplay;
+                
+                xPos = 10;
+                doc.text(serialStr, xPos + 1, yPos);
+                xPos += colWidths[0];
+                doc.text(dateStr, xPos + 1, yPos);
+                xPos += colWidths[1];
+                doc.text(nameStr, xPos + 1, yPos);
+                xPos += colWidths[2];
+                doc.text(idStr, xPos + 1, yPos);
+                xPos += colWidths[3];
+                doc.text(statusStr, xPos + 1, yPos);
+                xPos += colWidths[4];
+                doc.text(hoursStr, xPos + 1, yPos);
+                xPos += colWidths[5];
+                doc.text(rateStr, xPos + 1, yPos);
+                xPos += colWidths[6];
+                doc.text(earningsStr, xPos + 1, yPos);
+                xPos += colWidths[7];
+                doc.text(paidStr, xPos + 1, yPos);
+                xPos += colWidths[8];
+                doc.text(dueStr, xPos + 1, yPos);
+                xPos += colWidths[9];
+                doc.text(workStr, xPos + 1, yPos);
+                
+                yPos += 6.5;
+                serialNo++;
+            }
+            
+            yPos += 5;
+            doc.setDrawColor(245,158,11);
+            doc.setLineWidth(0.5);
+            doc.line(10, yPos - 2, 287, yPos - 2);
+            
+            doc.setFont("helvetica","bold");
+            doc.setTextColor(245,158,11);
+            doc.setFontSize(8);
+            
+            // IMPORTANT: Using string concatenation, NOT template literals!
+            doc.text('Workers: ' + formatNumber(serialNo - 1), 12, yPos + 3);
+            doc.text('Total Hours: ' + formatNumber(totalHours), 55, yPos + 3);
+            doc.text('Earnings: Rs ' + formatNumber(totalEarnings), 100, yPos + 3);
+            doc.text('Paid: Rs ' + formatNumber(totalPaid), 160, yPos + 3);
+            doc.text('Due: Rs ' + formatNumber(totalDue), 220, yPos + 3);
+            
             const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) { doc.setPage(i); doc.setTextColor(148,163,184); doc.setFontSize(7); doc.text(`Generated on: ${new Date().toLocaleString()} | SP Construction Management System`, 105, 290, { align: "center" }); doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: "center" }); }
-            let fileName = `Attendance_Report${workerNameForFile ? `_${workerNameForFile}` : ''}_${fromDate}_to_${toDate}`.replace(/__/g, '_').replace(/[^a-zA-Z0-9_-]/g, '_');
-            doc.save(`${fileName}.pdf`);
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor(148,163,184);
+                doc.setFontSize(6);
+                doc.text('Generated on: ' + new Date().toLocaleString() + ' | SP Construction', 148.5, 203, { align: "center" });
+                doc.text('Page ' + i + ' of ' + pageCount, 148.5, 198, { align: "center" });
+            }
+            
+            let fileName = 'Attendance_Report';
+            if (workerNameForFile) fileName = fileName + '_' + workerNameForFile;
+            fileName = fileName + '_' + fromDate + '_to_' + toDate;
+            fileName = fileName.replace(/__/g, '_').replace(/[^a-zA-Z0-9_-]/g, '_');
+            doc.save(fileName + '.pdf');
             closeDownloadModal();
             showSuccess('PDF report downloaded successfully!');
-        } catch (error) { console.error("PDF generation error:", error); showError('Failed to generate PDF: ' + error.message); }
+        } catch (error) { 
+            console.error("PDF generation error:", error); 
+            showError('Failed to generate PDF: ' + error.message); 
+        }
         showLoading(false);
     };
     
@@ -609,30 +707,30 @@
         const email = document.getElementById('newEmail').value.trim();
         const dob = document.getElementById('newDob').value;
         if (!firstName || !lastName) { showError('Please enter first name and last name'); return; }
-        const userId = generateUserId(); const fullName = `${firstName} ${lastName}`;
+        const userId = generateUserId(); const fullName = firstName + ' ' + lastName;
         const newUser = { userId, firstName, lastName, fullName, mobile: phone || 'N/A', email: email || 'N/A', dob: dob || 'N/A', registeredAt: new Date().toISOString(), emailVerified: false, profileCompleted: false };
         showLoading(true);
-        try { const newRef = window.push(window.ref(window.db, 'users')); await window.set(newRef, newUser); showSuccess(`Worker "${fullName}" added successfully! ID: ${userId}`); closeAddUserModal(); await loadUsers(); }
+        try { const newRef = window.push(window.ref(window.db, 'users')); await window.set(newRef, newUser); showSuccess('Worker "' + fullName + '" added successfully! ID: ' + userId); closeAddUserModal(); await loadUsers(); }
         catch (error) { console.error("Error adding user:", error); showError('Failed to add worker: ' + error.message); }
         showLoading(false);
     };
     
     window.clearSelectedWorker = function() { selectedWorker = null; document.getElementById('nameSearchInput').value = ''; document.getElementById('idSearchInput').value = ''; document.getElementById('selectedWorkerInfo').classList.remove('show'); document.getElementById('nameSuggestions').classList.remove('show'); document.getElementById('idSuggestions').classList.remove('show'); };
-    function displaySelectedWorker() { if (selectedWorker) { document.getElementById('selectedWorkerName').textContent = selectedWorker.fullName || `${selectedWorker.firstName} ${selectedWorker.lastName}`; document.getElementById('selectedWorkerIdDisplay').textContent = `ID: ${selectedWorker.userId}`; document.getElementById('selectedWorkerInfo').classList.add('show'); } else { document.getElementById('selectedWorkerInfo').classList.remove('show'); } }
+    function displaySelectedWorker() { if (selectedWorker) { document.getElementById('selectedWorkerName').textContent = selectedWorker.fullName || (selectedWorker.firstName + ' ' + selectedWorker.lastName); document.getElementById('selectedWorkerIdDisplay').textContent = 'ID: ' + selectedWorker.userId; document.getElementById('selectedWorkerInfo').classList.add('show'); } else { document.getElementById('selectedWorkerInfo').classList.remove('show'); } }
     window.selectWorkerFromSearch = function(userId, fullName, firstName, lastName) { selectedWorker = { userId, fullName, firstName, lastName }; document.getElementById('nameSearchInput').value = fullName; document.getElementById('idSearchInput').value = userId; displaySelectedWorker(); document.getElementById('nameSuggestions').classList.remove('show'); document.getElementById('idSuggestions').classList.remove('show'); };
     
     function setupNameAutoSuggest() {
         const nameInput = document.getElementById('nameSearchInput'); const nameDropdown = document.getElementById('nameSuggestions');
-        nameInput.addEventListener('input', function() { const query = this.value.toLowerCase().trim(); if (!query) { nameDropdown.classList.remove('show'); return; } const filtered = allUsers.filter(user => `${user.firstName} ${user.lastName}`.toLowerCase().includes(query)); if (filtered.length === 0) { nameDropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found. <a href="#" onclick="openAddUserModal(); return false;">Click here to add new worker</a></div>'; nameDropdown.classList.add('show'); return; } nameDropdown.innerHTML = filtered.map(user => { const fullName = `${user.firstName} ${user.lastName}`; return `<div class="suggestion-item" onclick="selectWorkerFromSearch('${user.userId}', '${escapeHtml(fullName)}', '${escapeHtml(user.firstName)}', '${escapeHtml(user.lastName)}')"><div class="suggestion-name">${escapeHtml(fullName)}</div><div class="suggestion-id">ID: ${user.userId}</div><div class="suggestion-detail">📞 ${user.mobile || 'N/A'} | 📧 ${user.email || 'N/A'}</div></div>`; }).join(''); nameDropdown.classList.add('show'); });
+        nameInput.addEventListener('input', function() { const query = this.value.toLowerCase().trim(); if (!query) { nameDropdown.classList.remove('show'); return; } const filtered = allUsers.filter(user => (user.firstName + ' ' + user.lastName).toLowerCase().includes(query)); if (filtered.length === 0) { nameDropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found. <a href="#" onclick="openAddUserModal(); return false;">Click here to add new worker</a></div>'; nameDropdown.classList.add('show'); return; } nameDropdown.innerHTML = filtered.map(user => { const fullName = user.firstName + ' ' + user.lastName; return '<div class="suggestion-item" onclick="selectWorkerFromSearch(\'' + user.userId + '\', \'' + escapeHtml(fullName) + '\', \'' + escapeHtml(user.firstName) + '\', \'' + escapeHtml(user.lastName) + '\')"><div class="suggestion-name">' + escapeHtml(fullName) + '</div><div class="suggestion-id">ID: ' + user.userId + '</div><div class="suggestion-detail">📞 ' + (user.mobile || 'N/A') + ' | 📧 ' + (user.email || 'N/A') + '</div></div>'; }).join(''); nameDropdown.classList.add('show'); });
         document.addEventListener('click', function(e) { if (!nameInput.contains(e.target) && !nameDropdown.contains(e.target)) nameDropdown.classList.remove('show'); });
     }
     function setupIdAutoSuggest() {
         const idInput = document.getElementById('idSearchInput'); const idDropdown = document.getElementById('idSuggestions');
-        idInput.addEventListener('input', function() { const query = this.value.toLowerCase().trim(); if (!query) { idDropdown.classList.remove('show'); return; } const filtered = allUsers.filter(user => user.userId?.toLowerCase().includes(query)); if (filtered.length === 0) { idDropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found with this ID. <a href="#" onclick="openAddUserModal(); return false;">Click here to add new worker</a></div>'; idDropdown.classList.add('show'); return; } idDropdown.innerHTML = filtered.map(user => { const fullName = `${user.firstName} ${user.lastName}`; return `<div class="suggestion-item" onclick="selectWorkerFromSearch('${user.userId}', '${escapeHtml(fullName)}', '${escapeHtml(user.firstName)}', '${escapeHtml(user.lastName)}')"><div class="suggestion-name">${escapeHtml(fullName)}</div><div class="suggestion-id">ID: ${user.userId}</div><div class="suggestion-detail">📞 ${user.mobile || 'N/A'} | 📧 ${user.email || 'N/A'}</div></div>`; }).join(''); idDropdown.classList.add('show'); });
+        idInput.addEventListener('input', function() { const query = this.value.toLowerCase().trim(); if (!query) { idDropdown.classList.remove('show'); return; } const filtered = allUsers.filter(user => user.userId?.toLowerCase().includes(query)); if (filtered.length === 0) { idDropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found with this ID. <a href="#" onclick="openAddUserModal(); return false;">Click here to add new worker</a></div>'; idDropdown.classList.add('show'); return; } idDropdown.innerHTML = filtered.map(user => { const fullName = user.firstName + ' ' + user.lastName; return '<div class="suggestion-item" onclick="selectWorkerFromSearch(\'' + user.userId + '\', \'' + escapeHtml(fullName) + '\', \'' + escapeHtml(user.firstName) + '\', \'' + escapeHtml(user.lastName) + '\')"><div class="suggestion-name">' + escapeHtml(fullName) + '</div><div class="suggestion-id">ID: ' + user.userId + '</div><div class="suggestion-detail">📞 ' + (user.mobile || 'N/A') + ' | 📧 ' + (user.email || 'N/A') + '</div></div>'; }).join(''); idDropdown.classList.add('show'); });
         document.addEventListener('click', function(e) { if (!idInput.contains(e.target) && !idDropdown.contains(e.target)) idDropdown.classList.remove('show'); });
     }
     
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
     
     async function loadUsers() { showLoading(true); try { const usersRef = window.ref(window.db, 'users'); const snapshot = await window.get(usersRef); if (snapshot.exists()) allUsers = Object.values(snapshot.val()); else allUsers = []; setupNameAutoSuggest(); setupIdAutoSuggest(); } catch (error) { console.error("Error loading users:", error); } showLoading(false); }
     
@@ -645,16 +743,16 @@
     
     window.editRecord = function(id) { const record = allRecords.find(r => r.id === id); if (!record) return; editRecordId = id; document.getElementById('editName').value = record.workerName; document.getElementById('editWorkerId').value = record.workerId; document.getElementById('editDate').value = record.date; document.getElementById('editStatus').value = record.status; document.getElementById('editHours').value = record.hours; document.getElementById('editRate').value = record.rate; document.getElementById('editWork').value = record.workDesc; document.getElementById('editPaid').value = record.paid; document.getElementById('editModal').classList.add('show'); };
     
-    window.saveEdit = async function() { const date = document.getElementById('editDate').value; const status = document.getElementById('editStatus').value; const hours = parseFloat(document.getElementById('editHours').value) || 0; const rate = parseFloat(document.getElementById('editRate').value) || 0; const workDesc = document.getElementById('editWork').value.trim() || '-'; const paid = parseFloat(document.getElementById('editPaid').value) || 0; const earnings = calculateEarnings(status, hours, rate); const due = earnings - paid; const originalRecord = allRecords.find(r => r.id === editRecordId); const updatedRecord = { workerId: originalRecord.workerId, workerName: originalRecord.workerName, date, status, hours: status === 'absent' ? 0 : hours, rate, earnings, paid, due, workDesc, createdAt: originalRecord.createdAt, updatedAt: new Date().toISOString() }; showLoading(true); try { const recordRef = window.ref(window.db, `attendance/${editRecordId}`); await window.update(recordRef, updatedRecord); showSuccess('Record updated successfully!'); closeEditModal(); await loadRecords(); if (currentFilterTerm) filterRecordsByGlobalSearch(); } catch (error) { console.error("Error updating record:", error); showError('Failed to update record: ' + error.message); } showLoading(false); };
+    window.saveEdit = async function() { const date = document.getElementById('editDate').value; const status = document.getElementById('editStatus').value; const hours = parseFloat(document.getElementById('editHours').value) || 0; const rate = parseFloat(document.getElementById('editRate').value) || 0; const workDesc = document.getElementById('editWork').value.trim() || '-'; const paid = parseFloat(document.getElementById('editPaid').value) || 0; const earnings = calculateEarnings(status, hours, rate); const due = earnings - paid; const originalRecord = allRecords.find(r => r.id === editRecordId); const updatedRecord = { workerId: originalRecord.workerId, workerName: originalRecord.workerName, date, status, hours: status === 'absent' ? 0 : hours, rate, earnings, paid, due, workDesc, createdAt: originalRecord.createdAt, updatedAt: new Date().toISOString() }; showLoading(true); try { const recordRef = window.ref(window.db, 'attendance/' + editRecordId); await window.update(recordRef, updatedRecord); showSuccess('Record updated successfully!'); closeEditModal(); await loadRecords(); if (currentFilterTerm) filterRecordsByGlobalSearch(); } catch (error) { console.error("Error updating record:", error); showError('Failed to update record: ' + error.message); } showLoading(false); };
     
-    window.deleteRecord = async function(id) { if (confirm('Are you sure you want to delete this record?')) { showLoading(true); try { const recordRef = window.ref(window.db, `attendance/${id}`); await window.remove(recordRef); showSuccess('Record deleted successfully!'); await loadRecords(); if (currentFilterTerm) filterRecordsByGlobalSearch(); } catch (error) { console.error("Error deleting record:", error); showError('Failed to delete record: ' + error.message); } showLoading(false); } };
+    window.deleteRecord = async function(id) { if (confirm('Are you sure you want to delete this record?')) { showLoading(true); try { const recordRef = window.ref(window.db, 'attendance/' + id); await window.remove(recordRef); showSuccess('Record deleted successfully!'); await loadRecords(); if (currentFilterTerm) filterRecordsByGlobalSearch(); } catch (error) { console.error("Error deleting record:", error); showError('Failed to delete record: ' + error.message); } showLoading(false); } };
     
     function renderTableData(records) {
         const tbody = document.getElementById('tableBody');
         const tfoot = document.getElementById('tableFooter');
         
         if (!records || records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">📭 No records found. Add your first attendance record. </td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">📭 No records found. Add your first attendance record.</td></tr>';
             tfoot.innerHTML = '';
             return;
         }
@@ -688,10 +786,10 @@
                     </td>
                     <td><span class="${statusClass}">${statusText}</span></td>
                     <td>${record.hours || 0}</td>
-                    <td>${record.rate || 0}</td>
-                    <td>${(record.earnings || 0).toFixed(2)}</td>
-                    <td>${(record.paid || 0).toFixed(2)}</td>
-                    <td style="color: ${dueColor}">${due.toFixed(2)}</td>
+                    <td>₹${formatCurrencyForDisplay(record.rate || 0)}</td>
+                    <td>₹${formatCurrencyForDisplay(record.earnings || 0)}</td>
+                    <td>₹${formatCurrencyForDisplay(record.paid || 0)}</td>
+                    <td style="color: ${dueColor}">₹${formatCurrencyForDisplay(due)}</td>
                     <td>${escapeHtml(record.workDesc || '-')}</td>
                     <td class="action-btns">
                         <button class="edit-btn" onclick="editRecord('${record.id}')"><i class="fas fa-edit"></i> Edit</button>
@@ -706,9 +804,9 @@
                 <td class="serial-cell"><strong>TOTAL</strong></td>
                 <td colspan="3"><strong>${records.length} Workers</strong></td>
                 <td><strong>${totalHours.toFixed(1)}</strong></td>
-                <td><strong>${totalEarnings.toFixed(2)}</strong></td>
-                <td><strong>${totalPaid.toFixed(2)}</strong></td>
-                <td style="color: ${totalDue < 0 ? '#dc2626' : '#15803d'}"><strong>${totalDue.toFixed(2)}</strong></td>
+                <td><strong>₹${formatCurrencyForDisplay(totalEarnings)}</strong></td>
+                <td><strong>₹${formatCurrencyForDisplay(totalPaid)}</strong></td>
+                <td style="color: ${totalDue < 0 ? '#dc2626' : '#15803d'}"><strong>₹${formatCurrencyForDisplay(totalDue)}</strong></td>
                 <td colspan="3"></td>
             </tr>
         `;
@@ -728,13 +826,70 @@
         });
         
         document.getElementById('totalHours').textContent = totalHours.toFixed(1);
-        document.getElementById('totalEarnings').textContent = totalEarnings.toFixed(0);
-        document.getElementById('totalPaid').textContent = totalPaid.toFixed(0);
-        document.getElementById('totalDue').textContent = totalDue.toFixed(0);
+        document.getElementById('totalEarnings').textContent = formatCurrencyForDisplay(totalEarnings);
+        document.getElementById('totalPaid').textContent = formatCurrencyForDisplay(totalPaid);
+        document.getElementById('totalDue').textContent = formatCurrencyForDisplay(totalDue);
         
         const todayDate = new Date().toISOString().split('T')[0];
         const presentToday = dataToUse.filter(r => r.date === todayDate && r.status === 'present').length;
         document.getElementById('presentToday').textContent = presentToday;
+    }
+    
+    window.filterRecordsByGlobalSearch = function() {
+        const searchTerm = document.getElementById('searchRecords').value.toLowerCase().trim();
+        currentFilterTerm = searchTerm;
+        
+        if (!searchTerm) {
+            currentFilteredRecords = [...allRecords];
+            currentSearchWorkerId = null;
+            renderTableData(currentFilteredRecords);
+            updateStats(currentFilteredRecords);
+            document.getElementById('filterInfo').classList.remove('show');
+            return;
+        }
+        
+        const matchedUserIds = [];
+        for (const user of allUsers) {
+            const fullName = (user.firstName + ' ' + user.lastName).toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const phone = (user.mobile || '').toLowerCase();
+            const userId = (user.userId || '').toLowerCase();
+            
+            if (fullName.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm) || userId.includes(searchTerm)) {
+                matchedUserIds.push(user.userId);
+            }
+        }
+        
+        currentSearchWorkerId = matchedUserIds.length === 1 ? matchedUserIds[0] : null;
+        let filteredRecords = matchedUserIds.length > 0 ? allRecords.filter(record => matchedUserIds.includes(record.workerId)) : [];
+        const additionalRecords = allRecords.filter(record => (record.workerName.toLowerCase().includes(searchTerm) || record.workerId.toLowerCase().includes(searchTerm)) && !matchedUserIds.includes(record.workerId));
+        filteredRecords = [...filteredRecords, ...additionalRecords];
+        filteredRecords = filteredRecords.filter((record, index, self) => index === self.findIndex(r => r.id === record.id));
+        currentFilteredRecords = filteredRecords;
+        
+        if (filteredRecords.length > 0) {
+            document.getElementById('filterText').innerHTML = '🔍 Filtered by:';
+            document.getElementById('filterValue').innerHTML = '"' + searchTerm + '" - ' + filteredRecords.length + ' record(s) found';
+            document.getElementById('filterInfo').classList.add('show');
+        } else {
+            document.getElementById('filterText').innerHTML = 'No results for:';
+            document.getElementById('filterValue').innerHTML = '"' + searchTerm + '"';
+            document.getElementById('filterInfo').classList.add('show');
+        }
+        
+        renderTableData(filteredRecords);
+        updateStats(filteredRecords);
+    };
+    
+    function clearGlobalSearch() {
+        document.getElementById('searchRecords').value = '';
+        currentFilterTerm = '';
+        currentSearchWorkerId = null;
+        currentFilteredRecords = [...allRecords];
+        renderTableData(allRecords);
+        updateStats(allRecords);
+        document.getElementById('filterInfo').classList.remove('show');
+        showSuccess('Search filter cleared');
     }
     
     window.onAuthStateChanged(window.auth, (user) => {
