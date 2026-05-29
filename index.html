@@ -2,9 +2,8 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>এসপি কনস্ট্রাকশন - ঠিকাদার অ্যাপ</title>
-    <!-- Font Awesome 6 (ফ্রি আইকন লাইব্রেরি) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
@@ -15,27 +14,47 @@
 
         body {
             font-family: 'Segoe UI', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f7fb;
-            height: 100vh;
+            background: linear-gradient(145deg, #e2e8f0 0%, #f1f5f9 100%);
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
         }
 
-        /* =========== টপ হেডার =========== */
+        /* অ্যাপ র‍্যাপার */
+        .app-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            height: 100vh;
+            margin: 0 auto;
+            background: #f5f7fb;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* টপ হেডার */
         .top-header {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 18px 16px;
-            border-radius: 0 0 24px 24px;
+            padding: 16px 20px;
+            border-radius: 0 0 28px 28px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
         }
 
         .header-row {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
+            flex-wrap: nowrap;
         }
 
-        /* থ্রি লাইন মেনু আইকন - সাদা */
         .menu-icon {
             background: rgba(255,255,255,0.15);
             width: 44px;
@@ -53,7 +72,6 @@
 
         .menu-icon:hover {
             background: rgba(255,255,255,0.25);
-            transform: scale(0.95);
         }
 
         .menu-icon span {
@@ -61,28 +79,27 @@
             height: 2.5px;
             background: white;
             border-radius: 4px;
-            transition: 0.3s;
         }
 
-        /* সার্চ বার - সাদা ব্যাকগ্রাউন্ড */
         .search-wrapper {
             flex: 1;
             position: relative;
+            min-width: 0;
         }
 
         .search-wrapper input {
             width: 100%;
-            padding: 12px 16px 12px 44px;
+            padding: 11px 16px 11px 44px;
             border: none;
             border-radius: 40px;
             font-size: 0.9rem;
             background: white;
             color: #1e293b;
-            transition: all 0.3s;
         }
 
         .search-wrapper input::placeholder {
             color: #94a3b8;
+            font-size: 0.85rem;
         }
 
         .search-wrapper input:focus {
@@ -95,11 +112,10 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #94a3b8;
         }
 
-        /* প্রোফাইল ইমেজ - কাস্টম ইমেজ লোগো */
         .profile-img {
             width: 44px;
             height: 44px;
@@ -126,54 +142,6 @@
             border-color: #f59e0b;
         }
 
-        /* কাস্টম লোগো ইমেজ স্টাইল */
-        .custom-logo {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-        }
-
-        .custom-logo-sm {
-            width: 28px;
-            height: 28px;
-            object-fit: contain;
-        }
-
-        /* ব্র্যান্ড সেকশন - কাস্টম ইমেজ লোগো সহ */
-        .brand-section {
-            margin-top: 16px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .brand-logo {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-        }
-
-        .brand-name {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff, #fcd34d, #fbbf24);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            display: inline-block;
-        }
-
-        .brand-sub {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.7);
-            letter-spacing: 2px;
-            margin-top: 4px;
-        }
-
-        /* গ্রিটিং টেক্সট */
         .greeting {
             margin-top: 12px;
             color: white;
@@ -191,152 +159,100 @@
             margin-top: 4px;
         }
 
-        /* =========== বডি সেকশন =========== */
+        /* বডি সেকশন */
         .main-content {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 16px;
-            padding-bottom: 80px;
+            overflow-x: hidden;
+            background: #f5f7fb;
+            position: relative;
         }
 
-        /* সেকশন টাইটেল */
-        .section-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 16px;
-        }
-
-        .section-title h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .section-title a {
-            font-size: 0.75rem;
-            color: #f59e0b;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* কার্ড গ্রিড */
-        .report-grid {
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 170px);
+            background: white;
             display: flex;
             flex-direction: column;
-            gap: 16px;
         }
 
-        /* রিপোর্ট কার্ড */
-        .report-card {
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: all 0.3s;
-            border: 1px solid #eef2f6;
-        }
-
-        .report-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-        }
-
-        .report-image {
+        .dashboard-iframe {
             width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea20, #764ba220);
+            height: 100%;
+            min-height: 500px;
+            border: none;
+            background: #ffffff;
+            flex: 1;
         }
 
-        .report-content {
-            padding: 14px 16px;
+        .dynamic-view {
+            padding: 16px;
+            display: none;
         }
 
-        .report-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1e293b;
-        }
-
-        .report-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.7rem;
-            color: #64748b;
-        }
-
-        .work-status {
-            background: #f59e0b15;
-            color: #d97706;
-            padding: 4px 10px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        /* =========== বটম নেভিগেশন বার =========== */
+        /* =========== বটম নেভিগেশন বার - তাৎক্ষণিক লোড =========== */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255,255,255,0.96);
+            background: rgba(255,255,255,0.98);
             backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px 20px 24px;
+            padding: 12px 20px;
             border-top: 1px solid #eef2f6;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            max-width: 500px;
-            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            flex-shrink: 0;
+            /* দেরি না করে সাথে সাথে শো হবে */
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             cursor: pointer;
             transition: all 0.2s;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 40px;
+            flex: 0 1 auto;
         }
 
         .nav-item i {
-            font-size: 1.4rem;
-            color: black;
+            font-size: 1.5rem;
+            color: #64748b;
+            transition: all 0.2s;
         }
 
         .nav-item .nav-label {
-            font-size: 0.65rem;
-            font-weight: 500;
-            color: black;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: rgba(245,158,11,0.1);
+            transform: translateY(-2px);
         }
 
         .nav-item.active i {
             color: #f59e0b;
+            transform: translateY(-2px);
         }
 
         .nav-item.active .nav-label {
             color: #f59e0b;
         }
 
-        .nav-item.active i {
-            transform: translateY(-2px);
-        }
-
-        /* নোটিফিকেশন ব্যাজ */
-        .nav-item {
-            position: relative;
-        }
-
         .notification-badge {
             position: absolute;
-            top: -2px;
-            right: 6px;
+            top: 2px;
+            right: 12px;
             background: #ef4444;
             color: white;
             font-size: 0.6rem;
@@ -347,16 +263,65 @@
             text-align: center;
         }
 
-        /* =========== সাইড মেনু (বাম পাশ) =========== */
+        /* মোবাইলের জন্য */
+        @media (max-width: 550px) {
+            .bottom-nav {
+                padding: 8px 12px;
+            }
+            .nav-item {
+                padding: 6px 10px;
+            }
+            .nav-item i {
+                font-size: 1.3rem;
+            }
+            .nav-item .nav-label {
+                font-size: 0.65rem;
+            }
+            .notification-badge {
+                font-size: 0.55rem;
+                padding: 1px 4px;
+                right: 6px;
+                top: 0px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .nav-item {
+                padding: 5px 8px;
+            }
+            .nav-item i {
+                font-size: 1.2rem;
+            }
+            .nav-item .nav-label {
+                font-size: 0.6rem;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .bottom-nav {
+                padding: 14px 30px;
+            }
+            .nav-item i {
+                font-size: 1.6rem;
+            }
+            .nav-item .nav-label {
+                font-size: 0.75rem;
+            }
+            .nav-item {
+                padding: 10px 24px;
+            }
+        }
+
+        /* =========== সাইড মেনু =========== */
         .side-menu-left {
             position: fixed;
             top: 0;
-            left: -280px;
+            left: -300px;
             width: 280px;
             height: 100%;
             background: white;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            z-index: 1001;
             transition: 0.3s ease-in-out;
             border-radius: 0 20px 20px 0;
             overflow-y: auto;
@@ -366,7 +331,6 @@
             left: 0;
         }
 
-        /* =========== ডান পাশের মেনু (ইউজার মেনু) =========== */
         .side-menu-right {
             position: fixed;
             top: 0;
@@ -374,8 +338,8 @@
             width: 280px;
             height: 100%;
             background: white;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
-            z-index: 1000;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+            z-index: 1001;
             transition: 0.3s ease-in-out;
             border-radius: 20px 0 0 20px;
             overflow-y: auto;
@@ -396,15 +360,19 @@
             width: 60px;
             height: 60px;
             object-fit: contain;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
         }
 
         .menu-header h3 {
             font-size: 1.1rem;
+            margin-bottom: 5px;
         }
 
         .menu-item {
-            padding: 16px 20px;
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             gap: 14px;
@@ -415,13 +383,19 @@
 
         .menu-item i {
             width: 24px;
-            font-size: 1.2rem;
-            color: black;
+            font-size: 1.1rem;
+            color: #475569;
+        }
+
+        .menu-item span {
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .menu-item:hover {
             background: #fef3c7;
-            padding-left: 28px;
+            padding-left: 25px;
         }
 
         .overlay {
@@ -431,7 +405,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 999;
+            z-index: 1000;
             display: none;
         }
 
@@ -439,16 +413,14 @@
             display: block;
         }
 
-        /* স্ক্রলবার স্টাইল */
+        /* স্ক্রলবার */
         .main-content::-webkit-scrollbar {
             width: 4px;
         }
-
         .main-content::-webkit-scrollbar-track {
             background: #e2e8f0;
             border-radius: 4px;
         }
-
         .main-content::-webkit-scrollbar-thumb {
             background: #f59e0b;
             border-radius: 4px;
@@ -462,47 +434,35 @@
             margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
         .post-header {
             display: flex;
             align-items: center;
             gap: 12px;
             margin-bottom: 12px;
         }
-
         .post-avatar {
-            width: 48px;
-            height: 48px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            background: #e2e8f0;
+            background: #f59e0b;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
-
-        .post-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
         .post-author {
             font-weight: 700;
             font-size: 0.9rem;
         }
-
         .post-time {
             font-size: 0.7rem;
             color: #94a3b8;
         }
-
         .post-image {
             width: 100%;
             border-radius: 16px;
             margin: 12px 0;
         }
-
         .post-stats {
             display: flex;
             gap: 20px;
@@ -510,32 +470,66 @@
             padding-top: 12px;
             border-top: 1px solid #eef2f6;
         }
-
         .post-stats span {
             font-size: 0.8rem;
-            color: black;
+            color: #475569;
             cursor: pointer;
         }
+        .report-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+            border: 1px solid #eef2f6;
+        }
+        .report-content {
+            padding: 14px 16px;
+        }
+        .report-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 16px;
+        }
+        .section-title h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
 
-        .post-stats i {
-            margin-right: 6px;
-            color: black;
+        /* লোডিং ইফেক্টের জন্য - দেরি কমাতে */
+        .no-animation {
+            animation: none !important;
+            transition: none !important;
         }
     </style>
 </head>
 <body>
 
-<!-- বাম পাশের সাইড মেনু (থ্রি লাইন মেনু আইকন ক্লিক করবে) -->
+<!-- বাম পাশের সাইড মেনু -->
 <div class="side-menu-left" id="sideMenuLeft">
     <div class="menu-header">
-        <img src="image/logo/applogo.png" alt="SP Logo" class="menu-logo">
+        <img src="image/logo/applogo.png" alt="SP Logo" class="menu-logo" onerror="this.src='https://placehold.co/60x60?text=SP'">
         <h3>এসপি কনস্ট্রাকশন</h3>
-        <p style="font-size:0.7rem; margin-top:8px;">ঠিকাদারি ব্যবস্থাপনা</p>
+        <p style="font-size:0.65rem; margin-top:8px;">ঠিকাদারি ব্যবস্থাপনা</p>
     </div>
-    <div class="menu-item" onclick="closeRightMenu(); window.location.href='attendance.html'">
-    <i class="fas fa-calendar-check"></i> <span>ইউজার অ্যাটেনডেন্স</span>
-</div>
-    <div class="menu-item" onclick="closeLeftMenu(); alert('📊 ড্যাশবোর্ড')">
+    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='attendance.html'">
+        <i class="fas fa-calendar-check"></i> <span>ইউজার অ্যাটেনডেন্স</span>
+    </div>
+    <div class="menu-item" onclick="closeLeftMenu(); showHomeDashboard()">
         <i class="fas fa-chart-line"></i> <span>ড্যাশবোর্ড</span>
     </div>
     <div class="menu-item" onclick="closeLeftMenu(); alert('👥 লেবার লিস্ট')">
@@ -555,16 +549,16 @@
     </div>
 </div>
 
-<!-- ডান পাশের সাইড মেনু (প্রোফাইল ইমেজ ক্লিক করবে) -->
+<!-- ডান পাশের সাইড মেনু -->
 <div class="side-menu-right" id="sideMenuRight">
     <div class="menu-header">
-        <img src="image/logo/applogo.png" alt="Profile Logo" class="menu-logo">
+        <img src="image/logo/Logopit_1779819652415.png" alt="Profile Logo" class="menu-logo" onerror="this.src='https://placehold.co/60x60?text=SP'">
         <h3>আব্দুল করিম</h3>
-        <p style="font-size:0.7rem; margin-top:8px;">ঠিকাদার · প্রিমিয়াম প্ল্যান</p>
+        <p style="font-size:0.65rem; margin-top:8px;">ঠিকাদার · প্রিমিয়াম প্ল্যান</p>
     </div>
     <div class="menu-item" onclick="closeRightMenu(); window.location.href='profile.html'">
-    <i class="fas fa-user"></i> <span>প্রোফাইল</span>
-</div>
+        <i class="fas fa-user"></i> <span>প্রোফাইল</span>
+    </div>
     <div class="menu-item" onclick="closeRightMenu(); alert('⚙️ সেটিংস')">
         <i class="fas fa-cog"></i> <span>সেটিংস</span>
     </div>
@@ -585,7 +579,7 @@
 <div class="overlay" id="overlay" onclick="closeAllMenus()"></div>
 
 <!-- মেইন অ্যাপ -->
-<div style="max-width: 500px; margin: 0 auto; width: 100%; height: 100%; display: flex; flex-direction: column;">
+<div class="app-wrapper">
     <!-- টপ হেডার -->
     <div class="top-header">
         <div class="header-row">
@@ -599,42 +593,42 @@
                 <input type="text" id="searchInput" placeholder="কাজ, লেবার বা প্রোজেক্ট সার্চ করুন...">
             </div>
             <div class="profile-img" onclick="toggleRightMenu()">
-                <img src="image/logo/Logopit_1779819652415.png" alt="SP Logo">
+                <img src="image/logo/Logopit_1779819652415.png" alt="SP Logo" onerror="this.src='https://placehold.co/44x44?text=SP'">
             </div>
         </div>
-
-        
-
-       
+        <div class="greeting">
+            <h3>👷 স্বাগতম, এসপি কনস্ট্রাকশন</h3>
+            <p>ড্যাশবোর্ডে আপনার কাজের অগ্রগতি দেখুন</p>
+        </div>
+    </div>
 
     <!-- বডি সেকশন -->
     <div class="main-content" id="mainContent">
-        <div class="section-title">
-            <h2><i class="fas fa-clipboard-list" style="margin-right: 8px; color: white;"></i> আজকের কাজের রিপোর্ট</h2>
-            <a href="#" onclick="alert('সব রিপোর্ট দেখুন')">সব দেখুন →</a>
+        <div class="iframe-container" id="iframeContainer">
+            <iframe class="dashboard-iframe" id="dashboardFrame" src="dashboard.html" title="SP Construction Dashboard"></iframe>
         </div>
-        <div class="report-grid" id="reportGrid"></div>
+        <div class="dynamic-view" id="dynamicView"></div>
     </div>
 
-    <!-- বটম নেভিগেশন বার -->
+    <!-- বটম নেভিগেশন বার - তাৎক্ষণিকভাবে দৃশ্যমান -->
     <div class="bottom-nav">
-        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); filterReports('home')">
+        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); handleBottomNav('home')">
             <i class="fas fa-home"></i>
             <div class="nav-label">হোম</div>
         </div>
-        <div class="nav-item" data-nav="search" onclick="setActiveNav(this); filterReports('search')">
+        <div class="nav-item" data-nav="search" onclick="setActiveNav(this); handleBottomNav('search')">
             <i class="fas fa-search"></i>
             <div class="nav-label">সার্চ</div>
         </div>
-        <div class="nav-item" data-nav="post" onclick="setActiveNav(this); filterReports('post')">
+        <div class="nav-item" data-nav="post" onclick="setActiveNav(this); handleBottomNav('post')">
             <i class="fas fa-plus-circle"></i>
             <div class="nav-label">পোস্ট</div>
         </div>
-        <div class="nav-item" data-nav="support" onclick="setActiveNav(this); filterReports('support')">
+        <div class="nav-item" data-nav="support" onclick="setActiveNav(this); handleBottomNav('support')">
             <i class="fas fa-headset"></i>
             <div class="nav-label">সাপোর্ট</div>
         </div>
-        <div class="nav-item" data-nav="notification" onclick="setActiveNav(this); filterReports('notification')">
+        <div class="nav-item" data-nav="notification" onclick="setActiveNav(this); handleBottomNav('notification')">
             <i class="fas fa-bell"></i>
             <div class="nav-label">নোটিফিকেশন</div>
             <span class="notification-badge">3</span>
@@ -643,62 +637,8 @@
 </div>
 
 <script>
-    // কাজের রিপোর্ট ডাটা
-    const workReports = [
-        {
-            id: 1,
-            title: "৫ম তলার ইট বসানোর কাজ",
-            project: "মিরপুর হাউজিং প্রোজেক্ট",
-            workers: 12,
-            status: "চলমান",
-            earnings: 24500,
-            image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=500&h=200&fit=crop",
-            date: "2026-05-26"
-        },
-        {
-            id: 2,
-            title: "ছাদের পানি নিরোধক (ওয়াটারপ্রুফিং)",
-            project: "বসুন্ধরা আবাসিক",
-            workers: 6,
-            status: "সম্পন্ন",
-            earnings: 18750,
-            image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=500&h=200&fit=crop",
-            date: "2026-05-25"
-        },
-        {
-            id: 3,
-            title: "টাইলস ও ফ্লোরিং কাজ",
-            project: "গুলশান টাওয়ার",
-            workers: 8,
-            status: "চলমান",
-            earnings: 32000,
-            image: "https://images.unsplash.com/photo-1581093458791-9f3c3a4b5c6d?w=500&h=200&fit=crop",
-            date: "2026-05-26"
-        },
-        {
-            id: 4,
-            title: "ইলেকট্রিক্যাল ওয়্যারিং",
-            project: "উত্তরা সেক্টর-১০",
-            workers: 4,
-            status: "আজ শুরু",
-            earnings: 12500,
-            image: "https://images.unsplash.com/photo-1621905251189-08b45d6a2c4e?w=500&h=200&fit=crop",
-            date: "2026-05-26"
-        },
-        {
-            id: 5,
-            title: "প্লাস্টার ও ফিনিশিং",
-            project: "ধানমন্ডি ২৭",
-            workers: 10,
-            status: "অর্ধেক সম্পন্ন",
-            earnings: 28900,
-            image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500&h=200&fit=crop",
-            date: "2026-05-24"
-        }
-    ];
-
-    // পোস্ট ডাটা
-    const posts = [
+    // ডাটা
+    const postsData = [
         {
             id: 1,
             author: "আব্দুল করিম",
@@ -719,167 +659,124 @@
         }
     ];
 
-    // নোটিফিকেশন ডাটা
-    const notifications = [
+    const notificationsData = [
         { id: 1, title: "নতুন কাজ যোগ হয়েছে", message: "গুলশান টাওয়ারে নতুন ফ্লোরিং কাজ শুরু", time: "৫ মিনিট আগে" },
         { id: 2, title: "পেমেন্ট সফল হয়েছে", message: "মিরপুর প্রকল্প থেকে ৫০,০০০ টাকা প্রাপ্ত", time: "১ ঘন্টা আগে" },
         { id: 3, title: "লেবার উপস্থিতি", message: "আজ ১২ জন লেবার উপস্থিত আছে", time: "২ ঘন্টা আগে" }
     ];
 
-    // রিপোর্ট রেন্ডার
-    function renderReports(reports) {
-        const container = document.getElementById('reportGrid');
-        if(!reports || reports.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-folder-open" style="font-size:3rem; color:#cbd5e1;"></i><p style="margin-top:12px;">📭 কোনো রিপোর্ট খুঁজে পাওয়া যায়নি</p></div>`;
-            return;
+    const iframeContainer = document.getElementById('iframeContainer');
+    const dynamicView = document.getElementById('dynamicView');
+    const dashboardFrame = document.getElementById('dashboardFrame');
+
+    function showHomeDashboard() {
+        iframeContainer.style.display = 'flex';
+        dynamicView.style.display = 'none';
+        dynamicView.innerHTML = '';
+        if(dashboardFrame && dashboardFrame.src) {
+            // ফ্রেম রিলোড করা
+            dashboardFrame.src = dashboardFrame.src;
         }
-
-        container.innerHTML = reports.map(report => `
-            <div class="report-card" onclick="alert('${report.title} এর বিস্তারিত দেখুন')">
-                <img class="report-image" src="${report.image}" alt="${report.title}" onerror="this.src='https://placehold.co/500x200?text=SP+Construction'">
-                <div class="report-content">
-                    <div class="report-title">${report.title}</div>
-                    <div class="report-meta">
-                        <span><i class="fas fa-building"></i> ${report.project}</span>
-                        <span class="work-status"><i class="fas fa-chart-line"></i> ${report.status}</span>
-                    </div>
-                    <div class="report-meta" style="margin-top: 8px;">
-                        <span><i class="fas fa-users"></i> ${report.workers} জন লেবার</span>
-                        <span><i class="fas fa-taka-sign"></i> ${report.earnings.toLocaleString()} টাকা</span>
-                    </div>
-                    <div class="report-meta">
-                        <span><i class="far fa-calendar-alt"></i> ${report.date}</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
     }
 
-    // পোস্ট রেন্ডার
     function renderPosts() {
-        const container = document.getElementById('reportGrid');
-        container.innerHTML = posts.map(post => `
-            <div class="post-card">
-                <div class="post-header">
-                    <div class="post-avatar">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='44' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" alt="SP Logo">
-                    </div>
-                    <div>
-                        <div class="post-author">${post.author}</div>
-                        <div class="post-time"><i class="far fa-clock"></i> ${post.time}</div>
-                    </div>
-                </div>
-                <p>${post.content}</p>
-                <img class="post-image" src="${post.image}" onerror="this.src='https://placehold.co/500x250?text=SP+Construction'">
-                <div class="post-stats">
-                    <span><i class="far fa-heart"></i> ${post.likes}</span>
-                    <span><i class="far fa-comment"></i> ${post.comments}</span>
-                    <span><i class="far fa-share-square"></i> শেয়ার</span>
-                </div>
+        dynamicView.innerHTML = `
+            <div class="section-title">
+                <h2><i class="fas fa-images"></i> সাম্প্রতিক পোস্ট</h2>
             </div>
-        `).join('');
+            ${postsData.map(post => `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='44' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" style="width:45px; border-radius:50%;">
+                        </div>
+                        <div>
+                            <div class="post-author">${post.author}</div>
+                            <div class="post-time"><i class="far fa-clock"></i> ${post.time}</div>
+                        </div>
+                    </div>
+                    <p>${post.content}</p>
+                    <img class="post-image" src="${post.image}" onerror="this.src='https://placehold.co/500x250?text=SP'">
+                    <div class="post-stats">
+                        <span><i class="far fa-heart"></i> ${post.likes}</span>
+                        <span><i class="far fa-comment"></i> ${post.comments}</span>
+                        <span><i class="far fa-share-square"></i> শেয়ার</span>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+        iframeContainer.style.display = 'none';
+        dynamicView.style.display = 'block';
     }
 
-    // সাপোর্ট পেজ
     function renderSupport() {
-        const container = document.getElementById('reportGrid');
-        container.innerHTML = `
+        dynamicView.innerHTML = `
             <div class="post-card" style="text-align:center;">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" alt="SP Logo" style="width: 80px; margin-bottom: 16px;">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" style="width: 70px; margin-bottom: 16px;">
                 <h3>সাপোর্ট সেন্টার - এসপি কনস্ট্রাকশন</h3>
                 <p style="margin:12px 0; color:#64748b;">আপনার যেকোনো সমস্যায় আমাদের সাথে যোগাযোগ করুন</p>
-                <div style="background:#f1f5f9; border-radius:16px; padding:16px; margin:16px 0; text-align:left;">
-                    <p><i class="fas fa-phone-alt" style="color: black;"></i> <strong>হটলাইন:</strong> ০১৭XX-XXXXXX</p>
-                    <p style="margin-top:8px;"><i class="fab fa-whatsapp" style="color: black;"></i> <strong>হোয়াটসঅ্যাপ:</strong> ০১৮XX-XXXXXX</p>
-                    <p style="margin-top:8px;"><i class="far fa-envelope" style="color: black;"></i> <strong>ইমেইল:</strong> support@spconstruction.com</p>
+                <div style="background:#f1f5f9; border-radius:16px; padding:15px; margin:16px 0; text-align:left;">
+                    <p><i class="fas fa-phone-alt"></i> <strong>হটলাইন:</strong> ০১৭XX-XXXXXX</p>
+                    <p style="margin-top:8px;"><i class="fab fa-whatsapp"></i> <strong>হোয়াটসঅ্যাপ:</strong> ০১৮XX-XXXXXX</p>
+                    <p style="margin-top:8px;"><i class="far fa-envelope"></i> <strong>ইমেইল:</strong> support@spconstruction.com</p>
                 </div>
-                <div style="background:#f1f5f9; border-radius:16px; padding:16px; text-align:left;">
-                    <p><i class="far fa-clock" style="color: black;"></i> <strong>সাপোর্ট সময়:</strong></p>
-                    <p>সকাল ৯টা - রাত ৮টা (শনিবার থেকে বৃহস্পতিবার)</p>
-                    <p style="margin-top:4px;">শুক্রবার: সকাল ১০টা - বিকেল ৫টা</p>
-                </div>
-                <button onclick="alert('সাপোর্ট টিকেট ওপেন করা হবে')" style="margin-top:20px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; border:none; padding:12px; border-radius:40px; width:100%; font-weight:600;">📝 সাপোর্ট টিকেট ওপেন করুন</button>
+                <button onclick="alert('সাপোর্ট টিকেট ওপেন করা হবে')" style="margin-top:15px; background:linear-gradient(135deg, #f59e0b, #d97706); color:white; border:none; padding:12px; border-radius:40px; width:100%; font-weight:600; cursor:pointer;">
+                    📝 সাপোর্ট টিকেট ওপেন করুন
+                </button>
             </div>
         `;
+        iframeContainer.style.display = 'none';
+        dynamicView.style.display = 'block';
     }
 
-    // নোটিফিকেশন দেখানো
     function showNotifications() {
-        const container = document.getElementById('reportGrid');
-        container.innerHTML = `
-            <div class="section-title" style="margin-bottom: 16px;">
-                <h2><i class="fas fa-bell" style="color: black;"></i> নোটিফিকেশন</h2>
+        dynamicView.innerHTML = `
+            <div class="section-title">
+                <h2><i class="fas fa-bell"></i> নোটিফিকেশন</h2>
             </div>
-            ${notifications.map(notif => `
+            ${notificationsData.map(notif => `
                 <div class="report-card" onclick="alert('${notif.title}')">
                     <div class="report-content">
                         <div class="report-title"><i class="fas fa-circle" style="font-size:0.6rem; color:#f59e0b;"></i> ${notif.title}</div>
                         <p style="font-size:0.85rem; margin-top:6px;">${notif.message}</p>
-                        <div class="report-meta" style="margin-top:8px;">
+                        <div class="report-meta">
                             <span><i class="far fa-clock"></i> ${notif.time}</span>
                         </div>
                     </div>
                 </div>
             `).join('')}
         `;
+        iframeContainer.style.display = 'none';
+        dynamicView.style.display = 'block';
     }
 
-    // ফিল্টার ফাংশন
-    function filterReports(type) {
-        let filtered = [...workReports];
-        const searchText = document.getElementById('searchInput')?.value.toLowerCase();
-
-        if(searchText && searchText !== "" && type !== 'post' && type !== 'support' && type !== 'notification') {
-            filtered = filtered.filter(r => 
-                r.title.toLowerCase().includes(searchText) || 
-                r.project.toLowerCase().includes(searchText)
-            );
-        }
-
-        if(type === 'search') {
-            renderReports(filtered);
-        } 
-        else if(type === 'post') {
+    function handleBottomNav(type) {
+        if(type === 'home') {
+            showHomeDashboard();
+        } else if(type === 'post') {
             renderPosts();
-        }
-        else if(type === 'support') {
+        } else if(type === 'support') {
             renderSupport();
-        }
-        else if(type === 'notification') {
+        } else if(type === 'notification') {
             showNotifications();
-        }
-        else {
-            const today = new Date().toISOString().split('T')[0];
-            filtered = filtered.filter(r => r.date === today || r.status === "চলমান");
-            renderReports(filtered);
+        } else if(type === 'search') {
+            dynamicView.innerHTML = `
+                <div class="post-card" style="text-align:center;">
+                    <i class="fas fa-search" style="font-size:3rem; color:#f59e0b;"></i>
+                    <h3 style="margin-top:12px;">সার্চ ফলাফল</h3>
+                    <p style="margin-top:8px; color:#64748b;">দয়া করে উপরের সার্চ বক্স ব্যবহার করে ড্যাশবোর্ডে অনুসন্ধান করুন।</p>
+                </div>
+            `;
+            iframeContainer.style.display = 'none';
+            dynamicView.style.display = 'block';
         }
     }
 
-    // নেভিগেশন একটিভ সেট
     function setActiveNav(element) {
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
-        
-        const type = element.getAttribute('data-nav');
-        filterReports(type);
     }
 
-    // সার্চ ইভেন্ট
-    function setupSearch() {
-        const searchInput = document.getElementById('searchInput');
-        if(searchInput) {
-            searchInput.addEventListener('keyup', function() {
-                const activeNav = document.querySelector('.nav-item.active')?.getAttribute('data-nav') || 'home';
-                if(activeNav !== 'post' && activeNav !== 'support' && activeNav !== 'notification') {
-                    filterReports(activeNav);
-                }
-            });
-        }
-    }
-
-    // বাম মেনু (থ্রি লাইন)
     function toggleLeftMenu() {
         document.getElementById('sideMenuLeft').classList.add('open');
         document.getElementById('overlay').classList.add('show');
@@ -890,7 +787,6 @@
         document.getElementById('overlay').classList.remove('show');
     }
 
-    // ডান মেনু (প্রোফাইল ইমেজ)
     function toggleRightMenu() {
         document.getElementById('sideMenuRight').classList.add('open');
         document.getElementById('overlay').classList.add('show');
@@ -907,20 +803,30 @@
         document.getElementById('overlay').classList.remove('show');
     }
 
-    // ইমেজ এরর হ্যান্ডলিং
-    function handleImageErrors() {
-        const images = document.querySelectorAll('.report-image');
-        images.forEach(img => {
-            img.onerror = function() {
-                this.src = 'https://placehold.co/500x200?text=SP+Construction';
-            };
+    // সার্চ ইভেন্ট
+    const searchInput = document.getElementById('searchInput');
+    if(searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const activeNav = document.querySelector('.nav-item.active')?.getAttribute('data-nav') || 'home';
+            if(activeNav === 'home' && iframeContainer.style.display !== 'none') {
+                console.log('Dashboard এ সার্চ করুন');
+            }
         });
     }
 
-    window.onload = () => {
-        renderReports(workReports.filter(r => r.date === new Date().toISOString().split('T')[0] || r.status === "চলমান"));
-        setupSearch();
-        handleImageErrors();
+    // পেজ লোডের সাথে সাথেই সবকিছু দৃশ্যমান
+    window.addEventListener('DOMContentLoaded', function() {
+        showHomeDashboard();
+    });
+    
+    // ব্যাকআপ হিসেবে onload
+    window.onload = function() {
+        // নিশ্চিত করা যে নেভিগেশন বার দৃশ্যমান
+        const bottomNav = document.querySelector('.bottom-nav');
+        if(bottomNav) {
+            bottomNav.style.opacity = '1';
+            bottomNav.style.visibility = 'visible';
+        }
     };
 </script>
 </body>
