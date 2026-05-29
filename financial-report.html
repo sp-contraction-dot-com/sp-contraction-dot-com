@@ -435,7 +435,7 @@
     </div>
     
     <div class="table-container">
-        <table id="paymentTable">
+        <table>
             <thead>
                 <tr><th>Date</th><th>Company Name</th><th>Total Workers</th><th>Total Earnings</th><th>Company Paid</th><th>Company Due</th><th>Actions</th></tr>
             </thead>
@@ -453,14 +453,11 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('dateInput').value = today;
     
-    // Safe number formatter - NO EXTRA "1" ISSUE
-    function safeFormatNumber(value) {
+    function formatNumber(value) {
         if (value === null || value === undefined || value === '') return '0';
         let num = parseFloat(value);
         if (isNaN(num)) return '0';
-        // Round to nearest integer for currency display
         num = Math.round(num);
-        // Format with commas
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
     
@@ -468,7 +465,7 @@
         const totalEarning = parseFloat(document.getElementById('totalEarningInput').value) || 0;
         const companyPaid = parseFloat(document.getElementById('companyPaidInput').value) || 0;
         const due = totalEarning - companyPaid;
-        document.getElementById('companyDueInput').value = safeFormatNumber(due);
+        document.getElementById('companyDueInput').value = formatNumber(due);
         return due;
     }
     
@@ -527,9 +524,9 @@
         
         document.getElementById('totalRecords').innerHTML = totalRecords;
         document.getElementById('totalWorkers').innerHTML = totalWorkers;
-        document.getElementById('totalEarnings').innerHTML = `₹${safeFormatNumber(totalEarnings)}`;
-        document.getElementById('totalPaid').innerHTML = `₹${safeFormatNumber(totalPaid)}`;
-        document.getElementById('totalDue').innerHTML = `₹${safeFormatNumber(totalDue)}`;
+        document.getElementById('totalEarnings').innerHTML = `₹${formatNumber(totalEarnings)}`;
+        document.getElementById('totalPaid').innerHTML = `₹${formatNumber(totalPaid)}`;
+        document.getElementById('totalDue').innerHTML = `₹${formatNumber(totalDue)}`;
         
         const dueElement = document.getElementById('totalDue');
         if (totalDue < 0) dueElement.style.color = '#ffeb3b';
@@ -635,9 +632,9 @@
                     <td>${p.date}</td>
                     <td><strong>${escapeHtml(p.companyName)}</strong></td>
                     <td>${p.totalWorker || 0}</td>
-                    <td class="amount-positive">₹${safeFormatNumber(p.totalEarning)}</td>
-                    <td class="amount-positive">₹${safeFormatNumber(p.companyPaid)}</td>
-                    <td style="color:${dueColor}; font-weight:600;">₹${safeFormatNumber(due)}</td>
+                    <td class="amount-positive">₹${formatNumber(p.totalEarning)}</td>
+                    <td class="amount-positive">₹${formatNumber(p.companyPaid)}</td>
+                    <td style="color:${dueColor}; font-weight:600;">₹${formatNumber(due)}</td>
                     <td class="action-btns"><button class="delete-btn" onclick="deletePayment('${p.id}')"><i class="fas fa-trash"></i> Delete</button></td>
                 </tr>
             `;
@@ -654,9 +651,9 @@
         tfoot.innerHTML = `<tr class="summary-row">
             <td colspan="2"><strong>GRAND TOTAL</strong></td>
             <td><strong>${footerTotalWorkers}</strong></td>
-            <td><strong>₹${safeFormatNumber(footerTotalEarnings)}</strong></td>
-            <td><strong>₹${safeFormatNumber(footerTotalPaid)}</strong></td>
-            <td><strong>₹${safeFormatNumber(footerTotalDue)}</strong></td>
+            <td><strong>₹${formatNumber(footerTotalEarnings)}</strong></td>
+            <td><strong>₹${formatNumber(footerTotalPaid)}</strong></td>
+            <td><strong>₹${formatNumber(footerTotalDue)}</strong></td>
             <td></td>
         </tr>`;
     }
@@ -727,159 +724,183 @@
         }
     };
     
-    // ========== FIXED PDF GENERATION ==========
+    // ================= PDF DOWNLOAD - FULLY FIXED =================
     window.downloadCompanyReport = async function() {
         let recordsToInclude = [...allPayments];
         let companyName = 'All Companies';
-        
+
         if (currentFilterCompanyId) {
             const selectedCompany = allCompanies.find(c => c.id === currentFilterCompanyId);
             companyName = selectedCompany ? selectedCompany.name : 'Selected Company';
             recordsToInclude = recordsToInclude.filter(p => p.companyId === currentFilterCompanyId);
         }
-        
+
         if (recordsToInclude.length === 0) {
             showError('No records found to download!');
             return;
         }
-        
+
         showLoading(true);
+
         try {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            
-            // Header
+
+            // ================= HEADER =================
             doc.setFillColor(15, 23, 42);
             doc.rect(0, 0, 210, 45, 'F');
+
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(20);
             doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
             doc.text("SP CONSTRUCTION", 105, 18, { align: "center" });
+
             doc.setFontSize(10);
             doc.setTextColor(253, 186, 116);
             doc.text("BUILDING DREAMS", 105, 26, { align: "center" });
+
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(9);
             doc.text("COMPANY PAYMENT REPORT", 105, 35, { align: "center" });
+
             doc.setTextColor(253, 186, 116);
             doc.setFontSize(8);
             doc.text(`Company: ${companyName}`, 105, 42, { align: "center" });
-            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 48, { align: "center" });
-            
-            // Table Header
+
+            // ================= TABLE HEADER =================
+            const headers = ["Date", "Company", "Workers", "Earnings", "Paid", "Due"];
+            const colWidths = [25, 50, 20, 30, 30, 30];
+
             doc.setFillColor(245, 158, 11);
-            doc.rect(10, 56, 190, 10, 'F');
+            doc.rect(10, 52, 190, 10, 'F');
+
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(9);
             doc.setFont("helvetica", "bold");
-            
-            const headers = ["Date", "Company", "Workers", "Earnings (₹)", "Paid (₹)", "Due (₹)"];
-            const colWidths = [28, 42, 22, 30, 30, 30];
+            doc.setFontSize(8);
+
             let xPos = 10;
-            headers.forEach((header, i) => { doc.text(header, xPos + 2, 63); xPos += colWidths[i]; });
-            
-            // Table Data
-            doc.setTextColor(40, 50, 70);
+
+            headers.forEach((header, index) => {
+                doc.text(String(header), xPos + 2, 58);
+                xPos += colWidths[index];
+            });
+
+            // ================= TABLE BODY =================
+            let yPos = 67;
+
+            doc.setTextColor(40, 40, 40);
             doc.setFont("helvetica", "normal");
             doc.setFontSize(8);
-            let yPos = 72;
-            let totalWorkers = 0, totalEarnings = 0, totalPaid = 0, totalDue = 0;
-            
-            for (let idx = 0; idx < recordsToInclude.length; idx++) {
-                const record = recordsToInclude[idx];
-                
+
+            let totalWorkers = 0;
+            let totalEarnings = 0;
+            let totalPaid = 0;
+            let totalDue = 0;
+
+            for (const record of recordsToInclude) {
+
+                // New Page
                 if (yPos > 270) {
+
                     doc.addPage();
-                    yPos = 25;
-                    doc.setFillColor(245, 158, 11);
-                    doc.rect(10, 15, 190, 10, 'F');
+
+                    doc.setFillColor(15, 23, 42);
+                    doc.rect(0, 0, 210, 40, 'F');
+
                     doc.setTextColor(255, 255, 255);
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(18);
+                    doc.text("SP CONSTRUCTION", 105, 15, { align: "center" });
+
                     doc.setFontSize(9);
-                    xPos = 10;
-                    headers.forEach((header, i) => { doc.text(header, xPos + 2, 22); xPos += colWidths[i]; });
-                    yPos = 32;
-                    doc.setTextColor(40, 50, 70);
+                    doc.setTextColor(253, 186, 116);
+                    doc.text("COMPANY PAYMENT REPORT (Continued)", 105, 25, { align: "center" });
+
+                    doc.setFillColor(245, 158, 11);
+                    doc.rect(10, 32, 190, 10, 'F');
+
+                    doc.setTextColor(255, 255, 255);
                     doc.setFontSize(8);
+
+                    xPos = 10;
+
+                    headers.forEach((header, index) => {
+                        doc.text(String(header), xPos + 2, 38);
+                        xPos += colWidths[index];
+                    });
+
+                    yPos = 48;
+
+                    doc.setTextColor(40, 40, 40);
+                    doc.setFont("helvetica", "normal");
                 }
-                
-                const workers = record.totalWorker || 0;
-                const earnings = record.totalEarning || 0;
-                const paid = record.companyPaid || 0;
-                const due = (record.totalEarning - record.companyPaid) || 0;
-                
+
+                // Safe Number Conversion
+                const workers = Number(record.totalWorker || 0);
+                const earnings = Number(record.totalEarning || 0);
+                const paid = Number(record.companyPaid || 0);
+                const due = Number(record.companyDue || (earnings - paid));
+
                 totalWorkers += workers;
                 totalEarnings += earnings;
                 totalPaid += paid;
                 totalDue += due;
-                
-                // Convert to numbers and format safely - NO STRING CONCATENATION ISSUES
-                const workersNum = Number(workers);
-                const earningsNum = Number(earnings);
-                const paidNum = Number(paid);
-                const dueNum = Number(due);
-                
-                // Format with commas using regex
-                const workersStr = workersNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                const earningsStr = "₹" + earningsNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                const paidStr = "₹" + paidNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                const dueStr = "₹" + dueNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                
-                // Company name truncation
-                let companyDisplay = record.companyName || '';
-                if (companyDisplay.length > 20) companyDisplay = companyDisplay.substring(0, 18) + '..';
-                
+
+                // FINAL FIXED STRINGS
+                const row = [
+                    String(record.date || ''),
+                    String(record.companyName || ''),
+                    String(workers),
+                    `Rs ${formatNumber(earnings)}`,
+                    `Rs ${formatNumber(paid)}`,
+                    `Rs ${formatNumber(due)}`
+                ];
+
                 xPos = 10;
-                doc.text(record.date || '', xPos + 2, yPos);
-                xPos += colWidths[0];
-                doc.text(companyDisplay, xPos + 2, yPos);
-                xPos += colWidths[1];
-                doc.text(workersStr, xPos + 2, yPos);
-                xPos += colWidths[2];
-                doc.text(earningsStr, xPos + 2, yPos);
-                xPos += colWidths[3];
-                doc.text(paidStr, xPos + 2, yPos);
-                xPos += colWidths[4];
-                doc.text(dueStr, xPos + 2, yPos);
-                
-                yPos += 7;
+
+                row.forEach((text, index) => {
+                    doc.text(String(text), xPos + 2, yPos);
+                    xPos += colWidths[index];
+                });
+
+                yPos += 8;
             }
-            
-            // Footer Summary
-            yPos += 6;
+
+            // ================= GRAND TOTAL =================
+            yPos += 5;
+
             doc.setDrawColor(245, 158, 11);
-            doc.setLineWidth(0.5);
             doc.line(10, yPos - 3, 200, yPos - 3);
-            
+
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(9);
+            doc.setFontSize(8);
             doc.setTextColor(245, 158, 11);
-            
-            const totalWorkersStr = totalWorkers.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            const totalEarningsStr = totalEarnings.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            const totalPaidStr = totalPaid.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            const totalDueStr = totalDue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            
-            doc.text(`Total Workers: ${totalWorkersStr}`, 12, yPos);
-            doc.text(`Total Earnings: ₹${totalEarningsStr}`, 70, yPos);
-            doc.text(`Total Paid: ₹${totalPaidStr}`, 130, yPos);
-            doc.text(`Balance Due: ₹${totalDueStr}`, 172, yPos);
-            
-            // Page numbers
+
+            doc.text(`Workers: ${formatNumber(totalWorkers)}`, 10, yPos);
+            doc.text(`Earnings: Rs ${formatNumber(totalEarnings)}`, 55, yPos);
+            doc.text(`Paid: Rs ${formatNumber(totalPaid)}`, 115, yPos);
+            doc.text(`Due: Rs ${formatNumber(totalDue)}`, 160, yPos);
+
+            // ================= FOOTER =================
             const pageCount = doc.internal.getNumberOfPages();
+
             for (let i = 1; i <= pageCount; i++) {
                 doc.setPage(i);
-                doc.setTextColor(150, 160, 180);
+                doc.setTextColor(148, 163, 184);
                 doc.setFontSize(7);
-                doc.text(`Page ${i} of ${pageCount} | SP Construction Management System`, 105, 290, { align: "center" });
+                doc.text(`Generated on: ${new Date().toLocaleString()} | SP Construction`, 105, 290, { align: "center" });
             }
-            
+
+            // ================= SAVE =================
             const safeFileName = `Company_Payment_Report_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
             doc.save(safeFileName);
             showSuccess('PDF report downloaded successfully!');
-        } catch (error) { 
-            console.error("PDF generation error:", error); 
-            showError('Failed to generate PDF: ' + error.message); 
+
+        } catch (error) {
+            console.error(error);
+            showError('Failed to generate PDF: ' + error.message);
         }
+
         showLoading(false);
     };
     
