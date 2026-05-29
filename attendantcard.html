@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Premium Attendance Card - SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(245,158,11,0.3); }
+        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #fcd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-text p { font-size: 0.55rem; color: rgba(255,255,255,0.5); letter-spacing: 2px; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; transition: all 0.3s; text-decoration: none; display: inline-block; font-size: 0.85rem; }
+        .nav-btn:hover { background: linear-gradient(135deg, #f59e0b, #d97706); border-color: transparent; transform: translateY(-2px); }
+        
+        /* Mode Toggle Premium */
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 5px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .mode-btn.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 5px 20px rgba(245,158,11,0.4);
+        }
+        
+        /* Search Card */
+        .search-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 45px -15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .search-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 22px;
+            color: #1e293b;
+            border-left: 5px solid #f59e0b;
+            padding-left: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .auto-badge {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #0369a1;
+        }
+        .search-box {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .search-input-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        .search-input-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .search-input-group input, .search-input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            background: white;
+        }
+        .search-input-group input:focus, .search-input-group select:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+        }
+        .search-input-group select:disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .search-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 0 35px;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245,158,11,0.4);
+        }
+        
+        .card-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        /* ========== PREMIUM CARD DESIGN ========== */
+        .premium-card {
+            width: 560px;
+            background: linear-gradient(135deg, #ffffff 0%, #fef9f0 100%);
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 35px 60px -20px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+        }
+        .premium-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 40px 70px -20px rgba(0,0,0,0.5);
+        }
+        
+        /* Card Header with Gradient Border */
+        .card-header-premium {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            padding: 20px 25px;
+            text-align: center;
+            position: relative;
+            border-bottom: 3px solid #f59e0b;
+        }
+        .company-logo-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.08);
+            padding: 8px 22px;
+            border-radius: 60px;
+            backdrop-filter: blur(5px);
+        }
+        .logo-circle-premium {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+        }
+        .logo-circle-premium span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: white;
+        }
+        .company-name-premium h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 1px;
+        }
+        .company-name-premium p {
+            font-size: 0.5rem;
+            color: #fcd34d;
+            letter-spacing: 2px;
+        }
+        .card-badge-premium {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            background: rgba(245,158,11,0.2);
+            border: 1px solid rgba(245,158,11,0.6);
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #fcd34d;
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Two Column Premium Layout */
+        .card-body-premium {
+            display: flex;
+            padding: 25px;
+            gap: 25px;
+            background: linear-gradient(135deg, #ffffff, #fef9f0);
+        }
+        
+        /* LEFT COLUMN - Logo & User ID */
+        .left-column-premium {
+            flex: 0 0 140px;
+            text-align: center;
+        }
+        .premium-logo-box {
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(145deg, #f59e0b08, #d9770615);
+            border-radius: 24px;
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #f59e0b, #d97706) 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .premium-logo-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translate(-30%, -30%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translate(30%, 30%); opacity: 0; }
+        }
+        .premium-logo-box i {
+            font-size: 4rem;
+            color: #f59e0b;
+            z-index: 1;
+        }
+        .logo-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #f59e0b;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+        .user-id-premium {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            padding: 8px 12px;
+            border-radius: 40px;
+            margin-top: 10px;
+            display: inline-block;
+            width: 100%;
+        }
+        .user-id-premium span {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #d97706;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .user-id-premium i {
+            color: #f59e0b;
+            font-size: 0.6rem;
+            margin-right: 5px;
+        }
+        
+        /* RIGHT COLUMN - Name & Mobile */
+        .right-column-premium {
+            flex: 1;
+        }
+        .worker-name-premium {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f59e0b;
+            display: inline-block;
+            letter-spacing: -0.3px;
+        }
+        
+        /* Info Cards */
+        .info-card-premium {
+            background: white;
+            border-radius: 18px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+            border: 1px solid #f1f5f9;
+        }
+        .info-card-premium:hover {
+            transform: translateX(3px);
+            border-color: #f59e0b30;
+        }
+        .info-icon-premium {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #f59e0b15, #d9770615);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-icon-premium i {
+            font-size: 1rem;
+            color: #f59e0b;
+        }
+        .info-content-premium {
+            flex: 1;
+        }
+        .info-label-premium {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .info-value-premium {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        /* Month Badge */
+        .month-badge-premium {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            border-radius: 40px;
+            padding: 8px 15px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .month-badge-premium span {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #0369a1;
+        }
+        .month-badge-premium i {
+            margin-right: 6px;
+        }
+        
+        /* Stats Grid Premium */
+        .stats-premium {
+            background: linear-gradient(135deg, #fef3c7, #fffbeb);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .stats-grid-premium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .stat-item-premium {
+            text-align: center;
+            background: white;
+            padding: 10px 8px;
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        .stat-item-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .stat-number-premium {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        .stat-label-premium {
+            font-size: 0.6rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        
+        /* Financial Grid Premium */
+        .financial-premium {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .financial-card-premium {
+            background: white;
+            border-radius: 18px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid #f1f5f9;
+        }
+        .financial-card-premium.earnings {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-left: 4px solid #22c55e;
+        }
+        .financial-card-premium.paid {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-left: 4px solid #3b82f6;
+        }
+        .financial-card-premium.due {
+            background: linear-gradient(135deg, #fff7ed, #fffbeb);
+            border-left: 4px solid #f59e0b;
+            grid-column: span 2;
+        }
+        .financial-label-premium {
+            font-size: 0.6rem;
+            color: #64748b;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .financial-amount-premium {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        
+        /* Hours Row */
+        .hours-row-premium {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .hours-row-premium i {
+            color: #f59e0b;
+            font-size: 1rem;
+        }
+        .hours-text-premium {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        .hours-text-premium strong {
+            color: #f59e0b;
+            font-size: 0.9rem;
+        }
+        
+        /* Address Section */
+        .address-premium {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .address-premium i {
+            color: #f59e0b;
+            font-size: 0.8rem;
+        }
+        .address-text-premium {
+            font-size: 0.6rem;
+            color: #64748b;
+            line-height: 1.3;
+        }
+        
+        /* Card Footer */
+        .card-footer-premium {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            padding: 12px 25px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .card-footer-premium p {
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            margin-top: 25px;
+            margin-bottom: 20px;
+        }
+        .download-card-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+        }
+        .print-card-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+        .download-card-btn:hover, .print-card-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.05);
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .loading.show { display: flex; }
+        .spinner {
+            width: 55px;
+            height: 55px;
+            border: 5px solid rgba(245,158,11,0.2);
+            border-top: 5px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-msg {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 14px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.85rem;
+            border-left: 4px solid #dc2626;
+        }
+        .error-msg.show { display: block; }
+        
+        .no-data-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 60px 40px;
+            text-align: center;
+            color: #64748b;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 620px) {
+            .premium-card { width: 95%; }
+            .card-body-premium { flex-direction: column; align-items: center; }
+            .left-column-premium { flex: auto; }
+            .right-column-premium { width: 100%; }
+            .stats-grid-premium { grid-template-columns: repeat(3, 1fr); }
+            .financial-premium { grid-template-columns: 1fr; }
+            .financial-card-premium.due { grid-column: span 1; }
+            .search-box { flex-direction: column; }
+            .search-btn { margin-top: 0; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-text">
+                <h1>SP CONSTRUCTION</h1>
+                <p>BUILDING DREAMS</p>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <a href="attendance.html" class="nav-btn">📋 Attendance</a>
+            <a href="profile.html" class="nav-btn">👤 Profile</a>
+            <a href="dashboard.html" class="nav-btn">🏠 Home</a>
+        </div>
+    </div>
+    
+    <div id="errorMsg" class="error-msg"></div>
+    
+    <div class="search-card">
+        <div class="search-title">
+            <span><i class="fas fa-id-card"></i> Employee Attendance Card</span>
+            <span class="auto-badge" id="modeBadge">🤖 Auto Mode: Current Month</span>
+        </div>
+        
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="autoModeBtn" onclick="setMode('auto')">
+                <i class="fas fa-magic"></i> Auto Mode
+            </button>
+            <button class="mode-btn" id="manualModeBtn" onclick="setMode('manual')">
+                <i class="fas fa-calendar-alt"></i> Manual Mode
+            </button>
+        </div>
+        
+        <div class="search-box">
+            <div class="search-input-group">
+                <label><i class="fas fa-user"></i> Worker Name / ID</label>
+                <input type="text" id="workerSearch" placeholder="Enter worker name or ID...">
+            </div>
+            <div class="search-input-group" id="monthGroup">
+                <label><i class="fas fa-calendar"></i> Select Month</label>
+                <select id="monthSelect" disabled>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div class="search-input-group" id="yearGroup">
+                <label><i class="fas fa-calendar"></i> Select Year</label>
+                <select id="yearSelect" disabled></select>
+            </div>
+            <button class="search-btn" onclick="searchAndGenerateCard()"><i class="fas fa-search"></i> Generate Card</button>
+        </div>
+    </div>
+    
+    <div id="cardDisplayArea" class="card-container">
+        <div class="no-data-card">
+            <i class="fas fa-id-card" style="font-size: 3.5rem; color: #f59e0b; margin-bottom: 18px; opacity: 0.6;"></i>
+            <h3 style="margin-bottom: 10px;">Premium Attendance Card Generator</h3>
+            <p>Search a worker by name or ID to generate beautiful attendance card</p>
+            <p style="font-size: 0.8rem; margin-top: 12px; color: #f59e0b;">✨ Auto Mode: Shows current month's report ✨</p>
+        </div>
+    </div>
+    
+    <div id="actionButtons" class="action-buttons" style="display: none;">
+        <button class="download-card-btn" onclick="downloadCardAsImage()">
+            <i class="fas fa-download"></i> Download as Image
+        </button>
+        <button class="print-card-btn" onclick="printCard()">
+            <i class="fas fa-print"></i> Print Card
+        </button>
+    </div>
+</div>
+
+<script type="module">
+    let allUsers = [];
+    let allAttendance = [];
+    let currentUser = null;
+    let currentMode = 'auto';
+    let currentMonth = new Date().getMonth() + 1;
+    let currentYear = new Date().getFullYear();
+    
+    const CURRENT_YEAR = new Date().getFullYear();
+    const CURRENT_MONTH = new Date().getMonth() + 1;
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    // Year range: 2026 to 2075 (50 years)
+    const START_YEAR = 2026;
+    const END_YEAR = 2075;
+    
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('show', show);
+    }
+    
+    function showError(message) {
+        const el = document.getElementById('errorMsg');
+        el.textContent = message;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 5000);
+    }
+    
+    function populateYearSelect() {
+        const yearSelect = document.getElementById('yearSelect');
+        yearSelect.innerHTML = '';
+        
+        // Add years from START_YEAR (2026) to END_YEAR (2075)
+        for (let year = START_YEAR; year <= END_YEAR; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            if (year === CURRENT_YEAR && year >= START_YEAR && year <= END_YEAR) {
+                option.selected = true;
+            } else if (CURRENT_YEAR < START_YEAR) {
+                if (year === START_YEAR) option.selected = true;
+            } else if (CURRENT_YEAR > END_YEAR) {
+                if (year === END_YEAR) option.selected = true;
+            }
+            yearSelect.appendChild(option);
+        }
+    }
+    
+    window.setMode = function(mode) {
+        currentMode = mode;
+        const autoBtn = document.getElementById('autoModeBtn');
+        const manualBtn = document.getElementById('manualModeBtn');
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const modeBadge = document.getElementById('modeBadge');
+        
+        if (mode === 'auto') {
+            autoBtn.classList.add('active');
+            manualBtn.classList.remove('active');
+            monthSelect.disabled = true;
+            yearSelect.disabled = true;
+            modeBadge.innerHTML = '🤖 Auto Mode: ' + monthNames[CURRENT_MONTH - 1] + ' ' + CURRENT_YEAR;
+            currentMonth = CURRENT_MONTH;
+            currentYear = CURRENT_YEAR;
+            if (currentUser) {
+                generateCardForCurrentUser();
+            }
+        } else {
+            autoBtn.classList.remove('active');
+            manualBtn.classList.add('active');
+            monthSelect.disabled = false;
+            yearSelect.disabled = false;
+            modeBadge.innerHTML = '📅 Manual Mode: Select Month & Year (2026-2075)';
+            currentMonth = parseInt(document.getElementById('monthSelect').value);
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+            if (currentUser) {
+                generateCardForCurrentUser();
+            }
+        }
+    };
+    
+    async function generateCardForCurrentUser() {
+        if (!currentUser) return;
+        showLoading(true);
+        const stats = calculateMonthlyStats(currentUser.userId, currentMonth, currentYear);
+        generateCardHTML(currentUser, stats, currentMonth, currentYear);
+        showLoading(false);
+        document.getElementById('actionButtons').style.display = 'flex';
+    }
+    
+    async function loadUsers() {
+        try {
+            const usersRef = window.ref(window.db, 'users');
+            const snapshot = await window.get(usersRef);
+            if (snapshot.exists()) {
+                const usersData = snapshot.val();
+                allUsers = Object.values(usersData);
+                console.log("Users loaded:", allUsers.length);
+            }
+        } catch (error) {
+            console.error("Error loading users:", error);
+        }
+    }
+    
+    async function loadAttendance() {
+        try {
+            const attendanceRef = window.ref(window.db, 'attendance');
+            const snapshot = await window.get(attendanceRef);
+            if (snapshot.exists()) {
+                const attendanceData = snapshot.val();
+                allAttendance = Object.values(attendanceData);
+                console.log("Attendance loaded:", allAttendance.length);
+            }
+        } catch (error) {
+            console.error("Error loading attendance:", error);
+        }
+    }
+    
+    function calculateMonthlyStats(workerId, month, year) {
+        const monthStr = month.toString().padStart(2, '0');
+        const yearStr = year.toString();
+        
+        const monthlyRecords = allAttendance.filter(record => {
+            if (!record.date) return false;
+            const [recordYear, recordMonth] = record.date.split('-');
+            return record.workerId === workerId && recordYear === yearStr && recordMonth === monthStr;
+        });
+        
+        let presentDays = 0;
+        let absentDays = 0;
+        let halfDays = 0;
+        let totalHours = 0;
+        let totalEarnings = 0;
+        let totalPaid = 0;
+        
+        monthlyRecords.forEach(record => {
+            if (record.status === 'present') presentDays++;
+            else if (record.status === 'absent') absentDays++;
+            else if (record.status === 'halfday') halfDays++;
+            
+            totalHours += record.hours || 0;
+            totalEarnings += record.earnings || 0;
+            totalPaid += record.paid || 0;
+        });
+        
+        const totalWorkingDays = presentDays + halfDays;
+        const totalDue = totalEarnings - totalPaid;
+        
+        return {
+            presentDays,
+            absentDays,
+            halfDays,
+            totalWorkingDays,
+            totalHours: totalHours.toFixed(1),
+            totalEarnings: totalEarnings.toFixed(0),
+            totalPaid: totalPaid.toFixed(0),
+            totalDue: totalDue.toFixed(0),
+            totalRecords: monthlyRecords.length
+        };
+    }
+    
+    window.searchAndGenerateCard = async function() {
+        const searchTerm = document.getElementById('workerSearch').value.trim();
+        
+        if (currentMode === 'auto') {
+            currentMonth = CURRENT_MONTH;
+            currentYear = CURRENT_YEAR;
+        } else {
+            currentMonth = parseInt(document.getElementById('monthSelect').value);
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+        }
+        
+        if (!searchTerm) {
+            showError('Please enter worker name or ID');
+            return;
+        }
+        
+        showLoading(true);
+        
+        if (allUsers.length === 0) await loadUsers();
+        if (allAttendance.length === 0) await loadAttendance();
+        
+        let foundUser = null;
+        
+        foundUser = allUsers.find(user => user.userId === searchTerm);
+        
+        if (!foundUser) {
+            foundUser = allUsers.find(user => {
+                const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+                return fullName.includes(searchTerm.toLowerCase());
+            });
+        }
+        
+        if (!foundUser) {
+            showLoading(false);
+            showError('Worker not found! Please check the name or ID.');
+            return;
+        }
+        
+        currentUser = foundUser;
+        const stats = calculateMonthlyStats(foundUser.userId, currentMonth, currentYear);
+        generateCardHTML(foundUser, stats, currentMonth, currentYear);
+        
+        showLoading(false);
+        document.getElementById('actionButtons').style.display = 'flex';
+    };
+    
+    function generateCardHTML(user, stats, month, year) {
+        const monthName = monthNames[month - 1];
+        const fullName = `${user.firstName} ${user.lastName}`;
+        const phone = user.mobile || 'Not provided';
+        const modeIndicator = currentMode === 'auto' ? 'AUTO MODE' : 'MANUAL MODE';
+        
+        const cardHTML = `
+            <div class="premium-card" id="attendanceCard">
+                <div class="card-header-premium">
+                    <div class="company-logo-premium">
+                        <div class="logo-circle-premium">
+                            <span>SP</span>
+                        </div>
+                        <div class="company-name-premium">
+                            <h2>SP CONSTRUCTION</h2>
+                            <p>BUILDING DREAMS</p>
+                        </div>
+                    </div>
+                    <div class="card-badge-premium">
+                        <i class="fas fa-id-card"></i> ${modeIndicator}
+                    </div>
+                </div>
+                
+                <div class="card-body-premium">
+                    <!-- LEFT COLUMN: Logo Box & User ID -->
+                    <div class="left-column-premium">
+                        <div class="premium-logo-box">
+                            <i class="fas fa-hard-hat"></i>
+                        </div>
+                        <div class="logo-label">EMPLOYEE CARD</div>
+                        <div class="user-id-premium">
+                            <i class="fas fa-qrcode"></i> <span>${user.userId}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- RIGHT COLUMN: Name, Mobile & All Data -->
+                    <div class="right-column-premium">
+                        <div class="worker-name-premium">${escapeHtml(fullName)}</div>
+                        
+                        <!-- Mobile Info Card -->
+                        <div class="info-card-premium">
+                            <div class="info-icon-premium">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="info-content-premium">
+                                <div class="info-label-premium">CONTACT NUMBER</div>
+                                <div class="info-value-premium">${escapeHtml(phone)}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Month Badge -->
+                        <div class="month-badge-premium">
+                            <span><i class="fas fa-calendar-alt"></i> REPORT: ${monthName} ${year}</span>
+                        </div>
+                        
+                        <!-- Attendance Stats -->
+                        <div class="stats-premium">
+                            <div class="stats-grid-premium">
+                                <div class="stat-item-premium">
+                                    <div class="stat-number-premium">${stats.presentDays}</div>
+                                    <div class="stat-label-premium">Present</div>
+                                </div>
+                                <div class="stat-item-premium">
+                                    <div class="stat-number-premium">${stats.halfDays}</div>
+                                    <div class="stat-label-premium">Half Day</div>
+                                </div>
+                                <div class="stat-item-premium">
+                                    <div class="stat-number-premium">${stats.absentDays}</div>
+                                    <div class="stat-label-premium">Absent</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Financial Summary -->
+                        <div class="financial-premium">
+                            <div class="financial-card-premium earnings">
+                                <div class="financial-label-premium">Total Earnings</div>
+                                <div class="financial-amount-premium">৳ ${stats.totalEarnings}</div>
+                            </div>
+                            <div class="financial-card-premium paid">
+                                <div class="financial-label-premium">Total Paid</div>
+                                <div class="financial-amount-premium">৳ ${stats.totalPaid}</div>
+                            </div>
+                            <div class="financial-card-premium due">
+                                <div class="financial-label-premium">Balance Due</div>
+                                <div class="financial-amount-premium" style="color: ${parseFloat(stats.totalDue) < 0 ? '#dc2626' : '#f59e0b'}">৳ ${stats.totalDue}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Work Hours -->
+                        <div class="hours-row-premium">
+                            <i class="fas fa-clock"></i>
+                            <div class="hours-text-premium">
+                                Total Work Hours: <strong>${stats.totalHours} hours</strong> (${stats.totalWorkingDays} working days)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Address -->
+                <div class="address-premium" style="margin: 0 25px 15px 25px;">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div class="address-text-premium">
+                        Corporate Office: House #12, Road #05, Sector #10, Uttara, Dhaka-1230
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="card-footer-premium">
+                    <p><i class="far fa-copyright"></i> ${year} SP CONSTRUCTION | All Rights Reserved | www.spconstruction.com</p>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('cardDisplayArea').innerHTML = cardHTML;
+    }
+    
+    window.downloadCardAsImage = async function() {
+        const cardElement = document.getElementById('attendanceCard');
+        if (!cardElement) {
+            showError('No card to download. Please generate a card first.');
+            return;
+        }
+        
+        showLoading(true);
+        
+        try {
+            const canvas = await html2canvas(cardElement, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: true
+            });
+            
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            const fileName = `${currentUser?.firstName}_${currentUser?.lastName}_Attendance_${currentMonth}_${currentYear}.png`;
+            link.download = fileName;
+            link.href = image;
+            link.click();
+            
+            showLoading(false);
+        } catch (error) {
+            console.error("Error generating image:", error);
+            showLoading(false);
+            showError('Failed to generate image. Please try again.');
+        }
+    };
+    
+    window.printCard = function() {
+        const cardElement = document.getElementById('attendanceCard');
+        if (!cardElement) {
+            showError('No card to print. Please generate a card first.');
+            return;
+        }
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Attendance Card - ${currentUser?.firstName} ${currentUser?.lastName}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            background: #f0f2f5;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            min-height: 100vh;
+                            padding: 20px;
+                        }
+                        @media print {
+                            body { background: white; padding: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div>
+                        ${cardElement.outerHTML}
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                setTimeout(function() { window.close(); }, 500);
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    document.getElementById('workerSearch').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchAndGenerateCard();
+        }
+    });
+    
+    document.getElementById('monthSelect').addEventListener('change', function() {
+        if (currentMode === 'manual' && currentUser) {
+            currentMonth = parseInt(this.value);
+            generateCardForCurrentUser();
+        }
+    });
+    
+    document.getElementById('yearSelect').addEventListener('change', function() {
+        if (currentMode === 'manual' && currentUser) {
+            currentYear = parseInt(this.value);
+            generateCardForCurrentUser();
+        }
+    });
+    
+    populateYearSelect();
+    
+    window.onAuthStateChanged(window.auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            showLoading(true);
+            Promise.all([loadUsers(), loadAttendance()]).then(() => {
+                showLoading(false);
+                console.log("All data loaded. Users:", allUsers.length, "Attendance:", allAttendance.length);
+            }).catch(() => {
+                showLoading(false);
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>কোম্পানি পেমেন্ট - এসপি কনস্ট্রাকশন</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, push, remove, update, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.set = set;
+        window.push = push;
+        window.remove = remove;
+        window.update = update;
+        window.onValue = onValue;
+        window.onAuthStateChanged = onAuthStateChanged;
+        
+        console.log("Firebase initialized successfully");
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #fcd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .logo-text p { font-size: 0.55rem; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 8px 16px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; text-decoration: none; }
+        .nav-btn:hover { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .search-section .input-group { flex: 1; min-width: 200px; }
+        .search-section label { display: block; font-size: 0.7rem; font-weight: 600; color: #475569; margin-bottom: 5px; }
+        .search-section select, .search-section input {
+            width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-size: 0.9rem;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(34,197,94,0.3); }
+        
+        .filter-info {
+            background: #e0f2fe;
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+        .filter-info.show { display: flex; }
+        .clear-filter {
+            background: none;
+            border: none;
+            color: #0284c7;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .form-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #1e293b;
+            border-left: 4px solid #f59e0b;
+            padding-left: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        .input-group label i { margin-right: 6px; color: #f59e0b; }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+        }
+        .input-group input[readonly] {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+        
+        .company-select-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .company-select-group select { flex: 1; }
+        .company-action-btn {
+            width: 40px;
+            height: 42px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .company-action-btn.add { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .company-action-btn.add:hover { transform: scale(1.05); }
+        .company-action-btn.delete { background: #ef4444; color: white; }
+        .company-action-btn.delete:hover { background: #dc2626; }
+        
+        .btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
+        
+        .button-group { display: flex; gap: 15px; justify-content: flex-end; margin-top: 10px; }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 24px;
+        }
+        .summary-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .summary-card h4 { font-size: 0.7rem; color: #64748b; margin-bottom: 8px; }
+        .summary-card .value { font-size: 1.3rem; font-weight: 800; color: #f59e0b; }
+        
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 24px;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; font-weight: 600; color: #475569; font-size: 0.75rem; }
+        td { font-size: 0.85rem; }
+        .amount-positive { color: #15803d; font-weight: 600; }
+        .amount-negative { color: #dc2626; font-weight: 600; }
+        .summary-row { background: #fef3c7; font-weight: 600; }
+        .action-btns { display: flex; gap: 8px; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 0.7rem; }
+        
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white; border-radius: 32px; padding: 28px; max-width: 400px; width: 90%;
+        }
+        .modal-content h3 { margin-bottom: 20px; color: #1e293b; }
+        .modal-content input {
+            width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px;
+            margin-bottom: 20px; font-size: 0.9rem;
+        }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-buttons button { flex: 1; padding: 12px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
+        
+        .loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 999; }
+        .loading.show { display: flex; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .error-msg, .success-msg { padding: 12px; border-radius: 16px; margin-bottom: 20px; display: none; font-size: 0.8rem; }
+        .error-msg { background: #ef444415; color: #b91c1c; }
+        .success-msg { background: #22c55e15; color: #15803d; }
+        .error-msg.show, .success-msg.show { display: block; }
+        
+        @media (max-width: 700px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .button-group { flex-direction: column; }
+            .button-group button { width: 100%; }
+            .search-section { flex-direction: column; }
+            .download-btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<!-- Add Company Modal -->
+<div class="modal" id="addCompanyModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-building"></i> নতুন কোম্পানি যোগ করুন</h3>
+        <input type="text" id="newCompanyName" placeholder="কোম্পানির নাম লিখুন">
+        <div class="modal-buttons">
+            <button class="btn" onclick="addNewCompany()">যোগ করুন</button>
+            <button class="btn btn-secondary" onclick="closeAddCompanyModal()">বাতিল</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>COMPANY PAYMENT SYSTEM</p></div>
+        </div>
+        <div class="nav-buttons">
+            <a href="attendance.html" class="nav-btn">📋 অ্যাটেনডেন্স</a>
+            <a href="dashboard.html" class="nav-btn">🏠 হোম</a>
+        </div>
+    </div>
+    
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="successMsg" class="success-msg"></div>
+    
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="input-group">
+            <label><i class="fas fa-search"></i> কোম্পানি অনুসন্ধান করুন</label>
+            <select id="searchCompanySelect">
+                <option value="">-- সব কোম্পানি দেখুন --</option>
+            </select>
+        </div>
+        <button class="download-btn" onclick="downloadCompanyReport()">
+            <i class="fas fa-download"></i> PDF রিপোর্ট ডাউনলোড
+        </button>
+    </div>
+    
+    <!-- Filter Info -->
+    <div id="filterInfo" class="filter-info">
+        <span><i class="fas fa-filter"></i> <strong>ফিল্টার:</strong> <span id="filterCompanyName">-</span></span>
+        <button class="clear-filter" onclick="clearCompanyFilter()"><i class="fas fa-times-circle"></i> ক্লিয়ার</button>
+    </div>
+    
+    <!-- Main Form Card with 6 Input Fields -->
+    <div class="form-card">
+        <div class="form-title">
+            <span><i class="fas fa-calendar-alt"></i> দৈনিক পেমেন্ট হিসাব</span>
+        </div>
+        
+        <div class="input-grid">
+            <div class="input-group">
+                <label><i class="fas fa-calendar"></i> তারিখ</label>
+                <input type="date" id="dateInput">
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-building"></i> কোম্পানির নাম</label>
+                <div class="company-select-group">
+                    <select id="companySelect">
+                        <option value="">-- কোম্পানি নির্বাচন করুন --</option>
+                    </select>
+                    <button class="company-action-btn add" onclick="openAddCompanyModal()" title="নতুন কোম্পানি যোগ করুন"><i class="fas fa-plus"></i></button>
+                    <button class="company-action-btn delete" onclick="deleteSelectedCompany()" title="কোম্পানি ডিলিট করুন"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-users"></i> মোট শ্রমিক</label>
+                <input type="number" id="totalWorkerInput" placeholder="যেমন: 5">
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-taka-sign"></i> মোট উপার্জন (টাকা)</label>
+                <input type="number" id="totalEarningInput" placeholder="যেমন: 4850">
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-hand-holding-usd"></i> কোম্পানি দিয়েছে (টাকা)</label>
+                <input type="number" id="companyPaidInput" placeholder="যেমন: 50000">
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-clock"></i> কোম্পানি বাকি (টাকা)</label>
+                <input type="text" id="companyDueInput" readonly placeholder="স্বয়ংক্রিয়ভাবে গণনা হবে">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn" onclick="savePayment()"><i class="fas fa-save"></i> সংরক্ষণ করুন</button>
+            <button class="btn btn-secondary" onclick="clearForm()"><i class="fas fa-eraser"></i> ক্লিয়ার</button>
+        </div>
+    </div>
+    
+    <!-- Current Day Summary Cards -->
+    <div class="summary-grid" id="summaryGrid">
+        <div class="summary-card"><h4><i class="fas fa-building"></i> কোম্পানি</h4><div class="value" id="summaryCompany">-</div></div>
+        <div class="summary-card"><h4><i class="fas fa-users"></i> শ্রমিক</h4><div class="value" id="summaryWorkers">0</div></div>
+        <div class="summary-card"><h4><i class="fas fa-taka-sign"></i> উপার্জন</h4><div class="value" id="summaryEarnings">৳ 0</div></div>
+        <div class="summary-card"><h4><i class="fas fa-hand-holding-usd"></i> কোম্পানি দিয়েছে</h4><div class="value" id="summaryPaid">৳ 0</div></div>
+        <div class="summary-card"><h4><i class="fas fa-clock"></i> কোম্পানি বাকি</h4><div class="value" id="summaryDue">৳ 0</div></div>
+    </div>
+    
+    <!-- Payment History Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th>তারিখ</th><th>কোম্পানির নাম</th><th>মোট শ্রমিক</th><th>মোট উপার্জন</th><th>কোম্পানি দিয়েছে</th><th>কোম্পানি বাকি</th><th>অ্যাকশন</th></tr>
+            </thead>
+            <tbody id="paymentTableBody"><tr><td colspan="7" style="text-align:center;">লোড হচ্ছে...<\/td></tr></tbody>
+            <tfoot id="paymentTableFooter"></tfoot>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+    let allPayments = [];
+    let allCompanies = [];
+    let editPaymentId = null;
+    let currentFilterCompanyId = null;
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateInput').value = today;
+    
+    function calculateDue() {
+        const totalEarning = parseFloat(document.getElementById('totalEarningInput').value) || 0;
+        const companyPaid = parseFloat(document.getElementById('companyPaidInput').value) || 0;
+        const due = totalEarning - companyPaid;
+        document.getElementById('companyDueInput').value = due.toFixed(2);
+        return due;
+    }
+    
+    document.getElementById('totalEarningInput').addEventListener('input', calculateDue);
+    document.getElementById('companyPaidInput').addEventListener('input', calculateDue);
+    
+    function showLoading(show) { document.getElementById('loading').classList.toggle('show', show); }
+    function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 4000); }
+    function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000); }
+    
+    function clearForm() {
+        document.getElementById('dateInput').value = today;
+        document.getElementById('companySelect').value = '';
+        document.getElementById('totalWorkerInput').value = '';
+        document.getElementById('totalEarningInput').value = '';
+        document.getElementById('companyPaidInput').value = '';
+        document.getElementById('companyDueInput').value = '';
+        editPaymentId = null;
+    }
+    
+    // Filter by company
+    function filterByCompany(companyId) {
+        currentFilterCompanyId = companyId;
+        if (companyId) {
+            const selectedCompany = allCompanies.find(c => c.id === companyId);
+            document.getElementById('filterCompanyName').innerHTML = selectedCompany ? selectedCompany.name : '';
+            document.getElementById('filterInfo').classList.add('show');
+        } else {
+            document.getElementById('filterInfo').classList.remove('show');
+        }
+        renderFilteredTable();
+    }
+    
+    function clearCompanyFilter() {
+        document.getElementById('searchCompanySelect').value = '';
+        filterByCompany(null);
+    }
+    
+    function renderFilteredTable() {
+        let filteredPayments = [...allPayments];
+        if (currentFilterCompanyId) {
+            filteredPayments = filteredPayments.filter(p => p.companyId === currentFilterCompanyId);
+        }
+        renderPaymentTable(filteredPayments);
+    }
+    
+    async function loadCompanies() {
+        try {
+            const companiesRef = window.ref(window.db, 'companies');
+            const snapshot = await window.get(companiesRef);
+            if (snapshot.exists()) {
+                const companiesData = snapshot.val();
+                allCompanies = Object.entries(companiesData).map(([id, name]) => ({ id, name }));
+            } else {
+                const defaultCompanies = ['বসুন্ধরা সিটি', 'গুলশান টাওয়ার', 'উত্তরা সেক্টর-১০', 'ধানমন্ডি ২৭', 'মিরপুর হাউজিং'];
+                allCompanies = [];
+                for (const company of defaultCompanies) {
+                    const newRef = window.push(window.ref(window.db, 'companies'));
+                    await window.set(newRef, company);
+                    allCompanies.push({ id: newRef.key, name: company });
+                }
+            }
+            updateCompanySelects();
+        } catch (error) { 
+            console.error("Error loading companies:", error);
+        }
+    }
+    
+    function updateCompanySelects() {
+        const select = document.getElementById('companySelect');
+        const searchSelect = document.getElementById('searchCompanySelect');
+        const options = '<option value="">-- কোম্পানি নির্বাচন করুন --</option>' + 
+            allCompanies.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        select.innerHTML = options;
+        searchSelect.innerHTML = '<option value="">-- সব কোম্পানি দেখুন --</option>' + 
+            allCompanies.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+    
+    function openAddCompanyModal() { document.getElementById('addCompanyModal').classList.add('show'); }
+    function closeAddCompanyModal() { document.getElementById('addCompanyModal').classList.remove('show'); document.getElementById('newCompanyName').value = ''; }
+    
+    async function addNewCompany() {
+        const newCompanyName = document.getElementById('newCompanyName').value.trim();
+        if (!newCompanyName) { showError('কোম্পানির নাম লিখুন'); return; }
+        showLoading(true);
+        try {
+            const newRef = window.push(window.ref(window.db, 'companies'));
+            await window.set(newRef, newCompanyName);
+            showSuccess(`"${newCompanyName}" যোগ করা হয়েছে!`);
+            closeAddCompanyModal();
+            await loadCompanies();
+        } catch (error) { showError('যোগ করতে ব্যর্থ: ' + error.message); }
+        showLoading(false);
+    }
+    
+    async function deleteSelectedCompany() {
+        const selectedId = document.getElementById('companySelect').value;
+        if (!selectedId) { showError('দয়া করে একটি কোম্পানি নির্বাচন করুন'); return; }
+        const selectedCompany = allCompanies.find(c => c.id === selectedId);
+        if (confirm(`"${selectedCompany.name}" ডিলিট করতে চান?`)) {
+            showLoading(true);
+            try {
+                await window.remove(window.ref(window.db, `companies/${selectedId}`));
+                showSuccess('কোম্পানি ডিলিট করা হয়েছে!');
+                await loadCompanies();
+                clearForm();
+            } catch (error) { showError('ডিলিট করতে ব্যর্থ: ' + error.message); }
+            showLoading(false);
+        }
+    }
+    
+    async function loadPayments() {
+        showLoading(true);
+        try {
+            const paymentsRef = window.ref(window.db, 'companyDailyPayments');
+            const snapshot = await window.get(paymentsRef);
+            if (snapshot.exists()) {
+                allPayments = Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }));
+                allPayments.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else {
+                allPayments = [];
+            }
+            renderFilteredTable();
+        } catch (error) { console.error("Error loading payments:", error); }
+        showLoading(false);
+    }
+    
+    function renderPaymentTable(payments) {
+        const tbody = document.getElementById('paymentTableBody');
+        const tfoot = document.getElementById('paymentTableFooter');
+        if (!payments || payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">কোন পেমেন্ট রেকর্ড নেই<\/td></tr>';
+            tfoot.innerHTML = '';
+            return;
+        }
+        let totalWorkers = 0, totalEarnings = 0, totalPaid = 0, totalDue = 0;
+        tbody.innerHTML = payments.map(p => {
+            totalWorkers += p.totalWorker || 0;
+            totalEarnings += p.totalEarning || 0;
+            totalPaid += p.companyPaid || 0;
+            totalDue += (p.totalEarning - p.companyPaid) || 0;
+            const dueColor = (p.totalEarning - p.companyPaid) < 0 ? '#dc2626' : '#15803d';
+            return `
+                <tr>
+                    <td>${p.date}</td>
+                    <td>${p.companyName}</td>
+                    <td>${p.totalWorker || 0}</td>
+                    <td class="${(p.totalEarning || 0) >= 0 ? 'amount-positive' : ''}">৳ ${(p.totalEarning || 0).toLocaleString()}</td>
+                    <td class="${(p.companyPaid || 0) >= 0 ? 'amount-positive' : ''}">৳ ${(p.companyPaid || 0).toLocaleString()}</td>
+                    <td style="color:${dueColor}">৳ ${((p.totalEarning - p.companyPaid) || 0).toLocaleString()}</td>
+                    <td class="action-btns"><button class="delete-btn" onclick="deletePayment('${p.id}')"><i class="fas fa-trash"></i> ডিলিট</button></td>
+                </tr>
+            `;
+        }).join('');
+        tfoot.innerHTML = `<tr class="summary-row">
+            <td><strong>মোট</strong></td><td></td><td><strong>${totalWorkers}</strong></td>
+            <td><strong>৳ ${totalEarnings.toLocaleString()}</strong></td>
+            <td><strong>৳ ${totalPaid.toLocaleString()}</strong></td>
+            <td><strong>৳ ${totalDue.toLocaleString()}</strong></td><td></td>
+        </tr>`;
+    }
+    
+    window.savePayment = async function() {
+        const date = document.getElementById('dateInput').value;
+        const companyId = document.getElementById('companySelect').value;
+        const selectedCompany = allCompanies.find(c => c.id === companyId);
+        const companyName = selectedCompany ? selectedCompany.name : '';
+        const totalWorker = parseInt(document.getElementById('totalWorkerInput').value) || 0;
+        const totalEarning = parseFloat(document.getElementById('totalEarningInput').value) || 0;
+        const companyPaid = parseFloat(document.getElementById('companyPaidInput').value) || 0;
+        const companyDue = totalEarning - companyPaid;
+        
+        if (!date || !companyId) { showError('তারিখ এবং কোম্পানি নির্বাচন করুন'); return; }
+        
+        showLoading(true);
+        try {
+            const existingEntry = allPayments.find(p => p.date === date);
+            if (existingEntry && !editPaymentId) {
+                showError('এই তারিখে ইতিমধ্যে একটি এন্ট্রি আছে!');
+                showLoading(false); return;
+            }
+            
+            const paymentData = { date, companyId, companyName, totalWorker, totalEarning, companyPaid, companyDue, updatedAt: new Date().toISOString() };
+            
+            if (editPaymentId) {
+                await window.update(window.ref(window.db, `companyDailyPayments/${editPaymentId}`), paymentData);
+                showSuccess('পেমেন্ট আপডেট করা হয়েছে!');
+                editPaymentId = null;
+            } else {
+                paymentData.createdAt = new Date().toISOString();
+                const newRef = window.push(window.ref(window.db, 'companyDailyPayments'));
+                await window.set(newRef, paymentData);
+                showSuccess('পেমেন্ট যোগ করা হয়েছে!');
+            }
+            clearForm();
+            await loadPayments();
+            loadTodaySummary();
+        } catch (error) { 
+            if (error.code === 'PERMISSION_DENIED') {
+                showError('Permission denied! Please update Firebase Database Rules.');
+            } else { showError('ব্যর্থ: ' + error.message); }
+        }
+        showLoading(false);
+    };
+    
+    window.deletePayment = async function(id) {
+        if (confirm('এই পেমেন্ট ডিলিট করতে চান?')) {
+            showLoading(true);
+            try {
+                await window.remove(window.ref(window.db, `companyDailyPayments/${id}`));
+                showSuccess('পেমেন্ট ডিলিট করা হয়েছে!');
+                await loadPayments();
+                loadTodaySummary();
+            } catch (error) { showError('ডিলিট করতে ব্যর্থ: ' + error.message); }
+            showLoading(false);
+        }
+    };
+    
+    function loadTodaySummary() {
+        const todayDate = new Date().toISOString().split('T')[0];
+        const todayPayment = allPayments.find(p => p.date === todayDate);
+        if (todayPayment) {
+            document.getElementById('summaryCompany').textContent = todayPayment.companyName;
+            document.getElementById('summaryWorkers').textContent = todayPayment.totalWorker || 0;
+            document.getElementById('summaryEarnings').innerHTML = `৳ ${(todayPayment.totalEarning || 0).toLocaleString()}`;
+            document.getElementById('summaryPaid').innerHTML = `৳ ${(todayPayment.companyPaid || 0).toLocaleString()}`;
+            const due = (todayPayment.totalEarning - todayPayment.companyPaid) || 0;
+            document.getElementById('summaryDue').innerHTML = `৳ ${due.toLocaleString()}`;
+            document.getElementById('summaryDue').style.color = due < 0 ? '#dc2626' : '#15803d';
+        } else {
+            document.getElementById('summaryCompany').textContent = '-';
+            document.getElementById('summaryWorkers').textContent = '0';
+            document.getElementById('summaryEarnings').innerHTML = '৳ 0';
+            document.getElementById('summaryPaid').innerHTML = '৳ 0';
+            document.getElementById('summaryDue').innerHTML = '৳ 0';
+        }
+    }
+    
+    // PDF Download
+    window.downloadCompanyReport = async function() {
+        let recordsToInclude = [...allPayments];
+        let companyName = 'All Companies';
+        
+        if (currentFilterCompanyId) {
+            const selectedCompany = allCompanies.find(c => c.id === currentFilterCompanyId);
+            companyName = selectedCompany ? selectedCompany.name : 'Selected Company';
+            recordsToInclude = recordsToInclude.filter(p => p.companyId === currentFilterCompanyId);
+        }
+        
+        if (recordsToInclude.length === 0) {
+            showError('No records found to download!');
+            return;
+        }
+        
+        showLoading(true);
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Header
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 45, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.text("SP CONSTRUCTION", 105, 18, { align: "center" });
+            doc.setFontSize(10);
+            doc.setTextColor(253, 186, 116);
+            doc.text("BUILDING DREAMS", 105, 26, { align: "center" });
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.text("COMPANY PAYMENT REPORT", 105, 35, { align: "center" });
+            doc.setTextColor(253, 186, 116);
+            doc.setFontSize(8);
+            doc.text(`Company: ${companyName}`, 105, 42, { align: "center" });
+            
+            // Table Header
+            doc.setFillColor(245, 158, 11);
+            doc.rect(10, 52, 190, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            
+            const headers = ["Date", "Company", "Workers", "Earnings", "Paid", "Due"];
+            const colWidths = [25, 45, 20, 30, 30, 30];
+            let xPos = 10;
+            headers.forEach((header, i) => { doc.text(header, xPos + 2, 59); xPos += colWidths[i]; });
+            
+            // Table Data
+            doc.setTextColor(51, 65, 85);
+            doc.setFont("helvetica", "normal");
+            let yPos = 66;
+            let totalWorkers = 0, totalEarnings = 0, totalPaid = 0, totalDue = 0;
+            
+            for (const record of recordsToInclude) {
+                if (yPos > 270) { doc.addPage(); yPos = 20; doc.setFillColor(15,23,42); doc.rect(0,0,210,40,'F'); doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text("SP CONSTRUCTION",105,15,{align:"center"}); doc.setFontSize(9); doc.setTextColor(253,186,116); doc.text("COMPANY PAYMENT REPORT (Continued)",105,25,{align:"center"}); doc.setFillColor(245,158,11); doc.rect(10,32,190,10,'F'); doc.setTextColor(255,255,255); doc.setFontSize(8); xPos=10; headers.forEach((header,i)=>{ doc.text(header,xPos+2,39); xPos+=colWidths[i]; }); yPos=46; doc.setTextColor(51,65,85); }
+                
+                totalWorkers += record.totalWorker || 0;
+                totalEarnings += record.totalEarning || 0;
+                totalPaid += record.companyPaid || 0;
+                totalDue += (record.totalEarning - record.companyPaid) || 0;
+                
+                const rowData = [record.date, record.companyName, (record.totalWorker || 0).toString(), `৳ ${(record.totalEarning || 0).toLocaleString()}`, `৳ ${(record.companyPaid || 0).toLocaleString()}`, `৳ ${((record.totalEarning - record.companyPaid) || 0).toLocaleString()}`];
+                xPos = 10;
+                for (let i = 0; i < rowData.length; i++) { doc.text(rowData[i].toString(), xPos + 2, yPos); xPos += colWidths[i]; }
+                yPos += 7;
+            }
+            
+            yPos += 5;
+            doc.setDrawColor(245,158,11);
+            doc.line(10, yPos - 3, 200, yPos - 3);
+            doc.setFont("helvetica","bold");
+            doc.setTextColor(245,158,11);
+            doc.text(`Total Workers: ${totalWorkers}`, 10, yPos);
+            doc.text(`Total Earnings: ৳${totalEarnings.toLocaleString()}`, 70, yPos);
+            doc.text(`Total Paid: ৳${totalPaid.toLocaleString()}`, 130, yPos);
+            doc.text(`Balance Due: ৳${totalDue.toLocaleString()}`, 170, yPos);
+            
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setTextColor(148,163,184);
+                doc.setFontSize(7);
+                doc.text(`Generated on: ${new Date().toLocaleString()} | SP Construction Management System`, 105, 290, { align: "center" });
+            }
+            
+            doc.save(`Company_Payment_Report_${companyName.replace(/ /g, '_')}.pdf`);
+            showSuccess('PDF report downloaded successfully!');
+        } catch (error) { console.error("PDF generation error:", error); showError('Failed to generate PDF: ' + error.message); }
+        showLoading(false);
+    };
+    
+    // Event listeners
+    document.getElementById('searchCompanySelect').addEventListener('change', function(e) {
+        filterByCompany(e.target.value || null);
+    });
+    
+    window.addNewCompany = addNewCompany;
+    window.closeAddCompanyModal = closeAddCompanyModal;
+    window.openAddCompanyModal = openAddCompanyModal;
+    window.deleteSelectedCompany = deleteSelectedCompany;
+    window.clearCompanyFilter = clearCompanyFilter;
+    window.downloadCompanyReport = downloadCompanyReport;
+    
+    window.onAuthStateChanged(window.auth, (user) => {
+        if (!user) { window.location.href = 'login.html'; }
+        else {
+            console.log("User logged in:", user.email);
+            showLoading(true);
+            Promise.all([loadCompanies(), loadPayments()]).then(() => {
+                loadTodaySummary();
+                showLoading(false);
+            });
+        }
+    });
+</script>
+</body>
+</html>
