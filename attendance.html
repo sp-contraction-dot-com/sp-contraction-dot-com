@@ -50,42 +50,61 @@
         }
         .container { max-width: 1400px; margin: 0 auto; }
         
-        .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        /* Stats Grid - Colorful cards like dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
             border-radius: 24px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
+            padding: 18px 16px;
+            transition: all 0.3s;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
         }
-        .logo-section { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
-        .logo-text h1 { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #fcd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .logo-text p { font-size: 0.6rem; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
-        .date-box { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 40px; color: white; font-weight: 500; }
-        .nav-buttons { display: flex; gap: 12px; }
-        .nav-btn { background: rgba(255,255,255,0.1); border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; transition: all 0.3s; text-decoration: none; }
-        .nav-btn:hover { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 24px;
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-info h3 { 
+            font-size: 0.65rem; 
+            font-weight: 600; 
+            margin-bottom: 6px; 
+            text-transform: uppercase; 
+            opacity: 0.9;
+            letter-spacing: 0.5px;
         }
-        .stat-card {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        .stat-card .value { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            letter-spacing: -0.5px;
+            line-height: 1.2;
         }
-        .stat-card h3 { font-size: 0.7rem; color: #64748b; margin-bottom: 5px; }
-        .stat-card .value { font-size: 1.6rem; font-weight: 800; color: #f59e0b; }
+        .stat-card .sub-text { 
+            font-size: 0.55rem; 
+            opacity: 0.8; 
+            margin-top: 4px; 
+        }
+        .stat-icon { 
+            width: 46px; 
+            height: 46px; 
+            background: rgba(255,255,255,0.2); 
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.3rem;
+        }
+        /* Individual card colors (matching dashboard style) */
+        .card-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }  /* Total Workers */
+        .card-2 { background: linear-gradient(135deg, #f97316, #ea580c); }  /* Present Today */
+        .card-3 { background: linear-gradient(135deg, #10b981, #059669); }  /* Total Hours */
+        .card-4 { background: linear-gradient(135deg, #06b6d4, #0891b2); }  /* Total Earnings */
+        .card-5 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }  /* Total Paid */
+        .card-6 { background: linear-gradient(135deg, #ec489a, #db2777); }  /* Balance Due */
         
         .form-card {
             background: white;
@@ -265,7 +284,6 @@
         .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
         .modal-buttons button { flex: 1; padding: 12px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
         
-        /* Download Modal */
         .download-modal {
             display: none;
             position: fixed;
@@ -395,22 +413,61 @@
 </div>
 
 <div class="container">
-    <div class="header">
-        <div class="logo-section"><div class="logo-icon"><span>SP</span></div><div class="logo-text"><h1>SP CONSTRUCTION</h1><p>ATTENDANCE & WORK REPORT</p></div></div>
-        <div class="date-box" id="currentDate"></div>
-        <div class="nav-buttons"><button class="nav-btn" onclick="window.location.href='dashboard.html'">🏠 Home</button><button class="nav-btn" onclick="window.location.href='profile.html'">👤 Profile</button></div>
-    </div>
+    <!-- Header removed as requested -->
     
     <div id="errorMsg" class="error-msg"></div>
     <div id="successMsg" class="success-msg"></div>
     
+    <!-- Stats Grid with colorful cards (matching dashboard style) -->
     <div class="stats-grid">
-        <div class="stat-card"><h3>Total Workers</h3><div class="value" id="totalWorkers">0</div></div>
-        <div class="stat-card"><h3>Present Today</h3><div class="value" id="presentToday">0</div></div>
-        <div class="stat-card"><h3>Total Hours</h3><div class="value" id="totalHours">0</div></div>
-        <div class="stat-card"><h3>Total Earnings</h3><div class="value" id="totalEarnings">0</div></div>
-        <div class="stat-card"><h3>Total Paid</h3><div class="value" id="totalPaid">0</div></div>
-        <div class="stat-card"><h3>Balance Due</h3><div class="value" id="totalDue">0</div></div>
+        <div class="stat-card card-1">
+            <div class="stat-info">
+                <h3><i class="fas fa-users"></i> Total Workers</h3>
+                <div class="value" id="totalWorkers">0</div>
+                <div class="sub-text">Registered workforce</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="stat-card card-2">
+            <div class="stat-info">
+                <h3><i class="fas fa-user-check"></i> Present Today</h3>
+                <div class="value" id="presentToday">0</div>
+                <div class="sub-text">Active today</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+        </div>
+        <div class="stat-card card-3">
+            <div class="stat-info">
+                <h3><i class="fas fa-clock"></i> Total Hours</h3>
+                <div class="value" id="totalHours">0</div>
+                <div class="sub-text">Worked hours</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        </div>
+        <div class="stat-card card-4">
+            <div class="stat-info">
+                <h3><i class="fas fa-rupee-sign"></i> Total Earnings</h3>
+                <div class="value" id="totalEarnings">0</div>
+                <div class="sub-text">Gross revenue</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+        </div>
+        <div class="stat-card card-5">
+            <div class="stat-info">
+                <h3><i class="fas fa-money-bill-wave"></i> Total Paid</h3>
+                <div class="value" id="totalPaid">0</div>
+                <div class="sub-text">Disbursed amount</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+        </div>
+        <div class="stat-card card-6">
+            <div class="stat-info">
+                <h3><i class="fas fa-hand-holding-usd"></i> Balance Due</h3>
+                <div class="value" id="totalDue">0</div>
+                <div class="sub-text">Outstanding payment</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        </div>
     </div>
     
     <div class="form-card">
@@ -464,24 +521,16 @@
     
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('workDate').value = today;
-    document.getElementById('currentDate').innerHTML = `<i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+    // Header removed so no currentDate element
     
-    // ========== FIXED formatNumber FUNCTION - NO EXTRA "1" ISSUE ==========
     function formatNumber(value) {
         if (value === null || value === undefined || value === '') {
             return '0';
         }
-        
-        // Force clean number - remove any non-numeric characters except decimal and minus
-        const number = Number(
-            String(value).replace(/[^0-9.-]/g, '')
-        );
-        
+        const number = Number(String(value).replace(/[^0-9.-]/g, ''));
         if (isNaN(number)) {
             return '0';
         }
-        
-        // Proper formatting with Indian number system (no decimals for currency)
         return number.toLocaleString('en-IN', {
             maximumFractionDigits: 0
         });
@@ -510,7 +559,6 @@
     };
     window.closeDownloadModal = function() { document.getElementById('downloadModal').classList.remove('show'); };
     
-    // ========== FIXED PDF GENERATION - USING formatNumber() + STRING CONCATENATION ==========
     window.generatePDFReport = async function() {
         const fromDate = document.getElementById('downloadFromDate').value;
         const toDate = document.getElementById('downloadToDate').value;
@@ -531,7 +579,6 @@
                 else { workerInfo = 'Worker ID: ' + currentSearchWorkerId; workerNameForFile = currentSearchWorkerId; }
             }
             
-            // Header
             doc.setFillColor(15, 23, 42);
             doc.rect(0, 0, 297, 45, 'F');
             doc.setTextColor(255, 255, 255);
@@ -553,7 +600,6 @@
             
             let startY = workerInfo ? 58 : 54;
             
-            // Table Header
             doc.setFillColor(245, 158, 11);
             doc.rect(10, startY, 277, 8, 'F');
             doc.setTextColor(255, 255, 255);
@@ -619,7 +665,6 @@
                 let workDescDisplay = record.workDesc || '-';
                 if (workDescDisplay.length > 22) workDescDisplay = workDescDisplay.substring(0, 20) + '..';
                 
-                // IMPORTANT: Using string concatenation, NOT template literals!
                 const serialStr = String(serialNo);
                 const dateStr = record.date || '';
                 const nameStr = workerNameDisplay;
@@ -668,7 +713,6 @@
             doc.setTextColor(245,158,11);
             doc.setFontSize(8);
             
-            // IMPORTANT: Using string concatenation, NOT template literals!
             doc.text('Workers: ' + formatNumber(serialNo - 1), 12, yPos + 3);
             doc.text('Total Hours: ' + formatNumber(totalHours), 55, yPos + 3);
             doc.text('Earnings: Rs ' + formatNumber(totalEarnings), 100, yPos + 3);
@@ -752,7 +796,7 @@
         const tfoot = document.getElementById('tableFooter');
         
         if (!records || records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">📭 No records found. Add your first attendance record.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;">📭 No records found. Add your first attendance record. </td></tr>';
             tfoot.innerHTML = '';
             return;
         }
@@ -795,7 +839,7 @@
                         <button class="edit-btn" onclick="editRecord('${record.id}')"><i class="fas fa-edit"></i> Edit</button>
                         <button class="delete-btn" onclick="deleteRecord('${record.id}')"><i class="fas fa-trash"></i> Del</button>
                     </td>
-                </tr>
+                  </>
             `;
         }).join('');
         
@@ -808,7 +852,7 @@
                 <td><strong>₹${formatCurrencyForDisplay(totalPaid)}</strong></td>
                 <td style="color: ${totalDue < 0 ? '#dc2626' : '#15803d'}"><strong>₹${formatCurrencyForDisplay(totalDue)}</strong></td>
                 <td colspan="3"></td>
-            </tr>
+              </tr>
         `;
     }
     
