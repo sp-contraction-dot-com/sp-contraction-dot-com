@@ -602,25 +602,25 @@
         <input type="file" id="bgImageUpload" accept="image/jpeg,image/png,image/jpg" style="display: none;">
         <!-- No text, only background image -->
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='all-attendance.html'">
+    <div class="menu-item" onclick="loadPageInIframe('all-attendance.html'); closeLeftMenu();">
         <i class="fas fa-calendar-check"></i> <span>User Attendance</span>
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='dashboard.html'">
+    <div class="menu-item" onclick="loadPageInIframe('dashboard.html'); closeLeftMenu();">
         <i class="fas fa-chart-line"></i> <span>Dashboard</span>
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='worker-list.html'">
+    <div class="menu-item" onclick="loadPageInIframe('worker-list.html'); closeLeftMenu();">
         <i class="fas fa-users"></i> <span>Worker List</span>
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='financial-report.html'">
+    <div class="menu-item" onclick="loadPageInIframe('financial-report.html'); closeLeftMenu();">
         <i class="fas fa-money-bill-wave"></i> <span>Payment History</span>
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='projects.html'">
+    <div class="menu-item" onclick="loadPageInIframe('projects.html'); closeLeftMenu();">
         <i class="fas fa-building"></i> <span>Projects</span>
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='work-calendar.html'">
+    <div class="menu-item" onclick="loadPageInIframe('work-calendar.html'); closeLeftMenu();">
         <i class="fas fa-calendar-alt"></i> <span>Work Calendar</span>
     </div>
-    <div class="menu-item" onclick="closeLeftMenu(); window.location.href='report-archive.html'">
+    <div class="menu-item" onclick="loadPageInIframe('report-archive.html'); closeLeftMenu();">
         <i class="fas fa-folder-open"></i> <span>Report Archive</span>
     </div>
 </div>
@@ -688,7 +688,7 @@
 
     <!-- Bottom Navigation - Dark -->
     <div class="bottom-nav">
-        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); handleBottomNav('home')">
+        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); loadPageInIframe('dashboard.html');">
             <i class="fas fa-home"></i>
             <div class="nav-label">Home</div>
         </div>
@@ -904,6 +904,20 @@
         }
     });
 
+    // --------------------- NEW FUNCTION: Load any page inside iframe ---------------------
+    window.loadPageInIframe = function(pageUrl) {
+        const iframe = document.getElementById('dashboardFrame');
+        const iframeContainer = document.getElementById('iframeContainer');
+        const dynamicView = document.getElementById('dynamicView');
+        
+        // Set iframe source
+        iframe.src = pageUrl;
+        // Show iframe, hide dynamic view
+        iframeContainer.style.display = 'flex';
+        dynamicView.style.display = 'none';
+        dynamicView.innerHTML = '';
+    };
+
     // --------------------- ORIGINAL APP FUNCTIONALITY (posts, notifications, etc.) ---------------------
     const postsData = [
         {
@@ -1092,6 +1106,7 @@
     window.renderPosts = renderPosts;
     window.renderSupport = renderSupport;
     window.showNotifications = showNotifications;
+    window.loadPageInIframe = loadPageInIframe;
 </script>
 </body>
 </html>
