@@ -388,11 +388,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
         .footer-brand .footer-logo .logo-icon span {
             font-size: 1.4rem;
             font-weight: 800;
             color: white;
+        }
+        .footer-brand .footer-logo .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .footer-brand .footer-logo h2 {
             font-size: 1.1rem;
@@ -555,7 +561,7 @@
         <div class="table-container">
             <table>
                 <thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead>
-                <tbody id="usersTableBody"><tr><td colspan="6" style="text-align:center;">Loading...<\/td></tr></tbody>
+                <tbody id="usersTableBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -569,7 +575,7 @@
         <div class="table-container">
             <table>
                 <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead>
-                <tbody id="companyPaymentTableBody"><tr><td colspan="6" style="text-align:center;">Loading...<\/td></tr></tbody>
+                <tbody id="companyPaymentTableBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -583,7 +589,7 @@
         <div class="table-container">
             <table>
                 <thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead>
-                <tbody id="attendanceTableBody"><tr><td colspan="7" style="text-align:center;">Loading...<\/td></tr></tbody>
+                <tbody id="attendanceTableBody"><tr><td colspan="7" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -625,7 +631,7 @@
                 <ul>
                     <li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra </li>
                     <li><i class="fas fa-phone-alt"></i> +91 98674 78423</li>
-                    <li><i class="fas fa-envelope"></i> info@spbuild.official.com</li>
+                    <li><i class="fas fa-envelope"></i> spbuild.official@gmail.com</li>
                     <li><i class="fas fa-clock"></i> Mon - Sat: 9:00 AM - 6:00 PM</li>
                 </ul>
             </div>
@@ -776,7 +782,40 @@
         setTimeout(() => t.remove(), duration);
     }
     
-    // ==================== END BANNER FUNCTIONS ====================
+    // ==================== FOOTER LOGO UPDATE (from Firebase) ====================
+    async function loadFooterLogo(uid) {
+        if (!uid) return;
+        try {
+            const logoRef = window.ref(window.db, `users/${uid}/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            const logoBase64 = snapshot.val();
+            const footerLogoIcon = document.querySelector('.footer-logo .logo-icon');
+            if (footerLogoIcon) {
+                if (logoBase64 && logoBase64.startsWith('data:image')) {
+                    footerLogoIcon.innerHTML = `<img src="${logoBase64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    footerLogoIcon.innerHTML = `<span>SP</span>`;
+                }
+            }
+        } catch(e) { console.warn("Error loading footer logo", e); }
+    }
+    
+    function listenFooterLogoChanges(uid) {
+        if (!uid) return;
+        const logoRef = window.ref(window.db, `users/${uid}/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            const logoBase64 = snapshot.val();
+            const footerLogoIcon = document.querySelector('.footer-logo .logo-icon');
+            if (footerLogoIcon) {
+                if (logoBase64 && logoBase64.startsWith('data:image')) {
+                    footerLogoIcon.innerHTML = `<img src="${logoBase64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    footerLogoIcon.innerHTML = `<span>SP</span>`;
+                }
+            }
+        });
+    }
+    // ==================== END FOOTER LOGO ====================
     
     async function loadTotalRegisteredUsers() {
         try {
@@ -811,13 +850,15 @@
                     document.getElementById('welcomeName').innerHTML = user.email?.split('@')[0] || 'Admin';
                 }
                 await loadBannerImage();
+                await loadFooterLogo(user.uid);
+                listenFooterLogoChanges(user.uid);
             }
             
             updateStats();
             updateUsersTable();
             updateAttendanceTable();
             updateCompanyPaymentTable();
-            updateCharts(); // Charts will be created/updated
+            updateCharts();
         } catch(e) { console.error(e); }
         showLoading(false);
     }
@@ -922,7 +963,6 @@
     }
     
     function updateCharts() {
-        // Generate last 7 days labels
         let last7 = [];
         for (let i = 6; i >= 0; i--) {
             let d = new Date();
@@ -930,7 +970,6 @@
             last7.push(d.toISOString().split('T')[0]);
         }
         
-        // Calculate attendance rate per day
         let attRates = last7.map(d => {
             let dayRec = allAttendanceRecords.filter(r => r.date === d);
             if (!dayRec.length) return 0;
@@ -954,13 +993,11 @@
         
         if (!ctx1 || !ctx2 || !ctx3 || !ctx4) return;
         
-        // Destroy existing charts if any
         if (attendanceRateChart) attendanceRateChart.destroy();
         if (weeklyPaymentChart) weeklyPaymentChart.destroy();
         if (paymentPieChart) paymentPieChart.destroy();
         if (dailyEarningChart) dailyEarningChart.destroy();
         
-        // Create new charts (even with empty data they will show grid)
         attendanceRateChart = new Chart(ctx1, {
             type: 'line',
             data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Attendance Rate (%)', data: attRates, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#f59e0b', pointRadius: 4 }] },
