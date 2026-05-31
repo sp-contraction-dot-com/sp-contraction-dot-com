@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Image Manager | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.set = set;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: white;
+            border-radius: 24px;
+            padding: 16px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-icon span {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+        }
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+        .logo-text p { font-size: 0.55rem; color: #94a3b8; letter-spacing: 1px; }
+        .back-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: #475569;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover { background: #f59e0b; color: white; }
+        
+        .page-title {
+            margin-bottom: 24px;
+        }
+        .page-title h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .page-title p {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .image-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+            transition: 0.2s;
+        }
+        .image-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .card-header i {
+            font-size: 1.2rem;
+            color: #f59e0b;
+            background: #fef3c7;
+            padding: 8px;
+            border-radius: 12px;
+        }
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .preview-area {
+            background: #f8fafc;
+            border-radius: 16px;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            overflow: hidden;
+            position: relative;
+            border: 1px dashed #cbd5e1;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+        }
+        .preview-placeholder {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 20px;
+        }
+        .preview-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .upload-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+        }
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+        .remove-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        .info-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading.show { display: flex; }
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #15803d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            display: none;
+        }
+        @media (max-width: 700px) {
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>IMAGE MANAGER</p></div>
+        </div>
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <div class="page-title">
+        <h2><i class="fas fa-images"></i> Media & Branding Settings</h2>
+        <p>Upload and manage all your custom images from one place. Changes reflect instantly across the app.</p>
+    </div>
+
+    <div class="cards-grid">
+        <!-- Dashboard Banner -->
+        <div class="image-card">
+            <div class="card-header">
+                <i class="fas fa-image"></i>
+                <h3>Dashboard Banner</h3>
+            </div>
+            <div class="preview-area" id="dashboardBannerPreview">
+                <div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No banner uploaded</div>
+            </div>
+            <div class="action-buttons">
+                <button class="upload-btn" onclick="document.getElementById('dashboardBannerInput').click()">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <button class="remove-btn" id="removeDashboardBannerBtn" style="display:none;" onclick="removeDashboardBanner()">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+            <input type="file" id="dashboardBannerInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
+            <div class="info-text">Shown at the top of the main dashboard.</div>
+        </div>
+
+        <!-- Left Menu Background -->
+        <div class="image-card">
+            <div class="card-header">
+                <i class="fas fa-bars"></i>
+                <h3>Left Menu Background</h3>
+            </div>
+            <div class="preview-area" id="leftMenuBgPreview">
+                <div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No background set</div>
+            </div>
+            <div class="action-buttons">
+                <button class="upload-btn" onclick="document.getElementById('leftMenuBgInput').click()">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <button class="remove-btn" id="removeLeftMenuBgBtn" style="display:none;" onclick="removeLeftMenuBg()">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+            <input type="file" id="leftMenuBgInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
+            <div class="info-text">Background image for the left side menu (main app).</div>
+        </div>
+
+        <!-- Company Logo -->
+        <div class="image-card">
+            <div class="card-header">
+                <i class="fas fa-building"></i>
+                <h3>Company Logo</h3>
+            </div>
+            <div class="preview-area" id="footerLogoPreview">
+                <div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No custom logo</div>
+            </div>
+            <div class="action-buttons">
+                <button class="upload-btn" onclick="document.getElementById('footerLogoInput').click()">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <button class="remove-btn" id="removeFooterLogoBtn" style="display:none;" onclick="removeFooterLogo()">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+            <input type="file" id="footerLogoInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
+            <div class="info-text">Appears in the footer of all pages (replaces default SP icon).</div>
+        </div>
+
+        <!-- PDF Report Logo -->
+        <div class="image-card">
+            <div class="card-header">
+                <i class="fas fa-file-pdf"></i>
+                <h3>PDF Report Logo</h3>
+            </div>
+            <div class="preview-area" id="pdfLogoPreview">
+                <div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No custom logo</div>
+            </div>
+            <div class="action-buttons">
+                <button class="upload-btn" onclick="document.getElementById('pdfLogoInput').click()">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <button class="remove-btn" id="removePdfLogoBtn" style="display:none;" onclick="removePdfLogo()">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+            <input type="file" id="pdfLogoInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
+            <div class="info-text">Logo used in downloaded attendance reports (PDF).</div>
+        </div>
+    </div>
+</div>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    let currentUser = null;
+    
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('show', show);
+    }
+    
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.background = isError ? '#dc2626' : '#15803d';
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+    
+    // Helper: compress and convert to base64
+    function compressAndGetBase64(file, maxWidth = 800, quality = 0.7) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const base64 = canvas.toDataURL('image/jpeg', quality);
+                    resolve(base64);
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    // Update header logo icon based on base64 image
+    function updateHeaderLogo(base64) {
+        const logoIcon = document.querySelector('.logo-icon');
+        if (base64 && base64.startsWith('data:image')) {
+            logoIcon.innerHTML = `<img src="${base64}" alt="Company Logo">`;
+        } else {
+            logoIcon.innerHTML = `<span>SP</span>`;
+        }
+    }
+    
+    // Generic uploader
+    async function uploadImage(file, path, previewElementId, removeBtnId) {
+        if (!currentUser) {
+            showToast("User not logged in", true);
+            return;
+        }
+        if (!file || !file.type.match('image.*')) {
+            showToast("Please select a valid image file", true);
+            return;
+        }
+        showLoading(true);
+        try {
+            const base64 = await compressAndGetBase64(file, 800, 0.7);
+            const imageRef = window.ref(window.db, `users/${currentUser.uid}/${path}`);
+            await window.set(imageRef, base64);
+            
+            // Update preview
+            const previewDiv = document.getElementById(previewElementId);
+            previewDiv.innerHTML = `<img src="${base64}" class="preview-image" alt="Preview">`;
+            const removeBtn = document.getElementById(removeBtnId);
+            if (removeBtn) removeBtn.style.display = 'inline-flex';
+            
+            // If this is the company logo (footerLogo), update header
+            if (path === 'footerLogo') {
+                updateHeaderLogo(base64);
+            }
+            
+            showToast(`${path} uploaded successfully`);
+        } catch (err) {
+            console.error(err);
+            showToast("Upload failed", true);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function removeImage(path, previewElementId, removeBtnId, placeholderText = "No image uploaded") {
+        if (!currentUser) return;
+        showLoading(true);
+        try {
+            const imageRef = window.ref(window.db, `users/${currentUser.uid}/${path}`);
+            await window.set(imageRef, null);
+            
+            const previewDiv = document.getElementById(previewElementId);
+            previewDiv.innerHTML = `<div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> ${placeholderText}</div>`;
+            const removeBtn = document.getElementById(removeBtnId);
+            if (removeBtn) removeBtn.style.display = 'none';
+            
+            // If this is the company logo (footerLogo), revert header to default SP
+            if (path === 'footerLogo') {
+                updateHeaderLogo(null);
+            }
+            
+            showToast(`${path} removed`);
+        } catch (err) {
+            showToast("Remove failed", true);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    // Load existing images from Firebase
+    async function loadAllImages() {
+        if (!currentUser) return;
+        try {
+            const dashboardBannerRef = window.ref(window.db, `users/${currentUser.uid}/dashboardBanner`);
+            const leftMenuBgRef = window.ref(window.db, `users/${currentUser.uid}/leftMenuBg`);
+            const footerLogoRef = window.ref(window.db, `users/${currentUser.uid}/footerLogo`);
+            const pdfLogoRef = window.ref(window.db, `users/${currentUser.uid}/pdfLogo`);
+            
+            const [dashboardSnap, leftMenuSnap, footerSnap, pdfSnap] = await Promise.all([
+                window.get(dashboardBannerRef),
+                window.get(leftMenuBgRef),
+                window.get(footerLogoRef),
+                window.get(pdfLogoRef)
+            ]);
+            
+            // Dashboard Banner
+            if (dashboardSnap.exists() && dashboardSnap.val()?.startsWith('data:image')) {
+                document.getElementById('dashboardBannerPreview').innerHTML = `<img src="${dashboardSnap.val()}" class="preview-image" alt="Banner">`;
+                document.getElementById('removeDashboardBannerBtn').style.display = 'inline-flex';
+            }
+            
+            // Left Menu Background
+            if (leftMenuSnap.exists() && leftMenuSnap.val()?.startsWith('data:image')) {
+                document.getElementById('leftMenuBgPreview').innerHTML = `<img src="${leftMenuSnap.val()}" class="preview-image" alt="Left Menu BG">`;
+                document.getElementById('removeLeftMenuBgBtn').style.display = 'inline-flex';
+            }
+            
+            // Footer Logo (Company Logo)
+            if (footerSnap.exists() && footerSnap.val()?.startsWith('data:image')) {
+                const logoBase64 = footerSnap.val();
+                document.getElementById('footerLogoPreview').innerHTML = `<img src="${logoBase64}" class="preview-image" alt="Footer Logo">`;
+                document.getElementById('removeFooterLogoBtn').style.display = 'inline-flex';
+                // Update header logo
+                updateHeaderLogo(logoBase64);
+            } else {
+                // Ensure header shows default if no logo
+                updateHeaderLogo(null);
+            }
+            
+            // PDF Logo
+            if (pdfSnap.exists() && pdfSnap.val()?.startsWith('data:image')) {
+                document.getElementById('pdfLogoPreview').innerHTML = `<img src="${pdfSnap.val()}" class="preview-image" alt="PDF Logo">`;
+                document.getElementById('removePdfLogoBtn').style.display = 'inline-flex';
+            }
+        } catch (err) {
+            console.warn("Error loading images", err);
+        }
+    }
+    
+    // Event listeners for file inputs
+    document.getElementById('dashboardBannerInput').addEventListener('change', async (e) => {
+        if (e.target.files[0]) await uploadImage(e.target.files[0], 'dashboardBanner', 'dashboardBannerPreview', 'removeDashboardBannerBtn');
+    });
+    document.getElementById('leftMenuBgInput').addEventListener('change', async (e) => {
+        if (e.target.files[0]) await uploadImage(e.target.files[0], 'leftMenuBg', 'leftMenuBgPreview', 'removeLeftMenuBgBtn');
+    });
+    document.getElementById('footerLogoInput').addEventListener('change', async (e) => {
+        if (e.target.files[0]) await uploadImage(e.target.files[0], 'footerLogo', 'footerLogoPreview', 'removeFooterLogoBtn');
+    });
+    document.getElementById('pdfLogoInput').addEventListener('change', async (e) => {
+        if (e.target.files[0]) await uploadImage(e.target.files[0], 'pdfLogo', 'pdfLogoPreview', 'removePdfLogoBtn');
+    });
+    
+    // Remove functions
+    window.removeDashboardBanner = () => removeImage('dashboardBanner', 'dashboardBannerPreview', 'removeDashboardBannerBtn', 'No banner uploaded');
+    window.removeLeftMenuBg = () => removeImage('leftMenuBg', 'leftMenuBgPreview', 'removeLeftMenuBgBtn', 'No background set');
+    window.removeFooterLogo = () => removeImage('footerLogo', 'footerLogoPreview', 'removeFooterLogoBtn', 'No custom logo');
+    window.removePdfLogo = () => removeImage('pdfLogo', 'pdfLogoPreview', 'removePdfLogoBtn', 'No custom logo');
+    
+    // Auth check
+    window.onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentUser = user;
+        loadAllImages();
+    });
+</script>
+</body>
+</html>
