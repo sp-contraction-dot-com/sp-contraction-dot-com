@@ -9,7 +9,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
@@ -31,6 +31,9 @@
         window.ref = ref;
         window.get = get;
         window.set = set;
+        window.push = push;
+        window.onValue = onValue;
+        window.remove = remove;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
@@ -41,6 +44,8 @@
             padding: 20px;
         }
         .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Header with User Info */
         .header {
             background: white;
             border-radius: 24px;
@@ -65,18 +70,44 @@
             justify-content: center;
             overflow: hidden;
         }
-        .logo-icon span {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: white;
-        }
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
         .logo-text h1 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
         .logo-text p { font-size: 0.55rem; color: #94a3b8; letter-spacing: 1px; }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 6px 16px;
+            border-radius: 40px;
+        }
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .user-email {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
         .back-btn {
             background: #f1f5f9;
             border: none;
@@ -108,9 +139,260 @@
             margin-top: 4px;
         }
         
+        /* 3 Banner Section */
+        .banner-section {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f6;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .section-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header h3 i {
+            color: #f59e0b;
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 14px;
+        }
+        .add-banner-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .add-banner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+        }
+        
+        /* Desktop View */
+        .banner-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .banner-card {
+            background: #1e293b;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .banner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        .banner-image {
+            width: 100%;
+            aspect-ratio: 900 / 480;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .banner-card:hover .banner-overlay {
+            opacity: 1;
+        }
+        .banner-overlay button {
+            background: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .banner-overlay button:hover {
+            transform: scale(1.1);
+        }
+        .banner-overlay .delete-btn { color: #ef4444; }
+        .banner-info {
+            padding: 12px;
+            text-align: center;
+            background: white;
+        }
+        .banner-info p {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        
+        /* Mobile Slider View */
+        .mobile-slider {
+            display: none;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #1e293b;
+        }
+        .slider-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        .slider-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .slider-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+        }
+        .slider-slide .banner-image {
+            width: 100%;
+            aspect-ratio: 900 / 480;
+            background-size: cover;
+            background-position: center;
+        }
+        .slider-nav {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        .slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .slider-dot.active {
+            background: #f59e0b;
+            width: 24px;
+            border-radius: 10px;
+        }
+        .mobile-banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+        .mobile-slider:hover .mobile-banner-overlay {
+            opacity: 1;
+        }
+        .mobile-banner-overlay button {
+            background: white;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .mobile-banner-overlay button:hover {
+            transform: scale(1.1);
+        }
+        .mobile-banner-overlay .delete-btn { color: #ef4444; }
+        
+        .empty-banners {
+            text-align: center;
+            padding: 60px;
+            background: #f8fafc;
+            border-radius: 20px;
+            color: #94a3b8;
+        }
+        .empty-banners i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        /* Sidebar Menu Banner Section */
+        .sidebar-banner-section {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f6;
+        }
+        .sidebar-preview-area {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            overflow: hidden;
+            border: 1px dashed #cbd5e1;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .sidebar-preview-placeholder {
+            color: white;
+            text-align: center;
+            padding: 30px;
+            background: rgba(0,0,0,0.5);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Cards Grid */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 24px;
             margin-bottom: 30px;
         }
@@ -120,11 +402,6 @@
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.04);
             border: 1px solid #eef2f6;
-            transition: 0.2s;
-        }
-        .image-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
         }
         .card-header {
             display: flex;
@@ -149,45 +426,46 @@
         .preview-area {
             background: #f8fafc;
             border-radius: 16px;
-            min-height: 160px;
+            min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 16px;
             overflow: hidden;
-            position: relative;
             border: 1px dashed #cbd5e1;
         }
         .preview-image {
             max-width: 100%;
-            max-height: 150px;
+            max-height: 120px;
             object-fit: contain;
         }
         .preview-placeholder {
             color: #94a3b8;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-align: center;
             padding: 20px;
         }
         .preview-placeholder i {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 8px;
             display: block;
         }
+        
+        /* Fixed Button Styles */
         .action-buttons {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
-            margin-top: 12px;
+            margin-top: 0;
         }
         .upload-btn {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
             border: none;
-            padding: 8px 20px;
+            padding: 10px 20px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: 0.2s;
             display: inline-flex;
@@ -204,10 +482,10 @@
             background: #ef4444;
             color: white;
             border: none;
-            padding: 8px 20px;
+            padding: 10px 20px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: 0.2s;
             display: inline-flex;
@@ -220,12 +498,14 @@
             background: #dc2626;
             transform: translateY(-2px);
         }
+        
         .info-text {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #64748b;
             margin-top: 12px;
             text-align: center;
         }
+        
         .loading {
             display: none;
             position: fixed;
@@ -259,8 +539,33 @@
             z-index: 1000;
             display: none;
         }
-        @media (max-width: 700px) {
-            .cards-grid { grid-template-columns: 1fr; }
+        
+        @media (max-width: 768px) {
+            .banner-grid {
+                display: none;
+            }
+            .mobile-slider {
+                display: block;
+            }
+            .banner-section {
+                padding: 16px;
+            }
+            .header-right {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            .user-info {
+                padding: 4px 12px;
+            }
+            .user-name {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-slider {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -268,61 +573,92 @@
 <div class="container">
     <div class="header">
         <div class="logo-section">
-            <div class="logo-icon"><span>SP</span></div>
-            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>IMAGE MANAGER</p></div>
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+            <div class="logo-text">
+                <h1>SP CONSTRUCTION</h1>
+                <p>IMAGE MANAGER</p>
+            </div>
         </div>
-        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <div class="header-right">
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar"><i class="fas fa-user"></i></div>
+                <div>
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-email" id="userEmail">-</div>
+                </div>
+            </div>
+            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
     </div>
 
     <div class="page-title">
         <h2><i class="fas fa-images"></i> Media & Branding Settings</h2>
-        <p>Upload and manage all your custom images from one place. Changes reflect instantly across the app.</p>
+        <p>Upload up to 3 banners. Desktop: 3 in a row | Mobile: Auto-slideshow every 3 seconds</p>
     </div>
 
-    <div class="cards-grid">
-        <!-- Dashboard Banner -->
-        <div class="image-card">
-            <div class="card-header">
+    <!-- 3 Banners Section -->
+    <div class="banner-section">
+        <div class="section-header">
+            <h3><i class="fas fa-sliders-h"></i> Dashboard Banners (Max 3 Images)</h3>
+            <button class="add-banner-btn" id="openBannerModalBtn">
+                <i class="fas fa-plus-circle"></i> Add Banner
+            </button>
+        </div>
+        
+        <!-- Desktop Grid View -->
+        <div class="banner-grid" id="bannerGrid">
+            <div class="empty-banners">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>No banners uploaded<br>Click "Add Banner" to upload up to 3 banners</p>
+            </div>
+        </div>
+        
+        <!-- Mobile Slider View -->
+        <div class="mobile-slider" id="mobileSlider">
+            <div class="slider-container">
+                <div class="slider-track" id="sliderTrack">
+                    <div class="slider-slide">
+                        <div class="banner-image" style="background-image: linear-gradient(135deg, #1e293b, #0f172a);"></div>
+                    </div>
+                </div>
+                <div class="slider-nav" id="sliderNav"></div>
+            </div>
+            <div class="mobile-banner-overlay" id="mobileBannerOverlay" style="display: none;">
+                <button class="delete-btn" id="mobileDeleteBtn"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+        
+        <div class="info-text">
+            <i class="fas fa-info-circle"></i> Desktop: 3 banners side by side | Mobile: Auto-slideshow every 3 seconds
+        </div>
+    </div>
+
+    <!-- Sidebar Menu Banner Section -->
+    <div class="sidebar-banner-section">
+        <div class="section-header">
+            <h3><i class="fas fa-bars"></i> Sidebar Menu Background</h3>
+        </div>
+        <div class="sidebar-preview-area" id="sidebarBgPreview">
+            <div class="sidebar-preview-placeholder" id="sidebarPlaceholder">
                 <i class="fas fa-image"></i>
-                <h3>Dashboard Banner</h3>
+                <p>Sidebar menu background image will appear here</p>
+                <small>Upload an image to customize the left menu background</small>
             </div>
-            <div class="preview-area" id="dashboardBannerPreview">
-                <div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No banner uploaded</div>
-            </div>
-            <div class="action-buttons">
-                <button class="upload-btn" onclick="document.getElementById('dashboardBannerInput').click()">
-                    <i class="fas fa-upload"></i> Upload
-                </button>
-                <button class="remove-btn" id="removeDashboardBannerBtn" style="display:none;" onclick="removeDashboardBanner()">
-                    <i class="fas fa-trash"></i> Remove
-                </button>
-            </div>
-            <input type="file" id="dashboardBannerInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
-            <div class="info-text">Shown at the top of the main dashboard.</div>
         </div>
-
-        <!-- Left Menu Background -->
-        <div class="image-card">
-            <div class="card-header">
-                <i class="fas fa-bars"></i>
-                <h3>Left Menu Background</h3>
-            </div>
-            <div class="preview-area" id="leftMenuBgPreview">
-                <div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No background set</div>
-            </div>
-            <div class="action-buttons">
-                <button class="upload-btn" onclick="document.getElementById('leftMenuBgInput').click()">
-                    <i class="fas fa-upload"></i> Upload
-                </button>
-                <button class="remove-btn" id="removeLeftMenuBgBtn" style="display:none;" onclick="removeLeftMenuBg()">
-                    <i class="fas fa-trash"></i> Remove
-                </button>
-            </div>
-            <input type="file" id="leftMenuBgInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
-            <div class="info-text">Background image for the left side menu (main app).</div>
+        <div class="action-buttons">
+            <button class="upload-btn" onclick="document.getElementById('sidebarBgInput').click()">
+                <i class="fas fa-upload"></i> Upload Sidebar Background
+            </button>
+            <button class="remove-btn" id="removeSidebarBgBtn" style="display:none;" onclick="removeSidebarBg()">
+                <i class="fas fa-trash"></i> Remove
+            </button>
         </div>
+        <input type="file" id="sidebarBgInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
+        <div class="info-text">This background will appear on the left sidebar menu of the dashboard.</div>
+    </div>
 
-        <!-- Company Logo -->
+    <!-- Other Images Grid -->
+    <div class="cards-grid">
         <div class="image-card">
             <div class="card-header">
                 <i class="fas fa-building"></i>
@@ -333,17 +669,16 @@
             </div>
             <div class="action-buttons">
                 <button class="upload-btn" onclick="document.getElementById('footerLogoInput').click()">
-                    <i class="fas fa-upload"></i> Upload
+                    <i class="fas fa-upload"></i> Upload Logo
                 </button>
                 <button class="remove-btn" id="removeFooterLogoBtn" style="display:none;" onclick="removeFooterLogo()">
                     <i class="fas fa-trash"></i> Remove
                 </button>
             </div>
             <input type="file" id="footerLogoInput" accept="image/jpeg,image/png,image/jpg" style="display:none;">
-            <div class="info-text">Appears in the footer of all pages (replaces default SP icon).</div>
+            <div class="info-text">Appears in the header (replaces default SP icon).</div>
         </div>
 
-        <!-- PDF Report Logo -->
         <div class="image-card">
             <div class="card-header">
                 <i class="fas fa-file-pdf"></i>
@@ -354,7 +689,7 @@
             </div>
             <div class="action-buttons">
                 <button class="upload-btn" onclick="document.getElementById('pdfLogoInput').click()">
-                    <i class="fas fa-upload"></i> Upload
+                    <i class="fas fa-upload"></i> Upload PDF Logo
                 </button>
                 <button class="remove-btn" id="removePdfLogoBtn" style="display:none;" onclick="removePdfLogo()">
                     <i class="fas fa-trash"></i> Remove
@@ -366,11 +701,30 @@
     </div>
 </div>
 
+<!-- Banner Upload Modal -->
+<div id="bannerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; border-radius:28px; padding:28px; max-width:450px; width:90%;">
+        <h3 style="margin-bottom:15px;"><i class="fas fa-image"></i> Add Banner Image</h3>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:15px;">Recommended size: 900×480 pixels | Max 3 banners</p>
+        <input type="file" id="bannerUploadInput" accept="image/jpeg,image/png,image/jpg" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:12px;">
+        <div style="display:flex; gap:12px; margin-top:20px;">
+            <button id="uploadBannerBtn" style="flex:1; background:#f59e0b; color:white; border:none; padding:12px; border-radius:40px; font-weight:600; cursor:pointer;">Upload</button>
+            <button id="closeBannerModalBtn" style="flex:1; background:#e2e8f0; color:#475569; border:none; padding:12px; border-radius:40px; font-weight:600; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div class="loading" id="loading"><div class="spinner"></div></div>
 <div id="toast" class="toast"></div>
 
 <script type="module">
     let currentUser = null;
+    let currentUserData = null;
+    let banners = [];
+    let slideInterval = null;
+    let currentSlide = 0;
+    
+    const COMPANY_ASSETS_PATH = 'companyAssets';
     
     function showLoading(show) {
         document.getElementById('loading').classList.toggle('show', show);
@@ -386,8 +740,7 @@
         }, 3000);
     }
     
-    // Helper: compress and convert to base64
-    function compressAndGetBase64(file, maxWidth = 800, quality = 0.7) {
+    function compressAndGetBase64(file, maxWidth = 900, maxHeight = 480, quality = 0.8) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -396,14 +749,29 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    if (width > maxWidth) {
-                        height = (height * maxWidth) / width;
-                        width = maxWidth;
+                    
+                    const targetWidth = maxWidth;
+                    const targetHeight = maxHeight;
+                    const aspectRatio = width / height;
+                    
+                    if (width / targetWidth > height / targetHeight) {
+                        width = targetWidth;
+                        height = width / aspectRatio;
+                    } else {
+                        height = targetHeight;
+                        width = height * aspectRatio;
                     }
-                    canvas.width = width;
-                    canvas.height = height;
+                    
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const x = (targetWidth - width) / 2;
+                    const y = (targetHeight - height) / 2;
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    ctx.drawImage(img, x, y, width, height);
+                    
                     const base64 = canvas.toDataURL('image/jpeg', quality);
                     resolve(base64);
                 };
@@ -415,155 +783,448 @@
         });
     }
     
-    // Update header logo icon based on base64 image
     function updateHeaderLogo(base64) {
-        const logoIcon = document.querySelector('.logo-icon');
+        const logoIcon = document.getElementById('headerLogo');
         if (base64 && base64.startsWith('data:image')) {
-            logoIcon.innerHTML = `<img src="${base64}" alt="Company Logo">`;
+            logoIcon.innerHTML = `<img src="${base64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
         } else {
             logoIcon.innerHTML = `<span>SP</span>`;
         }
     }
     
-    // Generic uploader
-    async function uploadImage(file, path, previewElementId, removeBtnId) {
-        if (!currentUser) {
-            showToast("User not logged in", true);
+    function updateUserInfo() {
+        if (currentUserData) {
+            const firstName = currentUserData.firstName || currentUserData.fullName?.split(' ')[0] || 'User';
+            const fullName = currentUserData.fullName || `${firstName} ${currentUserData.lastName || ''}`;
+            document.getElementById('userName').innerHTML = firstName;
+            document.getElementById('userEmail').innerHTML = currentUserData.email || currentUser.email;
+            
+            const avatar = document.getElementById('userAvatar');
+            avatar.innerHTML = firstName.charAt(0).toUpperCase();
+        } else if (currentUser) {
+            const email = currentUser.email || '';
+            const name = email.split('@')[0];
+            document.getElementById('userName').innerHTML = name;
+            document.getElementById('userEmail').innerHTML = email;
+            const avatar = document.getElementById('userAvatar');
+            avatar.innerHTML = name.charAt(0).toUpperCase();
+        }
+    }
+    
+    // ============ LOAD CURRENT USER ============
+    async function loadCurrentUser() {
+        const user = window.auth.currentUser;
+        if (!user) return null;
+        try {
+            const usersRef = window.ref(window.db, 'users');
+            const snapshot = await window.get(usersRef);
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                for (let key in users) {
+                    if (users[key].email === user.email) {
+                        currentUserData = users[key];
+                        break;
+                    }
+                }
+            }
+            updateUserInfo();
+            return currentUserData;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+    
+    // ============ BANNER FUNCTIONS ============
+    async function loadBanners() {
+        try {
+            const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
+            const snapshot = await window.get(bannersRef);
+            banners = [];
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                banners = Object.entries(data).map(([id, banner]) => ({
+                    id: id,
+                    image: banner.image,
+                    order: banner.order || 0,
+                    createdAt: banner.createdAt || new Date().toISOString()
+                }));
+                banners.sort((a, b) => (a.order || 0) - (b.order || 0));
+            }
+            renderAll();
+            return banners;
+        } catch (err) {
+            console.error("Error loading banners:", err);
+            return [];
+        }
+    }
+    
+    function renderAll() {
+        renderDesktopGrid();
+        renderMobileSlider();
+        startMobileAutoSlide();
+    }
+    
+    function renderDesktopGrid() {
+        const grid = document.getElementById('bannerGrid');
+        if (!banners.length) {
+            grid.innerHTML = '<div class="empty-banners"><i class="fas fa-cloud-upload-alt"></i><p>No banners uploaded<br>Click "Add Banner" to upload up to 3 banners</p></div>';
             return;
+        }
+        
+        grid.innerHTML = banners.map((banner, idx) => `
+            <div class="banner-card">
+                <div class="banner-image" style="background-image: url('${banner.image}');">
+                    <div class="banner-overlay">
+                        <button class="delete-btn" onclick="deleteBanner('${banner.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="banner-info">
+                    <p>Banner ${idx + 1} • ${new Date(banner.createdAt).toLocaleDateString()}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderMobileSlider() {
+        const track = document.getElementById('sliderTrack');
+        const nav = document.getElementById('sliderNav');
+        const overlay = document.getElementById('mobileBannerOverlay');
+        
+        if (!banners.length) {
+            track.innerHTML = `<div class="slider-slide"><div class="banner-image" style="background-image: linear-gradient(135deg, #1e293b, #0f172a);"></div></div>`;
+            nav.innerHTML = '';
+            overlay.style.display = 'none';
+            return;
+        }
+        
+        overlay.style.display = 'flex';
+        
+        track.innerHTML = banners.map((banner, idx) => `
+            <div class="slider-slide">
+                <div class="banner-image" style="background-image: url('${banner.image}');"></div>
+            </div>
+        `).join('');
+        
+        nav.innerHTML = banners.map((_, idx) => `
+            <div class="slider-dot ${idx === currentSlide ? 'active' : ''}" onclick="goToSlide(${idx})"></div>
+        `).join('');
+        
+        const trackElement = document.getElementById('sliderTrack');
+        if (trackElement) {
+            trackElement.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        
+        const deleteBtn = document.getElementById('mobileDeleteBtn');
+        if (deleteBtn && banners[currentSlide]) {
+            deleteBtn.onclick = () => deleteBanner(banners[currentSlide].id);
+        }
+    }
+    
+    function startMobileAutoSlide() {
+        if (slideInterval) clearInterval(slideInterval);
+        if (banners.length <= 1) return;
+        
+        slideInterval = setInterval(() => {
+            let next = currentSlide + 1;
+            if (next >= banners.length) next = 0;
+            goToSlide(next);
+        }, 3000);
+    }
+    
+    window.goToSlide = function(index) {
+        if (index < 0) index = 0;
+        if (index >= banners.length) index = 0;
+        currentSlide = index;
+        
+        const track = document.getElementById('sliderTrack');
+        if (track) {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        
+        const dots = document.querySelectorAll('.slider-dot');
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlide);
+        });
+        
+        const deleteBtn = document.getElementById('mobileDeleteBtn');
+        if (deleteBtn && banners[currentSlide]) {
+            deleteBtn.onclick = () => deleteBanner(banners[currentSlide].id);
+        }
+        
+        startMobileAutoSlide();
+    };
+    
+    window.deleteBanner = async function(id) {
+        if (!currentUser) return;
+        if (banners.length <= 1) {
+            showToast('At least one banner is required. Add a new banner before deleting.', true);
+            return;
+        }
+        
+        showLoading(true);
+        try {
+            const bannerRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners/${id}`);
+            await window.remove(bannerRef);
+            await loadBanners();
+            if (currentSlide >= banners.length - 1) currentSlide = Math.max(0, banners.length - 2);
+            renderMobileSlider();
+            showToast('Banner deleted successfully');
+        } catch (err) {
+            console.error("Error deleting banner:", err);
+            showToast('Failed to delete banner', true);
+        } finally {
+            showLoading(false);
+        }
+    };
+    
+    async function addBanner(file) {
+        if (!currentUser) return false;
+        if (banners.length >= 3) {
+            showToast('Maximum 3 banners allowed. Remove one first.', true);
+            return false;
         }
         if (!file || !file.type.match('image.*')) {
-            showToast("Please select a valid image file", true);
+            showToast('Please select a valid image file (JPEG/PNG)', true);
+            return false;
+        }
+        
+        showLoading(true);
+        try {
+            const base64 = await compressAndGetBase64(file, 900, 480, 0.8);
+            const newBannerRef = window.push(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`));
+            await window.set(newBannerRef, {
+                image: base64,
+                order: banners.length,
+                createdAt: new Date().toISOString()
+            });
+            await loadBanners();
+            showToast('Banner added successfully');
+            return true;
+        } catch (err) {
+            console.error("Error adding banner:", err);
+            showToast('Upload failed. Please try again.', true);
+            return false;
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    // ============ SIDEBAR BACKGROUND FUNCTIONS ============
+    async function uploadSidebarBg(file) {
+        if (!currentUser) return;
+        if (!file || !file.type.match('image.*')) {
+            showToast('Please select a valid image', true);
             return;
         }
         showLoading(true);
         try {
-            const base64 = await compressAndGetBase64(file, 800, 0.7);
-            const imageRef = window.ref(window.db, `users/${currentUser.uid}/${path}`);
-            await window.set(imageRef, base64);
+            const base64 = await compressAndGetBase64(file, 800, 600, 0.7);
+            const bgRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/sidebarBackground`);
+            await window.set(bgRef, base64);
             
-            // Update preview
-            const previewDiv = document.getElementById(previewElementId);
-            previewDiv.innerHTML = `<img src="${base64}" class="preview-image" alt="Preview">`;
-            const removeBtn = document.getElementById(removeBtnId);
-            if (removeBtn) removeBtn.style.display = 'inline-flex';
-            
-            // If this is the company logo (footerLogo), update header
-            if (path === 'footerLogo') {
-                updateHeaderLogo(base64);
-            }
-            
-            showToast(`${path} uploaded successfully`);
+            const previewDiv = document.getElementById('sidebarBgPreview');
+            const placeholder = document.getElementById('sidebarPlaceholder');
+            previewDiv.style.backgroundImage = `url(${base64})`;
+            if (placeholder) placeholder.style.display = 'none';
+            document.getElementById('removeSidebarBgBtn').style.display = 'inline-flex';
+            showToast('Sidebar background uploaded successfully');
         } catch (err) {
-            console.error(err);
-            showToast("Upload failed", true);
+            showToast('Upload failed', true);
         } finally {
             showLoading(false);
         }
     }
     
-    async function removeImage(path, previewElementId, removeBtnId, placeholderText = "No image uploaded") {
+    async function removeSidebarBg() {
         if (!currentUser) return;
         showLoading(true);
         try {
-            const imageRef = window.ref(window.db, `users/${currentUser.uid}/${path}`);
-            await window.set(imageRef, null);
+            const bgRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/sidebarBackground`);
+            await window.set(bgRef, null);
             
-            const previewDiv = document.getElementById(previewElementId);
-            previewDiv.innerHTML = `<div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> ${placeholderText}</div>`;
-            const removeBtn = document.getElementById(removeBtnId);
-            if (removeBtn) removeBtn.style.display = 'none';
-            
-            // If this is the company logo (footerLogo), revert header to default SP
-            if (path === 'footerLogo') {
-                updateHeaderLogo(null);
-            }
-            
-            showToast(`${path} removed`);
+            const previewDiv = document.getElementById('sidebarBgPreview');
+            const placeholder = document.getElementById('sidebarPlaceholder');
+            previewDiv.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+            document.getElementById('removeSidebarBgBtn').style.display = 'none';
+            showToast('Sidebar background removed');
         } catch (err) {
-            showToast("Remove failed", true);
+            showToast('Remove failed', true);
         } finally {
             showLoading(false);
         }
     }
     
-    // Load existing images from Firebase
-    async function loadAllImages() {
+    // ============ COMPANY LOGO FUNCTIONS ============
+    async function uploadFooterLogo(file) {
         if (!currentUser) return;
+        if (!file || !file.type.match('image.*')) {
+            showToast('Please select a valid image', true);
+            return;
+        }
+        showLoading(true);
         try {
-            const dashboardBannerRef = window.ref(window.db, `users/${currentUser.uid}/dashboardBanner`);
-            const leftMenuBgRef = window.ref(window.db, `users/${currentUser.uid}/leftMenuBg`);
-            const footerLogoRef = window.ref(window.db, `users/${currentUser.uid}/footerLogo`);
-            const pdfLogoRef = window.ref(window.db, `users/${currentUser.uid}/pdfLogo`);
-            
-            const [dashboardSnap, leftMenuSnap, footerSnap, pdfSnap] = await Promise.all([
-                window.get(dashboardBannerRef),
-                window.get(leftMenuBgRef),
-                window.get(footerLogoRef),
-                window.get(pdfLogoRef)
-            ]);
-            
-            // Dashboard Banner
-            if (dashboardSnap.exists() && dashboardSnap.val()?.startsWith('data:image')) {
-                document.getElementById('dashboardBannerPreview').innerHTML = `<img src="${dashboardSnap.val()}" class="preview-image" alt="Banner">`;
-                document.getElementById('removeDashboardBannerBtn').style.display = 'inline-flex';
+            const base64 = await compressAndGetBase64(file, 200, 200, 0.8);
+            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            await window.set(logoRef, base64);
+            document.getElementById('footerLogoPreview').innerHTML = `<img src="${base64}" class="preview-image" alt="Logo">`;
+            document.getElementById('removeFooterLogoBtn').style.display = 'inline-flex';
+            updateHeaderLogo(base64);
+            showToast('Company logo uploaded');
+        } catch (err) {
+            showToast('Upload failed', true);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function removeFooterLogo() {
+        if (!currentUser) return;
+        showLoading(true);
+        try {
+            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            await window.set(logoRef, null);
+            document.getElementById('footerLogoPreview').innerHTML = '<div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No custom logo</div>';
+            document.getElementById('removeFooterLogoBtn').style.display = 'none';
+            updateHeaderLogo(null);
+            showToast('Company logo removed');
+        } catch (err) {
+            showToast('Remove failed', true);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    // ============ PDF LOGO FUNCTIONS ============
+    async function uploadPdfLogo(file) {
+        if (!currentUser) return;
+        if (!file || !file.type.match('image.*')) {
+            showToast('Please select a valid image', true);
+            return;
+        }
+        showLoading(true);
+        try {
+            const base64 = await compressAndGetBase64(file, 300, 300, 0.8);
+            const pdfRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
+            await window.set(pdfRef, base64);
+            document.getElementById('pdfLogoPreview').innerHTML = `<img src="${base64}" class="preview-image" alt="PDF Logo">`;
+            document.getElementById('removePdfLogoBtn').style.display = 'inline-flex';
+            showToast('PDF logo uploaded');
+        } catch (err) {
+            showToast('Upload failed', true);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function removePdfLogo() {
+        if (!currentUser) return;
+        showLoading(true);
+        try {
+            const pdfRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
+            await window.set(pdfRef, null);
+            document.getElementById('pdfLogoPreview').innerHTML = '<div class="preview-placeholder"><i class="fas fa-cloud-upload-alt"></i> No custom logo</div>';
+            document.getElementById('removePdfLogoBtn').style.display = 'none';
+            showToast('PDF logo removed');
+        } catch (err) {
+            showToast('Remove failed', true);
+        } finally {
+            showLoading(false);
+        }
+    }
+    
+    async function loadExistingImages() {
+        try {
+            // Load Sidebar Background
+            const sidebarRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/sidebarBackground`);
+            const sidebarSnap = await window.get(sidebarRef);
+            if (sidebarSnap.exists() && sidebarSnap.val()?.startsWith('data:image')) {
+                const bgBase64 = sidebarSnap.val();
+                const previewDiv = document.getElementById('sidebarBgPreview');
+                const placeholder = document.getElementById('sidebarPlaceholder');
+                previewDiv.style.backgroundImage = `url(${bgBase64})`;
+                if (placeholder) placeholder.style.display = 'none';
+                document.getElementById('removeSidebarBgBtn').style.display = 'inline-flex';
             }
             
-            // Left Menu Background
-            if (leftMenuSnap.exists() && leftMenuSnap.val()?.startsWith('data:image')) {
-                document.getElementById('leftMenuBgPreview').innerHTML = `<img src="${leftMenuSnap.val()}" class="preview-image" alt="Left Menu BG">`;
-                document.getElementById('removeLeftMenuBgBtn').style.display = 'inline-flex';
-            }
-            
-            // Footer Logo (Company Logo)
+            // Load Company Logo
+            const footerRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            const footerSnap = await window.get(footerRef);
             if (footerSnap.exists() && footerSnap.val()?.startsWith('data:image')) {
                 const logoBase64 = footerSnap.val();
-                document.getElementById('footerLogoPreview').innerHTML = `<img src="${logoBase64}" class="preview-image" alt="Footer Logo">`;
+                document.getElementById('footerLogoPreview').innerHTML = `<img src="${logoBase64}" class="preview-image" alt="Logo">`;
                 document.getElementById('removeFooterLogoBtn').style.display = 'inline-flex';
-                // Update header logo
                 updateHeaderLogo(logoBase64);
-            } else {
-                // Ensure header shows default if no logo
-                updateHeaderLogo(null);
             }
             
-            // PDF Logo
+            // Load PDF Logo
+            const pdfRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
+            const pdfSnap = await window.get(pdfRef);
             if (pdfSnap.exists() && pdfSnap.val()?.startsWith('data:image')) {
                 document.getElementById('pdfLogoPreview').innerHTML = `<img src="${pdfSnap.val()}" class="preview-image" alt="PDF Logo">`;
                 document.getElementById('removePdfLogoBtn').style.display = 'inline-flex';
             }
         } catch (err) {
-            console.warn("Error loading images", err);
+            console.warn(err);
         }
     }
     
-    // Event listeners for file inputs
-    document.getElementById('dashboardBannerInput').addEventListener('change', async (e) => {
-        if (e.target.files[0]) await uploadImage(e.target.files[0], 'dashboardBanner', 'dashboardBannerPreview', 'removeDashboardBannerBtn');
+    // Modal handlers
+    const modal = document.getElementById('bannerModal');
+    const openModalBtn = document.getElementById('openBannerModalBtn');
+    const closeModalBtn = document.getElementById('closeBannerModalBtn');
+    const uploadBannerBtn = document.getElementById('uploadBannerBtn');
+    const bannerInput = document.getElementById('bannerUploadInput');
+    
+    openModalBtn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        bannerInput.value = '';
     });
-    document.getElementById('leftMenuBgInput').addEventListener('change', async (e) => {
-        if (e.target.files[0]) await uploadImage(e.target.files[0], 'leftMenuBg', 'leftMenuBgPreview', 'removeLeftMenuBgBtn');
+    
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    
+    uploadBannerBtn.addEventListener('click', async () => {
+        const file = bannerInput.files[0];
+        if (file) {
+            const success = await addBanner(file);
+            if (success) modal.style.display = 'none';
+        } else {
+            showToast('Please select an image', true);
+        }
+    });
+    
+    // File input listeners
+    document.getElementById('sidebarBgInput').addEventListener('change', async (e) => {
+        if (e.target.files[0]) await uploadSidebarBg(e.target.files[0]);
     });
     document.getElementById('footerLogoInput').addEventListener('change', async (e) => {
-        if (e.target.files[0]) await uploadImage(e.target.files[0], 'footerLogo', 'footerLogoPreview', 'removeFooterLogoBtn');
+        if (e.target.files[0]) await uploadFooterLogo(e.target.files[0]);
     });
     document.getElementById('pdfLogoInput').addEventListener('change', async (e) => {
-        if (e.target.files[0]) await uploadImage(e.target.files[0], 'pdfLogo', 'pdfLogoPreview', 'removePdfLogoBtn');
+        if (e.target.files[0]) await uploadPdfLogo(e.target.files[0]);
     });
     
-    // Remove functions
-    window.removeDashboardBanner = () => removeImage('dashboardBanner', 'dashboardBannerPreview', 'removeDashboardBannerBtn', 'No banner uploaded');
-    window.removeLeftMenuBg = () => removeImage('leftMenuBg', 'leftMenuBgPreview', 'removeLeftMenuBgBtn', 'No background set');
-    window.removeFooterLogo = () => removeImage('footerLogo', 'footerLogoPreview', 'removeFooterLogoBtn', 'No custom logo');
-    window.removePdfLogo = () => removeImage('pdfLogo', 'pdfLogoPreview', 'removePdfLogoBtn', 'No custom logo');
+    window.removeSidebarBg = removeSidebarBg;
+    window.removeFooterLogo = removeFooterLogo;
+    window.removePdfLogo = removePdfLogo;
+    window.deleteBanner = deleteBanner;
+    window.goToSlide = goToSlide;
     
-    // Auth check
-    window.onAuthStateChanged(auth, (user) => {
+    // Auth State
+    window.onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'login.html';
             return;
         }
         currentUser = user;
-        loadAllImages();
+        showLoading(true);
+        await loadCurrentUser();
+        await loadBanners();
+        await loadExistingImages();
+        showLoading(false);
     });
 </script>
 </body>
