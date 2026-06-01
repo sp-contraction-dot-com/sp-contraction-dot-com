@@ -50,7 +50,6 @@
         ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px; }
         
-        /* Logo Header - Clean style */
         .logo-header {
             background: transparent;
             padding: 0 0 16px 0;
@@ -116,7 +115,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        /* ========== BANNER SECTION - SAME STYLE AS ADMIN DASHBOARD ========== */
+        /* ========== BANNER SECTION - EXACTLY SAME STYLE AS ADMIN DASHBOARD ========== */
         .banner-section {
             position: relative;
             margin-bottom: 32px;
@@ -130,6 +129,7 @@
             justify-content: center;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             transition: 0.3s;
         }
         .banner-placeholder {
@@ -150,30 +150,6 @@
         .banner-placeholder p {
             font-size: 0.85rem;
             opacity: 0.8;
-        }
-        
-        /* Slider container for multiple banners - matches admin dashboard style */
-        .banner-slider-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 24px;
-        }
-        .banner-slider-track {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-        .banner-slide {
-            min-width: 100%;
-            flex-shrink: 0;
-        }
-        .banner-slide img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            max-height: 320px;
-            min-height: 160px;
         }
         
         .stats-grid {
@@ -331,8 +307,7 @@
             .action-card { padding: 18px 14px; }
             .logo-header { padding: 0 0 12px 0; }
             .logo-text h2 { font-size: 0.9rem; }
-            .banner-section { border-radius: 20px; }
-            .banner-slide img { max-height: 180px; }
+            .banner-section { border-radius: 20px; min-height: 120px; }
         }
     </style>
 </head>
@@ -358,8 +333,8 @@
         <div class="date-badge" id="currentDate"></div>
     </div>
     
-    <!-- BANNER SECTION - SAME STYLE AS ADMIN DASHBOARD -->
-    <div class="banner-section" id="bannerSection" style="background-size: cover; background-position: center;">
+    <!-- BANNER SECTION - EXACTLY SAME STYLE AS ADMIN DASHBOARD -->
+    <div class="banner-section" id="bannerSection">
         <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
                 <i class="fas fa-image"></i>
@@ -410,7 +385,7 @@
                     </tr>
                 </thead>
                 <tbody id="attendanceTableBody">
-                    <tr><td colspan="10" style="text-align:center; padding:50px;"><div class="spinner" style="width:30px; height:30px;"></div> Loading...<\/td></tr>
+                    <tr><td colspan="10" style="text-align:center; padding:50px;"><div class="spinner" style="width:30px; height:30px;"></div> Loading...</td></tr>
                 </tbody>
                 <tfoot id="attendanceTableFooter"></tfoot>
             </table>
@@ -433,11 +408,6 @@
     let myAttendanceRecords = [];
     let weeklyChart = null;
     let workChart = null;
-    
-    // Banner variables
-    let banners = [];
-    let currentSlide = 0;
-    let slideInterval = null;
     
     function formatIndianNumber(num) {
         if (num === null || num === undefined || isNaN(num)) return '0';
@@ -474,12 +444,13 @@
         document.getElementById('currentDate').innerHTML = `<i class="far fa-calendar-alt"></i> ${new Date().toLocaleDateString('en-US', options)}`;
     }
     
-    // ============ BANNER LOADING - SAME STYLE AS ADMIN DASHBOARD ============
+    // ============ BANNER LOADING - EXACT SAME STYLE AS ADMIN DASHBOARD ============
     async function loadBannerImage() {
         try {
             const bannersRef = window.ref(window.db, 'companyAssets/banners');
             const snapshot = await window.get(bannersRef);
             const bannerSection = document.getElementById('bannerSection');
+            const bannerContent = document.getElementById('bannerContent');
             const placeholder = document.getElementById('bannerPlaceholder');
             
             if (snapshot.exists()) {
@@ -488,91 +459,30 @@
                 bannersList.sort((a, b) => (a.order || 0) - (b.order || 0));
                 
                 if (bannersList.length > 0 && bannersList[0].image && bannersList[0].image.startsWith('data:image')) {
-                    // If multiple banners exist, use slider
-                    if (bannersList.length > 1) {
-                        setupBannerSlider(bannersList);
-                        return;
-                    } else {
-                        // Single banner - show as background image like admin dashboard
-                        bannerSection.style.backgroundImage = `url(${bannersList[0].image})`;
-                        bannerSection.style.backgroundSize = 'cover';
-                        bannerSection.style.backgroundPosition = 'center';
-                        if (placeholder) placeholder.style.display = 'none';
-                        return;
-                    }
+                    // Use the first banner as background image - EXACTLY like admin dashboard
+                    const bannerImage = bannersList[0].image;
+                    bannerSection.style.backgroundImage = `url(${bannerImage})`;
+                    bannerSection.style.backgroundSize = 'cover';
+                    bannerSection.style.backgroundPosition = 'center';
+                    bannerSection.style.backgroundRepeat = 'no-repeat';
+                    
+                    // Clear the inner content and hide placeholder
+                    if (bannerContent) bannerContent.innerHTML = '';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
                 }
             }
+            
             // No banner found - show placeholder
             bannerSection.style.backgroundImage = '';
             if (placeholder) placeholder.style.display = 'flex';
+            if (bannerContent) {
+                bannerContent.innerHTML = '';
+                bannerContent.appendChild(placeholder);
+            }
         } catch(e) {
             console.warn("Error loading banner:", e);
         }
-    }
-    
-    // Setup slider for multiple banners (same elegant style)
-    function setupBannerSlider(bannersList) {
-        const bannerSection = document.getElementById('bannerSection');
-        const bannerContent = document.getElementById('bannerContent');
-        const placeholder = document.getElementById('bannerPlaceholder');
-        
-        // Clear existing content
-        bannerSection.style.backgroundImage = '';
-        
-        // Create slider container
-        const sliderContainer = document.createElement('div');
-        sliderContainer.className = 'banner-slider-container';
-        const sliderTrack = document.createElement('div');
-        sliderTrack.className = 'banner-slider-track';
-        
-        // Add each banner as slide
-        bannersList.forEach(banner => {
-            const slide = document.createElement('div');
-            slide.className = 'banner-slide';
-            const img = document.createElement('img');
-            img.src = banner.image;
-            img.alt = "Dashboard Banner";
-            img.style.width = '100%';
-            img.style.height = 'auto';
-            img.style.display = 'block';
-            img.style.objectFit = 'cover';
-            img.style.maxHeight = '320px';
-            img.style.minHeight = '160px';
-            slide.appendChild(img);
-            sliderTrack.appendChild(slide);
-        });
-        
-        sliderContainer.appendChild(sliderTrack);
-        bannerContent.innerHTML = '';
-        bannerContent.appendChild(sliderContainer);
-        if (placeholder) placeholder.style.display = 'none';
-        
-        // Auto slide functionality
-        let currentIndex = 0;
-        const totalSlides = bannersList.length;
-        
-        function updateSliderPosition() {
-            sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-        }
-        
-        function startAutoSlide() {
-            if (slideInterval) clearInterval(slideInterval);
-            if (totalSlides <= 1) return;
-            slideInterval = setInterval(() => {
-                currentIndex = (currentIndex + 1) % totalSlides;
-                updateSliderPosition();
-            }, 4000);
-        }
-        
-        startAutoSlide();
-        
-        // Optional: pause on hover
-        sliderContainer.addEventListener('mouseenter', () => {
-            if (slideInterval) clearInterval(slideInterval);
-        });
-        sliderContainer.addEventListener('mouseleave', () => {
-            startAutoSlide();
-        });
     }
     
     // ============ LOAD COMPANY LOGO ============
