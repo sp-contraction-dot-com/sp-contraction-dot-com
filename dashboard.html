@@ -64,8 +64,9 @@
             border: 1px solid #eef2f6;
         }
         .logo-section { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
         .logo-text h1 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
         .logo-text p { font-size: 0.55rem; color: #94a3b8; letter-spacing: 1px; }
         .nav-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -103,7 +104,7 @@
         }
         .logout-btn:hover { background: #dc2626; }
         
-        /* Banner Section - without upload/remove buttons */
+        /* Banner Section */
         .banner-section {
             position: relative;
             margin-bottom: 28px;
@@ -462,7 +463,19 @@
 
 <div class="loading" id="loading"><div class="spinner"></div></div>
 
-
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+            <div class="logo-text">
+                <h1>SP CONSTRUCTION</h1>
+                <p>ADMIN DASHBOARD</p>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
     
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
         <div>
@@ -474,9 +487,9 @@
         </div>
     </div>
     
-    <!-- BANNER SECTION (upload/delete buttons removed) -->
-    <div class="banner-section" id="bannerSection">
-        <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center; transition:0.3s;">
+    <!-- BANNER SECTION - লোড হবে companyAssets/banners থেকে -->
+    <div class="banner-section" id="bannerSection" style="background-size: cover; background-position: center;">
+        <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
                 <i class="fas fa-image"></i>
                 <p>Dashboard banner image will appear here</p>
@@ -512,7 +525,7 @@
         <div class="table-container">
             <table>
                 <thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead>
-                <tbody id="usersTableBody"><tr><td colspan="6" style="text-align:center;">Loading...<\/td></tr></tbody>
+                <tbody id="usersTableBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -526,7 +539,7 @@
         <div class="table-container">
             <table>
                 <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead>
-                <tbody id="companyPaymentTableBody"><tr><td colspan="6" style="text-align:center;">Loading...<\/td></td></tbody>
+                <tbody id="companyPaymentTableBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -540,7 +553,7 @@
         <div class="table-container">
             <table>
                 <thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead>
-                <tbody id="attendanceTableBody"></tr><td colspan="7" style="text-align:center;">Loading...<\/td></tr></tbody>
+                <tbody id="attendanceTableBody"><tr><td colspan="7" style="text-align:center;">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -551,12 +564,12 @@
         <a href="profile.html" class="action-btn"><i class="fas fa-user-edit"></i> View Profile</a>
     </div>
     
-    <!-- FOOTER - White Background -->
+    <!-- FOOTER - White Background with Company Logo from companyAssets -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
                 <div class="footer-logo">
-                    <div class="logo-icon"><span>SP</span></div>
+                    <div class="logo-icon" id="footerLogoIcon"><span>SP</span></div>
                     <h2>SP CONSTRUCTION</h2>
                 </div>
                 <p>Building dreams with quality and precision. Trusted contractor for residential and commercial projects across the region.</p>
@@ -601,6 +614,56 @@
     let attendanceRateChart = null, weeklyPaymentChart = null, paymentPieChart = null, dailyEarningChart = null;
     let currentAuthUser = null;
     
+    // ==================== GLOBAL COMPANY ASSETS FUNCTIONS (সকল ইউজারের জন্য) ====================
+    const COMPANY_ASSETS_PATH = 'companyAssets';
+    
+    // কোম্পানির লোগো লোড করুন (হেডার ও ফুটার উভয় জায়গায়)
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            const footerLogoIcon = document.getElementById('footerLogoIcon');
+            const headerLogoIcon = document.getElementById('headerLogo');
+            
+            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                const logoUrl = snapshot.val();
+                if (footerLogoIcon) footerLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Company Logo">`;
+                if (headerLogoIcon) headerLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Company Logo">`;
+            } else {
+                if (footerLogoIcon) footerLogoIcon.innerHTML = `<span>SP</span>`;
+                if (headerLogoIcon) headerLogoIcon.innerHTML = `<span>SP</span>`;
+            }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+        }
+    }
+    
+    // ব্যানার ইমেজ লোড করুন (সব ব্যানারের মধ্যে প্রথমটি দেখাবে)
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
+            const snapshot = await window.get(bannersRef);
+            const bannerSection = document.getElementById('bannerSection');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerSection.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerSection.style.backgroundSize = 'cover';
+                    bannerSection.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            // কোন ব্যানার না থাকলে
+            bannerSection.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
     function formatNumber(value) {
         if (value === null || value === undefined) return '0';
         let num = parseFloat(value);
@@ -619,73 +682,6 @@
     updateLiveDate();
     setInterval(updateLiveDate, 60000);
     
-    // ==================== BANNER IMAGE FUNCTIONS ====================
-    async function loadBannerImage() {
-        if (!currentAuthUser) return;
-        try {
-            const bannerRef = window.ref(window.db, `users/${currentAuthUser.uid}/dashboardBanner`);
-            const snapshot = await window.get(bannerRef);
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        } catch(e) { console.warn("Error loading banner", e); }
-    }
-    
-    // ==================== FOOTER LOGO UPDATE (from Firebase) ====================
-    async function loadFooterLogo(uid) {
-        if (!uid) return;
-        try {
-            const logoRef = window.ref(window.db, `users/${uid}/footerLogo`);
-            const snapshot = await window.get(logoRef);
-            const logoBase64 = snapshot.val();
-            const footerLogoIcon = document.querySelector('.footer-logo .logo-icon');
-            if (footerLogoIcon) {
-                if (logoBase64 && logoBase64.startsWith('data:image')) {
-                    footerLogoIcon.innerHTML = `<img src="${logoBase64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
-                } else {
-                    footerLogoIcon.innerHTML = `<span>SP</span>`;
-                }
-            }
-        } catch(e) { console.warn("Error loading footer logo", e); }
-    }
-    
-    function listenFooterLogoChanges(uid) {
-        if (!uid) return;
-        const logoRef = window.ref(window.db, `users/${uid}/footerLogo`);
-        window.onValue(logoRef, (snapshot) => {
-            const logoBase64 = snapshot.val();
-            const footerLogoIcon = document.querySelector('.footer-logo .logo-icon');
-            if (footerLogoIcon) {
-                if (logoBase64 && logoBase64.startsWith('data:image')) {
-                    footerLogoIcon.innerHTML = `<img src="${logoBase64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
-                } else {
-                    footerLogoIcon.innerHTML = `<span>SP</span>`;
-                }
-            }
-        });
-    }
-    // ==================== END FOOTER LOGO ====================
-    
-    async function loadTotalRegisteredUsers() {
-        try {
-            const snapshot = await window.get(window.ref(window.db, 'users'));
-            if (snapshot.exists()) {
-                allUsers = Object.values(snapshot.val());
-                totalRegisteredUsersCount = allUsers.length;
-            } else totalRegisteredUsersCount = 0;
-            document.getElementById('totalRegisteredUsers').textContent = totalRegisteredUsersCount;
-        } catch(e) { console.error(e); document.getElementById('totalRegisteredUsers').textContent = '0'; }
-    }
-    
     async function loadDashboardData() {
         showLoading(true);
         try {
@@ -695,7 +691,12 @@
             const paySnap = await window.get(window.ref(window.db, 'companyDailyPayments'));
             allPaymentRecords = paySnap.exists() ? Object.entries(paySnap.val()).map(([id, data]) => ({ id, ...data })).sort((a,b)=>new Date(b.date)-new Date(a.date)) : [];
             
-            await loadTotalRegisteredUsers();
+            const usersSnap = await window.get(window.ref(window.db, 'users'));
+            if (usersSnap.exists()) {
+                allUsers = Object.values(usersSnap.val());
+                totalRegisteredUsersCount = allUsers.length;
+            } else totalRegisteredUsersCount = 0;
+            document.getElementById('totalRegisteredUsers').textContent = totalRegisteredUsersCount;
             
             const user = window.auth.currentUser;
             if (user) {
@@ -707,10 +708,11 @@
                 } else {
                     document.getElementById('welcomeName').innerHTML = user.email?.split('@')[0] || 'Admin';
                 }
-                await loadBannerImage();
-                await loadFooterLogo(user.uid);
-                listenFooterLogoChanges(user.uid);
             }
+            
+            // কোম্পানির লোগো এবং ব্যানার লোড করুন (সকল ইউজারের জন্য)
+            await loadCompanyLogo();
+            await loadBannerImage();
             
             updateStats();
             updateUsersTable();
@@ -754,7 +756,7 @@
         let sortedUsers = [...allUsers].sort((a,b) => new Date(b.registeredAt || 0) - new Date(a.registeredAt || 0));
         let last10 = sortedUsers.slice(0, 10);
         if (!last10.length) {
-            tbody.innerHTML = '</table><td colspan="6" style="text-align:center;">📭 No users found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 No users found</td></tr>';
             return;
         }
         let html = '';
@@ -768,7 +770,7 @@
                 <td>${escapeHtml(u.mobile || u.phone || 'N/A')}</td>
                 <td style="color:#f59e0b;">${escapeHtml(u.userId || u.uid?.slice(0,8) || 'N/A')}</td>
                 <td>${escapeHtml(regDate)}</td>
-              </tr>`;
+               </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -792,7 +794,7 @@
                 <td>${r.hours || 0}</td>
                 <td>₹${formatNumber(r.earnings || 0)}</td>
                 <td>${escapeHtml(r.workDesc || '-')}</td>
-              </tr>`;
+               </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -815,7 +817,7 @@
                 <td class="amount-positive">₹${formatNumber(p.totalEarning || 0)}</td>
                 <td class="amount-positive">₹${formatNumber(p.companyPaid || 0)}</td>
                 <td style="color:${dueColor};">₹${formatNumber(due)}</td>
-              </tr>`;
+               </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -898,6 +900,9 @@
         window.onValue(window.ref(window.db, 'attendance'), () => loadDashboardData());
         window.onValue(window.ref(window.db, 'companyDailyPayments'), () => loadDashboardData());
         window.onValue(window.ref(window.db, 'users'), () => loadDashboardData());
+        // রিয়েল-টাইমে লোগো ও ব্যানার পরিবর্তন শুনুন
+        window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`), () => loadCompanyLogo());
+        window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
     }
     
     window.onAuthStateChanged(window.auth, (user) => {
