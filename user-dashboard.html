@@ -42,7 +42,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            background: #f5f7fb;
             min-height: 100vh;
         }
         
@@ -50,7 +50,7 @@
         ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px; }
         
-        /* লোগো হেডার - ব্যাকগ্রাউন্ড রিমুভ করা হয়েছে, টেক্সট কালার গাঢ় করা হয়েছে */
+        /* Logo Header - Clean style */
         .logo-header {
             background: transparent;
             padding: 0 0 16px 0;
@@ -116,50 +116,65 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        /* Banner Slider Section - No Card, No Background, Just Image */
-        .banner-slider {
+        /* ========== BANNER SECTION - SAME STYLE AS ADMIN DASHBOARD ========== */
+        .banner-section {
             position: relative;
             margin-bottom: 32px;
-            border-radius: 0px;
+            border-radius: 24px;
             overflow: hidden;
-            background: transparent;
-            width: 100%;
-        }
-        .slider-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-        }
-        .slider-track {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            background: #e2e8f0;
+            min-height: 150px;
             display: flex;
-            transition: transform 0.6s ease-in-out;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            transition: 0.3s;
         }
-        .slider-slide {
-            min-width: 100%;
-            flex-shrink: 0;
-        }
-        .slider-slide img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            max-height: 350px;
-        }
-        
-        /* No placeholder background - transparent */
         .banner-placeholder {
-            background: transparent;
-            color: #64748b;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
             text-align: center;
-            padding: 60px 20px;
+            padding: 50px 20px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
         }
-        .banner-placeholder i { font-size: 2.8rem; opacity: 0.5; }
-        .banner-placeholder p { font-size: 0.85rem; opacity: 0.7; }
+        .banner-placeholder i {
+            font-size: 3rem;
+            opacity: 0.6;
+        }
+        .banner-placeholder p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        /* Slider container for multiple banners - matches admin dashboard style */
+        .banner-slider-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 24px;
+        }
+        .banner-slider-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .banner-slide {
+            min-width: 100%;
+            flex-shrink: 0;
+        }
+        .banner-slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            max-height: 320px;
+            min-height: 160px;
+        }
         
         .stats-grid {
             display: grid;
@@ -314,9 +329,10 @@
             .hero-text h1 { font-size: 1.2rem; }
             .quick-actions { gap: 14px; }
             .action-card { padding: 18px 14px; }
-            .slider-slide img { max-height: 200px; }
             .logo-header { padding: 0 0 12px 0; }
             .logo-text h2 { font-size: 0.9rem; }
+            .banner-section { border-radius: 20px; }
+            .banner-slide img { max-height: 180px; }
         }
     </style>
 </head>
@@ -327,7 +343,6 @@
 <div class="main-container">
     <div class="hero-section">
         <div class="hero-text">
-            <!-- লোগো হেডার - ব্যাকগ্রাউন্ড নেই, টেক্সট কালার গাঢ় -->
             <div class="logo-header">
                 <div class="logo-area">
                     <div class="logo-icon" id="companyLogo"><span>SP</span></div>
@@ -343,16 +358,12 @@
         <div class="date-badge" id="currentDate"></div>
     </div>
     
-    <!-- Banner Slider Section - Full width, no background card -->
-    <div class="banner-slider" id="bannerSlider">
-        <div class="slider-container">
-            <div class="slider-track" id="sliderTrack">
-                <div class="slider-slide">
-                    <div class="banner-placeholder">
-                        <i class="fas fa-building"></i>
-                        <p>🏗️ Building Dreams Together | SP Construction</p>
-                    </div>
-                </div>
+    <!-- BANNER SECTION - SAME STYLE AS ADMIN DASHBOARD -->
+    <div class="banner-section" id="bannerSection" style="background-size: cover; background-position: center;">
+        <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
+            <div class="banner-placeholder" id="bannerPlaceholder">
+                <i class="fas fa-image"></i>
+                <p>🏗️ SP Construction Dashboard Banner</p>
             </div>
         </div>
     </div>
@@ -423,7 +434,7 @@
     let weeklyChart = null;
     let workChart = null;
     
-    // Banner slider variables
+    // Banner variables
     let banners = [];
     let currentSlide = 0;
     let slideInterval = null;
@@ -463,62 +474,105 @@
         document.getElementById('currentDate').innerHTML = `<i class="far fa-calendar-alt"></i> ${new Date().toLocaleDateString('en-US', options)}`;
     }
     
-    // ============ BANNER SLIDER FUNCTIONS ============
-    async function loadBanners() {
+    // ============ BANNER LOADING - SAME STYLE AS ADMIN DASHBOARD ============
+    async function loadBannerImage() {
         try {
             const bannersRef = window.ref(window.db, 'companyAssets/banners');
             const snapshot = await window.get(bannersRef);
-            banners = [];
+            const bannerSection = document.getElementById('bannerSection');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
             if (snapshot.exists()) {
-                const data = snapshot.val();
-                banners = Object.values(data);
-                banners.sort((a, b) => (a.order || 0) - (b.order || 0));
+                const bannersData = snapshot.val();
+                const bannersList = Object.values(bannersData);
+                bannersList.sort((a, b) => (a.order || 0) - (b.order || 0));
+                
+                if (bannersList.length > 0 && bannersList[0].image && bannersList[0].image.startsWith('data:image')) {
+                    // If multiple banners exist, use slider
+                    if (bannersList.length > 1) {
+                        setupBannerSlider(bannersList);
+                        return;
+                    } else {
+                        // Single banner - show as background image like admin dashboard
+                        bannerSection.style.backgroundImage = `url(${bannersList[0].image})`;
+                        bannerSection.style.backgroundSize = 'cover';
+                        bannerSection.style.backgroundPosition = 'center';
+                        if (placeholder) placeholder.style.display = 'none';
+                        return;
+                    }
+                }
             }
-            renderSlider();
+            // No banner found - show placeholder
+            bannerSection.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
+    // Setup slider for multiple banners (same elegant style)
+    function setupBannerSlider(bannersList) {
+        const bannerSection = document.getElementById('bannerSection');
+        const bannerContent = document.getElementById('bannerContent');
+        const placeholder = document.getElementById('bannerPlaceholder');
+        
+        // Clear existing content
+        bannerSection.style.backgroundImage = '';
+        
+        // Create slider container
+        const sliderContainer = document.createElement('div');
+        sliderContainer.className = 'banner-slider-container';
+        const sliderTrack = document.createElement('div');
+        sliderTrack.className = 'banner-slider-track';
+        
+        // Add each banner as slide
+        bannersList.forEach(banner => {
+            const slide = document.createElement('div');
+            slide.className = 'banner-slide';
+            const img = document.createElement('img');
+            img.src = banner.image;
+            img.alt = "Dashboard Banner";
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.objectFit = 'cover';
+            img.style.maxHeight = '320px';
+            img.style.minHeight = '160px';
+            slide.appendChild(img);
+            sliderTrack.appendChild(slide);
+        });
+        
+        sliderContainer.appendChild(sliderTrack);
+        bannerContent.innerHTML = '';
+        bannerContent.appendChild(sliderContainer);
+        if (placeholder) placeholder.style.display = 'none';
+        
+        // Auto slide functionality
+        let currentIndex = 0;
+        const totalSlides = bannersList.length;
+        
+        function updateSliderPosition() {
+            sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+        
+        function startAutoSlide() {
+            if (slideInterval) clearInterval(slideInterval);
+            if (totalSlides <= 1) return;
+            slideInterval = setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSliderPosition();
+            }, 4000);
+        }
+        
+        startAutoSlide();
+        
+        // Optional: pause on hover
+        sliderContainer.addEventListener('mouseenter', () => {
+            if (slideInterval) clearInterval(slideInterval);
+        });
+        sliderContainer.addEventListener('mouseleave', () => {
             startAutoSlide();
-            return banners;
-        } catch (err) {
-            console.error("Error loading banners:", err);
-            return [];
-        }
-    }
-    
-    function renderSlider() {
-        const track = document.getElementById('sliderTrack');
-        
-        if (!banners.length) {
-            track.innerHTML = `<div class="slider-slide"><div class="banner-placeholder"><i class="fas fa-building"></i><p>🏗️ Building Dreams Together | SP Construction</p></div></div>`;
-            return;
-        }
-        
-        // Build slides with pure images - no card, no background
-        track.innerHTML = banners.map(banner => `
-            <div class="slider-slide">
-                <img src="${banner.image}" alt="Banner">
-            </div>
-        `).join('');
-        
-        // Set initial position
-        updateSliderPosition();
-    }
-    
-    function updateSliderPosition() {
-        const track = document.getElementById('sliderTrack');
-        if (track && banners.length > 0) {
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
-        }
-    }
-    
-    function startAutoSlide() {
-        if (slideInterval) clearInterval(slideInterval);
-        if (banners.length <= 1) return;
-        
-        slideInterval = setInterval(() => {
-            let next = currentSlide + 1;
-            if (next >= banners.length) next = 0;
-            currentSlide = next;
-            updateSliderPosition();
-        }, 3000);
+        });
     }
     
     // ============ LOAD COMPANY LOGO ============
@@ -682,7 +736,7 @@
             <td><strong>₹ ${formatNumber(totalPaid)}</strong></td>
             <td style="color:${dueColor};"><strong>₹ ${formatNumber(totalDue)}</strong></td>
             <td>—</strong></td>
-        </tr>`;
+         </tr>`;
     }
     
     function updateCharts() {
@@ -745,6 +799,9 @@
             window.equalTo(currentUserData.userId)
         );
         window.onValue(attendanceQuery, () => { loadMyAttendance(); });
+        
+        // Listen for banner updates in real-time
+        window.onValue(window.ref(window.db, 'companyAssets/banners'), () => { loadBannerImage(); });
     }
     
     updateDate();
@@ -757,7 +814,7 @@
             showLoading(true);
             await loadCompanyLogo();
             await loadCurrentUser();
-            await loadBanners();
+            await loadBannerImage();
             await loadMyAttendance();
             listenForUpdates();
             showLoading(false);
