@@ -399,7 +399,7 @@
                 <div class="pic-row">
                     <img id="modalPreview" class="pic-preview" src="https://via.placeholder.com/70?text=Img" alt="preview">
                     <label class="file-label" for="picUpload"><i class="fas fa-upload"></i> Choose Image</label>
-                    <input type="file" id="picUpload" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+                    <input type="file" id="picUpload" accept="image/jpeg,image/png,image/jpg,image/webp,image/heic" style="display: none;">
                 </div>
                 <div id="uploadStatus" class="upload-status"></div>
             </div>
@@ -472,41 +472,118 @@
     }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     
-    // Compress image with simulated progress percentage
-    function compressImageWithProgress(file, maxWidth = 300, quality = 0.7, onProgress) {
+    // ========== ADVANCED IMAGE COMPRESSION THAT HANDLES ANY SIZE (30MB+ to under 5MB) ==========
+    async function smartCompressImage(file, onProgress) {
+        // Accept any image type including large megapixel photos
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Simulate progress steps
-                    if (onProgress) onProgress(30);
-                    setTimeout(() => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = (height * maxWidth) / width;
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        if (onProgress) onProgress(70);
-                        setTimeout(() => {
-                            const base64 = canvas.toDataURL('image/jpeg', quality);
+                    if (onProgress) onProgress(20);
+                    
+                    // Calculate optimal dimensions to ensure final size < 5MB
+                    // For very high resolution images, we use aggressive downscaling
+                    let width = img.width;
+                    let height = img.height;
+                    const maxPixels = 1024 * 1024; // 1 Megapixel target for safe compression under 5MB
+                    const currentPixels = width * height;
+                    
+                    // Adaptive scaling based on original size
+                    let scale = 1;
+                    if (currentPixels > maxPixels * 4) {
+                        scale = Math.sqrt(maxPixels / currentPixels) * 0.8;
+                    } else if (currentPixels > maxPixels * 2) {
+                        scale = Math.sqrt(maxPixels / currentPixels) * 0.9;
+                    } else if (currentPixels > maxPixels) {
+                        scale = Math.sqrt(maxPixels / currentPixels);
+                    }
+                    
+                    // Apply scaling but keep minimum reasonable size (400px)
+                    let newWidth = Math.max(400, Math.floor(width * scale));
+                    let newHeight = Math.max(400, Math.floor(height * scale));
+                    
+                    if (onProgress) onProgress(40);
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                    
+                    if (onProgress) onProgress(60);
+                    
+                    // Dynamic quality adjustment - start with 0.75, try to keep under 5MB
+                    let quality = 0.75;
+                    let attempt = 0;
+                    let finalBase64 = '';
+                    
+                    const tryCompress = () => {
+                        finalBase64 = canvas.toDataURL('image/jpeg', quality);
+                        const approxSize = Math.round((finalBase64.length * 3/4) / 1024); // KB approx
+                        
+                        if (onProgress) onProgress(70 + attempt * 10);
+                        
+                        if (approxSize > 4800 && quality > 0.45 && attempt < 3) {
+                            // Still too large, reduce quality
+                            quality -= 0.1;
+                            attempt++;
+                            tryCompress();
+                        } else {
                             if (onProgress) onProgress(100);
-                            resolve(base64);
-                        }, 50);
-                    }, 30);
+                            resolve(finalBase64);
+                        }
+                    };
+                    
+                    tryCompress();
                 };
-                img.onerror = reject;
+                img.onerror = () => reject(new Error("Failed to load image"));
                 img.src = e.target.result;
             };
-            reader.onerror = reject;
+            reader.onerror = () => reject(new Error("File reading failed"));
             reader.readAsDataURL(file);
         });
+    }
+    
+    // Alternative: If image is already small, preserve it but still compress moderately
+    async function processProfileImage(file, onProgress) {
+        // Validate file size first - but we'll handle even 50MB files via compression
+        if (!file.type.match('image.*')) {
+            throw new Error('Please select a valid image file (JPEG, PNG, etc.)');
+        }
+        
+        // Show initial progress
+        if (onProgress) onProgress(5);
+        
+        // Always compress to ensure under 5MB with perfect quality/ratio
+        const compressedBase64 = await smartCompressImage(file, onProgress);
+        
+        // Final safety check: ensure base64 size is reasonable (max ~5MB = ~6.6 million chars base64)
+        if (compressedBase64.length > 7_000_000) {
+            // If somehow still too large, do one more aggressive compression
+            console.warn("Image still large, applying ultra compression");
+            const img = new Image();
+            const result = await new Promise((resolve) => {
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const targetPixels = 800 * 800;
+                    if (w * h > targetPixels) {
+                        const ratio = Math.sqrt(targetPixels / (w * h));
+                        w = Math.floor(w * ratio);
+                        h = Math.floor(h * ratio);
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.65));
+                };
+                img.src = compressedBase64;
+            });
+            return result;
+        }
+        
+        return compressedBase64;
     }
     
     function renderProfile(data, emailVerified) {
@@ -603,7 +680,6 @@
         else preview.src = 'https://via.placeholder.com/70?text=Avatar';
         selectedBase64 = currentUserData.profilePicture || null;
         document.getElementById('editModal').classList.add('show');
-        // Reset status message
         const statusDiv = document.getElementById('uploadStatus');
         statusDiv.innerHTML = '';
         statusDiv.className = 'upload-status';
@@ -617,29 +693,34 @@
         fileInput.onchange = async (e) => {
             const file = e.target.files[0];
             if(!file) return;
-            if(!file.type.match('image.*')) { showToast('Only images allowed', true); return; }
-            if(file.size > 5*1024*1024) { showToast('Max 5MB allowed', true); return; }
+            if(!file.type.match('image.*')) { showToast('Please select an image file (JPEG, PNG, WEBP, etc.)', true); return; }
             
-            // Show loading state with percentage simulation
-            statusDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Compressing image... 0%';
+            // Allow ANY file size - will compress regardless (even 100MB photos)
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing high-res image... 0%';
             statusDiv.className = 'upload-status status-loading';
             
             try {
-                const compressedBase64 = await compressImageWithProgress(file, 300, 0.7, (percent) => {
-                    statusDiv.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Compressing image... ${percent}%`;
-                });
+                // Progress callback
+                const updateProgress = (percent) => {
+                    statusDiv.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${percent < 30 ? 'Decoding image...' : percent < 70 ? 'Compressing to under 5MB...' : 'Finalizing...'} ${percent}%`;
+                };
+                
+                const compressedBase64 = await processProfileImage(file, updateProgress);
                 selectedBase64 = compressedBase64;
                 document.getElementById('modalPreview').src = compressedBase64;
-                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Image ready! (compressed)';
+                
+                const finalSizeKB = Math.round((compressedBase64.length * 3/4) / 1024);
+                statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> Ready! (${finalSizeKB} KB, within 5MB limit)`;
                 statusDiv.className = 'upload-status status-success';
                 setTimeout(() => {
-                    if (statusDiv.innerHTML.includes('ready')) statusDiv.innerHTML = '';
-                }, 3000);
+                    if (statusDiv.innerHTML.includes('Ready')) statusDiv.innerHTML = '';
+                }, 3500);
+                showToast(`Image compressed successfully (${finalSizeKB} KB)`);
             } catch(err) {
                 console.error(err);
-                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to process image';
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to process image. Try another photo.';
                 statusDiv.className = 'upload-status status-error';
-                showToast('Image processing failed', true);
+                showToast('Image processing failed, please try a different image', true);
             }
         };
         
