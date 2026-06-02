@@ -474,6 +474,43 @@
         }
         .icon-btn.delete:hover { transform: scale(1.05); background: #dc2626; }
         
+        /* Access Denied Message */
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 28px;
+            margin: 20px;
+        }
+        .access-denied i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        .access-denied h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .access-denied p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .access-denied button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
         @media (max-width: 700px) {
             .download-controls { flex-direction: column; align-items: stretch; }
             .download-group { justify-content: center; }
@@ -490,7 +527,7 @@
 <div class="container">
     <div class="header">
         <div class="logo-section">
-            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>PAYMENT MANAGER</p></div>
         </div>
         <div class="header-buttons">
@@ -534,35 +571,39 @@
         </div>
     </div>
 
-    <div class="data-card">
+    <div class="data-card" id="mainContentCard">
         <div class="section-title"><i class="fas fa-building"></i><h3>All Company Payment Records</h3></div>
         
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Search by date (YYYY-MM-DD) or company name...">
-            <div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 records</span></div>
+        <div id="paymentContent">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by date (YYYY-MM-DD) or company name...">
+                <div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 records</span></div>
+            </div>
+            
+            <div class="table-container">
+                <table id="paymentsTable">
+                    <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th><th style="width:120px;">Actions</th></tr></thead>
+                    <tbody id="paymentsTableBody"><tr><td colspan="7" class="loading"><div class="spinner"></div>解决了</tbody>
+                    <tfoot id="paymentsTableFooter"></tfoot>
+                </table>
+            </div>
+            
+            <div class="download-controls">
+                <div class="download-group">
+                    <i class="fas fa-database" style="color:#f59e0b;"></i>
+                    <label>DATA SOURCE</label>
+                    <select id="dataSourceSelect"><option value="all">📋 All records</option><option value="filtered">🔍 Filtered records (search result)</option></select>
+                </div>
+                <div class="download-group">
+                    <div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled><span style="font-size:0.7rem;">records</span></div>
+                    <select id="downloadFormat"><option value="csv">📊 CSV</option><option value="pdf">📑 PDF</option></select>
+                </div>
+                <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
+            </div>
         </div>
         
-        <div class="table-container">
-            <table id="paymentsTable">
-                <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th><th style="width:120px;">Actions</th></tr></thead>
-                <tbody id="paymentsTableBody"><tr><td colspan="7" class="loading"><div class="spinner"></div>解决了</tbody>
-                <tfoot id="paymentsTableFooter"></tfoot>
-            </table>
-        </div>
-        
-        <div class="download-controls">
-            <div class="download-group">
-                <i class="fas fa-database" style="color:#f59e0b;"></i>
-                <label>DATA SOURCE</label>
-                <select id="dataSourceSelect"><option value="all">📋 All records</option><option value="filtered">🔍 Filtered records (search result)</option></select>
-            </div>
-            <div class="download-group">
-                <div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled><span style="font-size:0.7rem;">records</span></div>
-                <select id="downloadFormat"><option value="csv">📊 CSV</option><option value="pdf">📑 PDF</option></select>
-            </div>
-            <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
-        </div>
+        <div id="accessDeniedMessage" style="display:none;"></div>
     </div>
 </div>
 
@@ -620,12 +661,56 @@
     let editPaymentId = null;
     let allCompanies = [];
     let isLoading = false;
+    let isAdminUser = false;
+    let adminChecked = false;
+    
+    // DOM elements
+    const tbody = document.getElementById('paymentsTableBody');
+    const tfoot = document.getElementById('paymentsTableFooter');
+    const searchInput = document.getElementById('searchInput');
+    const resultCountSpan = document.getElementById('resultCountSpan');
+    const dataSourceSelect = document.getElementById('dataSourceSelect');
+    const limitCheckbox = document.getElementById('limitCheckbox');
+    const limitCountInput = document.getElementById('limitCount');
+    const downloadFormatSelect = document.getElementById('downloadFormat');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const headerLogo = document.getElementById('headerLogo');
+    const paymentContent = document.getElementById('paymentContent');
+    const accessDeniedDiv = document.getElementById('accessDeniedMessage');
+    
+    // Modal elements
+    const modal = document.getElementById('paymentModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDate = document.getElementById('modalDate');
+    const modalCompanySelect = document.getElementById('modalCompanySelect');
+    const modalTotalWorkers = document.getElementById('modalTotalWorkers');
+    const modalTotalEarning = document.getElementById('modalTotalEarning');
+    const modalCompanyPaid = document.getElementById('modalCompanyPaid');
+    const modalDue = document.getElementById('modalDue');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const openAddPaymentBtn = document.getElementById('openAddPaymentBtn');
+    
+    const statTotalRecords = document.getElementById('statTotalRecords');
+    const statTotalEarnings = document.getElementById('statTotalEarnings');
+    const statTotalPaid = document.getElementById('statTotalPaid');
+    const statTotalDue = document.getElementById('statTotalDue');
+    const statTotalWorkers = document.getElementById('statTotalWorkers');
+    const statTotalCompanies = document.getElementById('statTotalCompanies');
     
     function showLoading(show) {
-        const loading = document.getElementById('loading');
-        if (loading) {
-            if (show) loading.classList.add('show');
-            else loading.classList.remove('show');
+        const loadingDiv = document.getElementById('loading');
+        if (!loadingDiv) {
+            const div = document.createElement('div');
+            div.id = 'loading';
+            div.className = 'loading';
+            div.innerHTML = '<div class="spinner"></div>';
+            document.body.appendChild(div);
+        }
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) {
+            if (show) loadingEl.classList.add('show');
+            else loadingEl.classList.remove('show');
         }
     }
     
@@ -663,29 +748,131 @@
     function formatNumber(value) { return formatIndianNumber(parseFloat(value) || 0); }
     
     function updateHeaderLogo(base64) {
-        const logoIconDiv = document.querySelector('.logo-icon');
-        if (logoIconDiv) {
-            if (base64 && base64.startsWith('data:image')) logoIconDiv.innerHTML = `<img src="${base64}" alt="Company Logo">`;
-            else logoIconDiv.innerHTML = `<span>SP</span>`;
+        if (headerLogo) {
+            if (base64 && base64.startsWith('data:image')) headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo">`;
+            else headerLogo.innerHTML = `<span>SP</span>`;
         }
     }
     
-    async function loadImages(uid) {
-        if (!uid) return;
+    // ========== LOAD COMPANY LOGO FROM CORRECT PATH ==========
+    async function loadCompanyLogo() {
         try {
-            const companyRef = window.ref(db, `users/${uid}/footerLogo`);
-            const pdfRef = window.ref(db, `users/${uid}/pdfLogo`);
-            const [companySnap, pdfSnap] = await Promise.all([window.get(companyRef), window.get(pdfRef)]);
-            if (companySnap.exists() && companySnap.val()?.startsWith('data:image')) {
-                companyLogoBase64 = companySnap.val();
-                updateHeaderLogo(companyLogoBase64);
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                updateHeaderLogo(snapshot.val());
+            } else {
+                updateHeaderLogo(null);
             }
-            if (pdfSnap.exists() && pdfSnap.val()?.startsWith('data:image')) pdfLogoBase64 = pdfSnap.val();
-        } catch(e) { console.warn(e); }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+        }
     }
     
-    // Load companies from Firebase (using 'companies' node like financial-report.html)
+    function listenLogoChanges() {
+        const logoRef = window.ref(db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val && val.startsWith('data:image')) {
+                updateHeaderLogo(val);
+            } else {
+                updateHeaderLogo(null);
+            }
+        });
+    }
+    
+    // ========== LOAD BANNER IMAGE FROM CORRECT PATH ==========
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(db, `companyAssets/banners`);
+            const snapshot = await window.get(bannersRef);
+            const bannerContainer = document.getElementById('bannerContent');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerContainer.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerContainer.style.backgroundSize = 'cover';
+                    bannerContainer.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            bannerContainer.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
+    function listenBannerChanges() {
+        const bannersRef = window.ref(db, `companyAssets/banners`);
+        window.onValue(bannersRef, () => {
+            loadBannerImage();
+        });
+    }
+    
+    // ========== ADMIN VERIFICATION FUNCTION ==========
+    function showAccessDenied() {
+        if (paymentContent) paymentContent.style.display = 'none';
+        if (accessDeniedDiv) {
+            accessDeniedDiv.style.display = 'block';
+            accessDeniedDiv.innerHTML = `
+                <div class="access-denied">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>⛔ Access Denied</h2>
+                    <p>You don't have administrator privileges to access this page.</p>
+                    <p style="font-size: 0.8rem; color: #ef4444;">Only authorized admins can view payment records.</p>
+                    <button onclick="window.location.href='dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    async function checkAdminAndLoad(user) {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            
+            // Check if user is admin
+            if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                isAdminUser = false;
+                adminChecked = true;
+                showAccessDenied();
+                return;
+            }
+            
+            // User is admin, load everything
+            isAdminUser = true;
+            adminChecked = true;
+            
+            if (paymentContent) paymentContent.style.display = 'block';
+            if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+            
+            await loadCompanies();
+            await loadAllPayments();
+            await loadCompanyLogo();
+            listenLogoChanges();
+            await loadBannerImage();
+            listenBannerChanges();
+            
+        } catch (error) {
+            console.error("Admin verification error:", error);
+            showAccessDenied();
+        }
+    }
+    
+    // Load companies from Firebase (using 'companies' node)
     async function loadCompanies() {
+        if (!isAdminUser) return;
         try {
             const companiesRef = window.ref(db, 'companies');
             const snapshot = await window.get(companiesRef);
@@ -695,16 +882,16 @@
             } else {
                 allCompanies = [];
             }
-            statTotalCompanies.innerText = formatIndianNumber(allCompanies.length);
+            if (statTotalCompanies) statTotalCompanies.innerText = formatIndianNumber(allCompanies.length);
             updateCompanySelect();
         } catch(e) { 
             console.error("Error loading companies:", e);
-            showToast('Error loading companies', true);
         }
     }
     
     function updateCompanySelect() {
         const select = modalCompanySelect;
+        if (!select) return;
         let options = '<option value="">-- Select Company --</option>';
         for (let i = 0; i < allCompanies.length; i++) {
             options += `<option value="${allCompanies[i].id}">${escapeHtml(allCompanies[i].name)}</option>`;
@@ -714,6 +901,7 @@
     
     // Save a new company
     window.saveNewCompany = async function() {
+        if (!isAdminUser) return;
         const companyName = document.getElementById('newCompanyName').value.trim();
         if (!companyName) {
             showToast('Please enter company name', true);
@@ -741,6 +929,7 @@
     
     // Delete selected company
     window.deleteSelectedCompany = async function() {
+        if (!isAdminUser) return;
         const selectedId = modalCompanySelect.value;
         if (!selectedId) {
             showToast('Please select a company first', true);
@@ -763,36 +952,6 @@
         }
     };
     
-    // DOM elements
-    const tbody = document.getElementById('paymentsTableBody');
-    const tfoot = document.getElementById('paymentsTableFooter');
-    const searchInput = document.getElementById('searchInput');
-    const resultCountSpan = document.getElementById('resultCountSpan');
-    const dataSourceSelect = document.getElementById('dataSourceSelect');
-    const limitCheckbox = document.getElementById('limitCheckbox');
-    const limitCountInput = document.getElementById('limitCount');
-    const downloadFormatSelect = document.getElementById('downloadFormat');
-    const downloadBtn = document.getElementById('downloadBtn');
-    
-    // Modal elements
-    const modal = document.getElementById('paymentModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDate = document.getElementById('modalDate');
-    const modalCompanySelect = document.getElementById('modalCompanySelect');
-    const modalTotalWorkers = document.getElementById('modalTotalWorkers');
-    const modalTotalEarning = document.getElementById('modalTotalEarning');
-    const modalCompanyPaid = document.getElementById('modalCompanyPaid');
-    const modalDue = document.getElementById('modalDue');
-    const modalSaveBtn = document.getElementById('modalSaveBtn');
-    const modalCancelBtn = document.getElementById('modalCancelBtn');
-    const openAddPaymentBtn = document.getElementById('openAddPaymentBtn');
-    
-    const statTotalRecords = document.getElementById('statTotalRecords');
-    const statTotalEarnings = document.getElementById('statTotalEarnings');
-    const statTotalPaid = document.getElementById('statTotalPaid');
-    const statTotalDue = document.getElementById('statTotalDue');
-    const statTotalWorkers = document.getElementById('statTotalWorkers');
-    
     function computeTotals(records) {
         let totalEarnings = 0, totalPaid = 0, totalDue = 0, totalWorkers = 0;
         const uniqueCompanies = new Set();
@@ -813,15 +972,16 @@
     
     function updateStatsCards(records) {
         const totals = computeTotals(records);
-        statTotalRecords.innerText = formatIndianNumber(totals.recordCount);
-        statTotalEarnings.innerHTML = `₹${formatIndianNumber(totals.totalEarnings)}`;
-        statTotalPaid.innerHTML = `₹${formatIndianNumber(totals.totalPaid)}`;
-        statTotalDue.innerHTML = `₹${formatIndianNumber(totals.totalDue)}`;
-        statTotalWorkers.innerText = formatIndianNumber(totals.totalWorkers);
+        if (statTotalRecords) statTotalRecords.innerText = formatIndianNumber(totals.recordCount);
+        if (statTotalEarnings) statTotalEarnings.innerHTML = `₹${formatIndianNumber(totals.totalEarnings)}`;
+        if (statTotalPaid) statTotalPaid.innerHTML = `₹${formatIndianNumber(totals.totalPaid)}`;
+        if (statTotalDue) statTotalDue.innerHTML = `₹${formatIndianNumber(totals.totalDue)}`;
+        if (statTotalWorkers) statTotalWorkers.innerText = formatIndianNumber(totals.totalWorkers);
+        if (statTotalCompanies) statTotalCompanies.innerText = formatIndianNumber(totals.uniqueCompanies);
     }
     
     function renderFooter(records) {
-        if (!records.length) { tfoot.innerHTML = ''; return; }
+        if (!records.length || !tfoot) { if(tfoot) tfoot.innerHTML = ''; return; }
         const totals = computeTotals(records);
         const dueColor = totals.totalDue < 0 ? '#dc2626' : '#15803d';
         tfoot.innerHTML = `
@@ -837,10 +997,11 @@
     }
     
     function renderTable() {
+        if (!tbody) return;
         if (!currentFilteredPayments.length) {
             tbody.innerHTML = '<tr><td colspan="7" class="no-data"><i class="fas fa-calendar-times"></i> No payment records found<\/td></tr>';
-            resultCountSpan.innerText = `0 records`;
-            tfoot.innerHTML = '';
+            if (resultCountSpan) resultCountSpan.innerText = `0 records`;
+            if (tfoot) tfoot.innerHTML = '';
             updateStatsCards([]);
             return;
         }
@@ -863,7 +1024,7 @@
                 </tr>`;
         }
         tbody.innerHTML = html;
-        resultCountSpan.innerText = `${currentFilteredPayments.length} record${currentFilteredPayments.length !== 1 ? 's' : ''}`;
+        if (resultCountSpan) resultCountSpan.innerText = `${currentFilteredPayments.length} record${currentFilteredPayments.length !== 1 ? 's' : ''}`;
         renderFooter(currentFilteredPayments);
         updateStatsCards(currentFilteredPayments);
     }
@@ -881,6 +1042,7 @@
     }
     
     async function loadAllPayments() {
+        if (!isAdminUser) return;
         showLoading(true);
         try {
             const snapshot = await window.get(window.ref(db, 'companyDailyPayments'));
@@ -892,10 +1054,10 @@
             allPayments.sort((a,b) => new Date(b.date) - new Date(a.date));
             currentFilteredPayments = [...allPayments];
             renderTable();
-            if (searchInput.value.trim()) filterRecords(searchInput.value);
+            if (searchInput && searchInput.value.trim()) filterRecords(searchInput.value);
         } catch(error) { 
             console.error(error); 
-            tbody.innerHTML = '<tr><td colspan="7" class="no-data">Error loading data<\/td></td>'; 
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="no-data">Error loading data<\/td></td>'; 
         }
         showLoading(false);
     }
@@ -903,13 +1065,14 @@
     function updateDue() {
         const earnings = parseFloat(modalTotalEarning.value) || 0;
         const paid = parseFloat(modalCompanyPaid.value) || 0;
-        modalDue.value = formatIndianNumber(earnings - paid);
+        if (modalDue) modalDue.value = formatIndianNumber(earnings - paid);
     }
     
-    modalTotalEarning.addEventListener('input', updateDue);
-    modalCompanyPaid.addEventListener('input', updateDue);
+    if (modalTotalEarning) modalTotalEarning.addEventListener('input', updateDue);
+    if (modalCompanyPaid) modalCompanyPaid.addEventListener('input', updateDue);
     
     async function addPaymentRecord(recordData) {
+        if (!isAdminUser) return false;
         try {
             const newRef = window.push(window.ref(db, 'companyDailyPayments'));
             await window.set(newRef, recordData);
@@ -924,6 +1087,7 @@
     }
     
     async function updatePaymentRecord(id, recordData) {
+        if (!isAdminUser) return false;
         try {
             const recordRef = window.ref(db, `companyDailyPayments/${id}`);
             await window.update(recordRef, recordData);
@@ -938,6 +1102,7 @@
     }
     
     window.deletePayment = async function(id) {
+        if (!isAdminUser) return;
         if (confirm('Are you sure you want to delete this payment record?')) {
             showLoading(true);
             try {
@@ -954,50 +1119,51 @@
     };
     
     function openAddModal() {
+        if (!isAdminUser) return;
         editPaymentId = null;
-        modalTitle.innerText = 'Add New Payment Record';
-        modalDate.value = new Date().toISOString().split('T')[0];
-        modalCompanySelect.value = '';
-        modalTotalWorkers.value = '';
-        modalTotalEarning.value = '';
-        modalCompanyPaid.value = '';
-        modalDue.value = '';
-        modal.classList.add('show');
+        if (modalTitle) modalTitle.innerText = 'Add New Payment Record';
+        if (modalDate) modalDate.value = new Date().toISOString().split('T')[0];
+        if (modalCompanySelect) modalCompanySelect.value = '';
+        if (modalTotalWorkers) modalTotalWorkers.value = '';
+        if (modalTotalEarning) modalTotalEarning.value = '';
+        if (modalCompanyPaid) modalCompanyPaid.value = '';
+        if (modalDue) modalDue.value = '';
+        if (modal) modal.classList.add('show');
     }
     
     window.editPayment = function(id) {
+        if (!isAdminUser) return;
         const payment = allPayments.find(p => p.id === id);
         if (!payment) {
             showToast('Payment record not found!', true);
             return;
         }
         editPaymentId = id;
-        modalTitle.innerText = 'Edit Payment Record';
-        modalDate.value = payment.date || '';
-        // Find company ID by name
+        if (modalTitle) modalTitle.innerText = 'Edit Payment Record';
+        if (modalDate) modalDate.value = payment.date || '';
         const company = allCompanies.find(c => c.name === payment.companyName);
-        modalCompanySelect.value = company ? company.id : '';
-        modalTotalWorkers.value = payment.totalWorker || 0;
-        modalTotalEarning.value = payment.totalEarning || 0;
-        modalCompanyPaid.value = payment.companyPaid || 0;
+        if (modalCompanySelect) modalCompanySelect.value = company ? company.id : '';
+        if (modalTotalWorkers) modalTotalWorkers.value = payment.totalWorker || 0;
+        if (modalTotalEarning) modalTotalEarning.value = payment.totalEarning || 0;
+        if (modalCompanyPaid) modalCompanyPaid.value = payment.companyPaid || 0;
         updateDue();
-        modal.classList.add('show');
+        if (modal) modal.classList.add('show');
     };
     
     function closeModal() {
-        modal.classList.remove('show');
+        if (modal) modal.classList.remove('show');
         editPaymentId = null;
     }
     
     async function savePayment() {
-        const date = modalDate.value;
-        const companyId = modalCompanySelect.value;
+        if (!isAdminUser) return;
+        const date = modalDate ? modalDate.value : '';
+        const companyId = modalCompanySelect ? modalCompanySelect.value : '';
         const selectedCompany = allCompanies.find(c => c.id === companyId);
         const companyName = selectedCompany ? selectedCompany.name : '';
-        const totalWorkers = parseInt(modalTotalWorkers.value) || 0;
-        const totalEarning = parseFloat(modalTotalEarning.value) || 0;
-        const companyPaid = parseFloat(modalCompanyPaid.value) || 0;
-        const due = totalEarning - companyPaid;
+        const totalWorkers = parseInt(modalTotalWorkers ? modalTotalWorkers.value : 0) || 0;
+        const totalEarning = parseFloat(modalTotalEarning ? modalTotalEarning.value : 0) || 0;
+        const companyPaid = parseFloat(modalCompanyPaid ? modalCompanyPaid.value : 0) || 0;
         
         if (!date) {
             showToast('Please select a date', true);
@@ -1015,7 +1181,7 @@
             totalWorker: totalWorkers,
             totalEarning: totalEarning,
             companyPaid: companyPaid,
-            companyDue: due,
+            companyDue: totalEarning - companyPaid,
             updatedAt: new Date().toISOString()
         };
         
@@ -1033,61 +1199,26 @@
         }
     }
     
-    async function loadBannerImage(uid) {
-        if (!uid) return;
-        try {
-            const bannerRef = window.ref(db, `users/${uid}/dashboardBanner`);
-            const snapshot = await window.get(bannerRef);
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        } catch(e) { console.warn(e); }
-    }
-    
-    function listenBannerChanges(uid) {
-        if (!uid) return;
-        const bannerRef = window.ref(db, `users/${uid}/dashboardBanner`);
-        window.onValue(bannerRef, (snapshot) => {
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        });
-    }
-    
     // Add Company Modal functions
     window.openAddCompanyModal = function() {
-        document.getElementById('addCompanyModal').classList.add('show');
+        if (!isAdminUser) return;
+        const addCompanyModal = document.getElementById('addCompanyModal');
+        if (addCompanyModal) addCompanyModal.classList.add('show');
     };
     
     window.closeAddCompanyModal = function() {
-        document.getElementById('addCompanyModal').classList.remove('show');
-        document.getElementById('newCompanyName').value = '';
+        const addCompanyModal = document.getElementById('addCompanyModal');
+        if (addCompanyModal) addCompanyModal.classList.remove('show');
+        const newCompanyName = document.getElementById('newCompanyName');
+        if (newCompanyName) newCompanyName.value = '';
     };
     
     // Export helpers
     function getRecordsToExport() {
-        const source = dataSourceSelect.value;
+        const source = dataSourceSelect ? dataSourceSelect.value : 'all';
         let baseRecords = (source === 'all') ? [...allPayments] : [...currentFilteredPayments];
-        if (limitCheckbox.checked) {
-            let limit = parseInt(limitCountInput.value, 10);
+        if (limitCheckbox && limitCheckbox.checked) {
+            let limit = parseInt(limitCountInput ? limitCountInput.value : 10, 10);
             if (isNaN(limit) || limit < 1) limit = 10;
             if (limit < baseRecords.length) baseRecords = baseRecords.slice(0, limit);
         }
@@ -1135,9 +1266,6 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         let startY = 15;
-        if (pdfLogoBase64) {
-            try { doc.addImage(pdfLogoBase64, 'JPEG', 14, 8, 25, 25); startY = 32; } catch(e) {}
-        }
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
         doc.setTextColor(245,158,11);
@@ -1199,48 +1327,56 @@
     }
     
     function handleDownload() {
+        if (!isAdminUser) return;
         const records = getRecordsToExport();
         if (!records.length) { alert("No records available."); return; }
-        const format = downloadFormatSelect.value;
+        const format = downloadFormatSelect ? downloadFormatSelect.value : 'csv';
         const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-        const sourceLabel = dataSourceSelect.value === 'all' ? 'all' : 'filtered';
-        const limitLabel = limitCheckbox.checked ? `_latest${limitCountInput.value}` : '';
+        const sourceLabel = (dataSourceSelect ? dataSourceSelect.value : 'all') === 'all' ? 'all' : 'filtered';
+        const limitLabel = (limitCheckbox && limitCheckbox.checked) ? `_latest${limitCountInput ? limitCountInput.value : 10}` : '';
         const fileName = `payments_${sourceLabel}${limitLabel}_${timestamp}.${format === 'csv' ? 'csv' : 'pdf'}`;
         if (format === 'csv') downloadCSV(records, fileName);
         else downloadPDF(records, fileName);
     }
     
     function toggleLimitInput() {
-        limitCountInput.disabled = !limitCheckbox.checked;
-        if (limitCheckbox.checked && (!limitCountInput.value || parseInt(limitCountInput.value)<1)) limitCountInput.value = "10";
+        if (limitCountInput) limitCountInput.disabled = !(limitCheckbox && limitCheckbox.checked);
+        if (limitCheckbox && limitCheckbox.checked && limitCountInput && (!limitCountInput.value || parseInt(limitCountInput.value)<1)) limitCountInput.value = "10";
     }
     
     let debounceTimer;
     function onSearchInput() {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => filterRecords(searchInput.value), 300);
+        debounceTimer = setTimeout(() => filterRecords(searchInput ? searchInput.value : ''), 300);
     }
     
     function bindEvents() {
-        searchInput.addEventListener('input', onSearchInput);
-        limitCheckbox.addEventListener('change', toggleLimitInput);
-        downloadBtn.addEventListener('click', handleDownload);
+        if (searchInput) searchInput.addEventListener('input', onSearchInput);
+        if (limitCheckbox) limitCheckbox.addEventListener('change', toggleLimitInput);
+        if (downloadBtn) downloadBtn.addEventListener('click', handleDownload);
         toggleLimitInput();
-        openAddPaymentBtn.addEventListener('click', openAddModal);
-        modalCancelBtn.addEventListener('click', closeModal);
-        modalSaveBtn.addEventListener('click', savePayment);
+        if (openAddPaymentBtn) openAddPaymentBtn.addEventListener('click', openAddModal);
+        if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+        if (modalSaveBtn) modalSaveBtn.addEventListener('click', savePayment);
     }
     
+    // Main auth check
     window.onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = 'login.html'; return; }
-        await loadCompanies();
-        bindEvents();
-        await loadAllPayments();
-        await loadImages(user.uid);
-        await loadBannerImage(user.uid);
-        listenBannerChanges(user.uid);
-        window.onValue(window.ref(db, 'companyDailyPayments'), () => loadAllPayments());
-        window.onValue(window.ref(db, 'companies'), () => loadCompanies());
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        await checkAdminAndLoad(user);
+        if (isAdminUser) {
+            bindEvents();
+            // Set up real-time listeners
+            window.onValue(window.ref(db, 'companyDailyPayments'), () => {
+                if (isAdminUser) loadAllPayments();
+            });
+            window.onValue(window.ref(db, 'companies'), () => {
+                if (isAdminUser) loadCompanies();
+            });
+        }
     });
 </script>
 </body>
