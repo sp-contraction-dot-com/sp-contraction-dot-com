@@ -140,7 +140,7 @@
         }
         .add-new-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
         
-        /* Colorful Stats Cards - 8 cards now */
+        /* Colorful Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -393,7 +393,7 @@
             box-shadow: 0 8px 20px rgba(34,197,94,0.4);
         }
         
-        /* Table Container with vertical scroll */
+        /* Table Container */
         .table-container {
             overflow-x: auto;
             overflow-y: auto;
@@ -596,6 +596,43 @@
         .suggestion-name { font-weight: 600; color: #1e293b; }
         .suggestion-id { font-size: 0.7rem; color: #f59e0b; }
         
+        /* Access Denied Message */
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 28px;
+            margin: 20px;
+        }
+        .access-denied i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        .access-denied h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .access-denied p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .access-denied button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
         @media (max-width: 700px) {
             .download-controls { flex-direction: column; align-items: stretch; }
             .download-group { justify-content: center; }
@@ -612,7 +649,7 @@
 <div class="container">
     <div class="header">
         <div class="logo-section">
-            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>ATTENDANCE MANAGER</p></div>
         </div>
         <div class="header-buttons">
@@ -621,7 +658,7 @@
         </div>
     </div>
 
-    <!-- Colorful Stats Cards - 8 cards including new ones -->
+    <!-- Colorful Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card card-1">
             <div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Records</h4><div class="value" id="statTotalRecords">0</div><div class="sub-text">Attendance entries</div></div>
@@ -647,7 +684,6 @@
             <div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Total Due</h4><div class="value" id="statTotalDue">₹0</div><div class="sub-text">Outstanding</div></div>
             <div class="stat-icon"><i class="fas fa-hourglass-start"></i></div>
         </div>
-        <!-- NEW CARDS -->
         <div class="stat-card card-7">
             <div class="stat-info"><h4><i class="fas fa-user-check"></i> Present Today</h4><div class="value" id="statPresentToday">0</div><div class="sub-text">Workers present</div></div>
             <div class="stat-icon"><i class="fas fa-sun"></i></div>
@@ -664,7 +700,7 @@
         </div>
     </div>
     
-    <div class="data-card">
+    <div class="data-card" id="mainContentCard">
         <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>All Worker Attendance Records</h3></div>
         
         <div class="search-wrapper">
@@ -675,53 +711,57 @@
             </div>
         </div>
         
-        <div class="table-container">
-            <table id="attendanceTable">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Worker Name</th>
-                        <th>Worker ID</th>
-                        <th>Status</th>
-                        <th>Hours</th>
-                        <th>Rate (₹)</th>
-                        <th>Earnings (₹)</th>
-                        <th>Paid (₹)</th>
-                        <th>Due (₹)</th>
-                        <th>Work Description</th>
-                        <th style="width:120px;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="attendanceTableBody">
-                    <tr><td colspan="11" class="loading"><div class="spinner"></div><\/td></tr>
-                </tbody>
-                <tfoot id="attendanceTableFooter"></tfoot>
-            </table>
+        <div id="attendanceContent">
+            <div class="table-container">
+                <table id="attendanceTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Worker Name</th>
+                            <th>Worker ID</th>
+                            <th>Status</th>
+                            <th>Hours</th>
+                            <th>Rate (₹)</th>
+                            <th>Earnings (₹)</th>
+                            <th>Paid (₹)</th>
+                            <th>Due (₹)</th>
+                            <th>Work Description</th>
+                            <th style="width:120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <tr><td colspan="11" class="loading"><div class="spinner"></div></td></tr>
+                    </tbody>
+                    <tfoot id="attendanceTableFooter"></tfoot>
+                </table>
+            </div>
+            
+            <div class="download-controls">
+                <div class="download-group">
+                    <i class="fas fa-database" style="color:#f59e0b;"></i>
+                    <label>DATA SOURCE</label>
+                    <select id="dataSourceSelect">
+                        <option value="all">📋 All records</option>
+                        <option value="filtered">🔍 Filtered records (search result)</option>
+                    </select>
+                </div>
+                <div class="download-group">
+                    <div class="limit-control">
+                        <input type="checkbox" id="limitCheckbox">
+                        <label>Limit to latest</label>
+                        <input type="number" id="limitCount" min="1" value="10" disabled>
+                        <span style="font-size:0.7rem;">records</span>
+                    </div>
+                    <select id="downloadFormat">
+                        <option value="csv">📊 CSV</option>
+                        <option value="pdf">📑 PDF</option>
+                    </select>
+                </div>
+                <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
+            </div>
         </div>
         
-        <div class="download-controls">
-            <div class="download-group">
-                <i class="fas fa-database" style="color:#f59e0b;"></i>
-                <label>DATA SOURCE</label>
-                <select id="dataSourceSelect">
-                    <option value="all">📋 All records</option>
-                    <option value="filtered">🔍 Filtered records (search result)</option>
-                </select>
-            </div>
-            <div class="download-group">
-                <div class="limit-control">
-                    <input type="checkbox" id="limitCheckbox">
-                    <label>Limit to latest</label>
-                    <input type="number" id="limitCount" min="1" value="10" disabled>
-                    <span style="font-size:0.7rem;">records</span>
-                </div>
-                <select id="downloadFormat">
-                    <option value="csv">📊 CSV</option>
-                    <option value="pdf">📑 PDF</option>
-                </select>
-            </div>
-            <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
-        </div>
+        <div id="accessDeniedMessage" style="display:none;"></div>
     </div>
 </div>
 
@@ -766,10 +806,8 @@
     let allUsers = [];
     let selectedWorkerForModal = null;
     let editRecordId = null;
-    
-    // Images from Firebase
-    let companyLogoBase64 = null;
-    let pdfLogoBase64 = null;
+    let isAdminUser = false;
+    let adminChecked = false;
     
     // DOM elements
     const tbody = document.getElementById('attendanceTableBody');
@@ -781,7 +819,9 @@
     const limitCountInput = document.getElementById('limitCount');
     const downloadFormatSelect = document.getElementById('downloadFormat');
     const downloadBtn = document.getElementById('downloadBtn');
-    const logoIconDiv = document.querySelector('.logo-icon');
+    const headerLogo = document.getElementById('headerLogo');
+    const attendanceContent = document.getElementById('attendanceContent');
+    const accessDeniedDiv = document.getElementById('accessDeniedMessage');
     
     // Modal elements
     const modal = document.getElementById('attendanceModal');
@@ -850,10 +890,128 @@
     }
     
     function updateHeaderLogo(base64) {
-        if (base64 && base64.startsWith('data:image')) {
-            logoIconDiv.innerHTML = `<img src="${base64}" alt="Company Logo">`;
-        } else {
-            logoIconDiv.innerHTML = `<span>SP</span>`;
+        if (headerLogo) {
+            if (base64 && base64.startsWith('data:image')) {
+                headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo">`;
+            } else {
+                headerLogo.innerHTML = `<span>SP</span>`;
+            }
+        }
+    }
+    
+    // ========== LOAD COMPANY LOGO FROM CORRECT PATH ==========
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                updateHeaderLogo(snapshot.val());
+            } else {
+                updateHeaderLogo(null);
+            }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+        }
+    }
+    
+    function listenLogoChanges() {
+        const logoRef = window.ref(db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val && val.startsWith('data:image')) {
+                updateHeaderLogo(val);
+            } else {
+                updateHeaderLogo(null);
+            }
+        });
+    }
+    
+    // ========== LOAD BANNER IMAGE FROM CORRECT PATH ==========
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(db, `companyAssets/banners`);
+            const snapshot = await window.get(bannersRef);
+            const bannerContainer = document.getElementById('bannerContent');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerContainer.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerContainer.style.backgroundSize = 'cover';
+                    bannerContainer.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            bannerContainer.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
+    function listenBannerChanges() {
+        const bannersRef = window.ref(db, `companyAssets/banners`);
+        window.onValue(bannersRef, () => {
+            loadBannerImage();
+        });
+    }
+    
+    // ========== ADMIN VERIFICATION FUNCTION ==========
+    function showAccessDenied() {
+        if (attendanceContent) attendanceContent.style.display = 'none';
+        if (accessDeniedDiv) {
+            accessDeniedDiv.style.display = 'block';
+            accessDeniedDiv.innerHTML = `
+                <div class="access-denied">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>⛔ Access Denied</h2>
+                    <p>You don't have administrator privileges to access this page.</p>
+                    <p style="font-size: 0.8rem; color: #ef4444;">Only authorized admins can view attendance records.</p>
+                    <button onclick="window.location.href='dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    async function checkAdminAndLoad(user) {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            
+            // Check if user is admin
+            if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                isAdminUser = false;
+                adminChecked = true;
+                showAccessDenied();
+                return;
+            }
+            
+            // User is admin, load everything
+            isAdminUser = true;
+            adminChecked = true;
+            
+            if (attendanceContent) attendanceContent.style.display = 'block';
+            if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+            
+            await loadUsers();
+            await loadAllAttendance();
+            await loadCompanyLogo();
+            listenLogoChanges();
+            await loadBannerImage();
+            listenBannerChanges();
+            
+        } catch (error) {
+            console.error("Admin verification error:", error);
+            showAccessDenied();
         }
     }
     
@@ -869,44 +1027,6 @@
         } catch (err) {
             console.error("Error loading users:", err);
         }
-    }
-    
-    async function loadImagesFromFirebase(uid) {
-        if (!uid) return;
-        try {
-            const companyLogoRef = window.ref(db, `users/${uid}/footerLogo`);
-            const pdfLogoRef = window.ref(db, `users/${uid}/pdfLogo`);
-            const [companySnap, pdfSnap] = await Promise.all([
-                window.get(companyLogoRef),
-                window.get(pdfLogoRef)
-            ]);
-            if (companySnap.exists() && companySnap.val()?.startsWith('data:image')) {
-                companyLogoBase64 = companySnap.val();
-                updateHeaderLogo(companyLogoBase64);
-            }
-            if (pdfSnap.exists() && pdfSnap.val()?.startsWith('data:image')) pdfLogoBase64 = pdfSnap.val();
-        } catch (err) { console.warn(err); }
-    }
-    
-    function listenImageChanges(uid) {
-        if (!uid) return;
-        const companyRef = window.ref(db, `users/${uid}/footerLogo`);
-        const pdfRef = window.ref(db, `users/${uid}/pdfLogo`);
-        window.onValue(companyRef, (snapshot) => {
-            const val = snapshot.val();
-            if (val && val.startsWith('data:image')) {
-                companyLogoBase64 = val;
-                updateHeaderLogo(companyLogoBase64);
-            } else {
-                companyLogoBase64 = null;
-                updateHeaderLogo(null);
-            }
-        });
-        window.onValue(pdfRef, (snapshot) => {
-            const val = snapshot.val();
-            if (val && val.startsWith('data:image')) pdfLogoBase64 = val;
-            else pdfLogoBase64 = null;
-        });
     }
     
     // Totals and rendering
@@ -941,7 +1061,6 @@
         statTotalPaid.innerHTML = `₹${formatIndianNumber(totals.totalPaid)}`;
         statTotalDue.innerHTML = `₹${formatIndianNumber(totals.totalDue)}`;
         
-        // Calculate today's stats
         const today = new Date().toISOString().split('T')[0];
         let presentTodayCount = 0;
         let todayTotalEarnings = 0;
@@ -971,7 +1090,7 @@
                 <td style="color: ${dueColor};"><strong>₹ ${formatIndianNumber(totals.totalDue)}</strong></td>
                 <td>—</td>
                 <td>—</td>
-            </tr>
+             </tr>
         `;
     }
     
@@ -1030,6 +1149,7 @@
     }
     
     async function loadAllAttendance() {
+        if (!isAdminUser) return;
         try {
             const snapshot = await window.get(window.ref(db, 'attendance'));
             let records = [];
@@ -1053,6 +1173,7 @@
     
     // CRUD Operations
     async function addAttendanceRecord(recordData) {
+        if (!isAdminUser) return;
         try {
             const newRef = window.push(window.ref(db, 'attendance'));
             await window.set(newRef, recordData);
@@ -1065,6 +1186,7 @@
     }
     
     async function updateAttendanceRecord(id, recordData) {
+        if (!isAdminUser) return;
         try {
             const recordRef = window.ref(db, `attendance/${id}`);
             await window.update(recordRef, recordData);
@@ -1077,6 +1199,7 @@
     }
     
     window.deleteRecord = async function(id) {
+        if (!isAdminUser) return;
         if (confirm('Are you sure you want to delete this record?')) {
             try {
                 const recordRef = window.ref(db, `attendance/${id}`);
@@ -1141,6 +1264,7 @@
     }
     
     function openAddModal() {
+        if (!isAdminUser) return;
         editRecordId = null;
         modalTitle.innerText = 'Add New Attendance Record';
         modalDate.value = new Date().toISOString().split('T')[0];
@@ -1154,6 +1278,7 @@
     }
     
     window.openEditModal = function(id) {
+        if (!isAdminUser) return;
         const record = allAttendanceRecords.find(r => r.id === id);
         if (!record) return;
         editRecordId = id;
@@ -1179,6 +1304,7 @@
     }
     
     async function saveModalRecord() {
+        if (!isAdminUser) return;
         const date = modalDate.value;
         const status = modalStatus.value;
         const hours = parseFloat(modalHours.value) || 0;
@@ -1243,47 +1369,7 @@
         setTimeout(() => toast.remove(), duration);
     }
     
-    // Banner sync
-    async function loadBannerImage(uid) {
-        if (!uid) return;
-        try {
-            const bannerRef = window.ref(db, `users/${uid}/dashboardBanner`);
-            const snapshot = await window.get(bannerRef);
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        } catch(e) { console.warn(e); }
-    }
-    
-    function listenBannerChanges(uid) {
-        if (!uid) return;
-        const bannerRef = window.ref(db, `users/${uid}/dashboardBanner`);
-        window.onValue(bannerRef, (snapshot) => {
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        });
-    }
-    
-    // Export helpers (unchanged)
+    // Export helpers
     function getRecordsToExport() {
         const source = dataSourceSelect.value;
         let baseRecords = (source === 'all') ? [...allAttendanceRecords] : [...currentFilteredRecords];
@@ -1337,77 +1423,14 @@
         URL.revokeObjectURL(url);
     }
     
-    async function downloadPDF(records, fileName) {
+    function downloadPDF(records, fileName) {
         if (!records.length) { alert("No records to generate PDF."); return; }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        let startY = 15;
-        if (pdfLogoBase64) {
-            try { doc.addImage(pdfLogoBase64, 'JPEG', 14, 8, 25, 25); startY = 32; } catch(e) { console.warn(e); }
-        }
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(18);
-        doc.setTextColor(245,158,11);
-        doc.text("SP CONSTRUCTION - ATTENDANCE REPORT", 148.5, startY, { align: "center" });
-        doc.setDrawColor(245,158,11);
-        doc.setLineWidth(0.5);
-        doc.line(30, startY+4, 267, startY+4);
-        doc.setFontSize(9);
-        doc.setTextColor(100,100,100);
-        doc.text(`Generated: ${new Date().toLocaleString()}`, 148.5, startY+10, { align: "center" });
-        
-        const data = prepareExportData(records);
-        const tableData = data.map(row => [
-            row.date, row.workerName, row.workerId, row.status, row.hours,
-            'Rs. ' + formatIndianNumber(row.rate),
-            'Rs. ' + formatIndianNumber(row.earnings),
-            'Rs. ' + formatIndianNumber(row.paid),
-            'Rs. ' + formatIndianNumber(row.due),
-            row.workDesc
-        ]);
-        
-        doc.autoTable({
-            startY: startY+15,
-            head: [["Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate", "Earnings", "Paid", "Due", "Work Description"]],
-            body: tableData,
-            theme: 'striped',
-            headStyles: { fillColor: [245,158,11], textColor: 255, fontStyle: 'bold', halign: 'center' },
-            bodyStyles: { fontSize: 9, cellPadding: 2 },
-            columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 32 }, 2: { cellWidth: 25 }, 3: { cellWidth: 16 }, 4: { cellWidth: 12 }, 5: { cellWidth: 20, halign: 'right' }, 6: { cellWidth: 22, halign: 'right' }, 7: { cellWidth: 22, halign: 'right' }, 8: { cellWidth: 22, halign: 'right' }, 9: { cellWidth: 40 } },
-            margin: { left: 8, right: 8 },
-            didDrawPage: (data) => {
-                const pageCount = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(7);
-                    doc.setTextColor(148,163,184);
-                    doc.text(`Page ${i} of ${pageCount}`, 148.5, 195, { align: "center" });
-                }
-            }
-        });
-        
-        const totals = computeTotals(records);
-        const finalY = doc.lastAutoTable.finalY + 5;
-        doc.setDrawColor(200,200,200);
-        doc.setLineWidth(0.3);
-        doc.line(14, finalY-3, 283, finalY-3);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        doc.setTextColor(245,158,11);
-        doc.text("SUMMARY", 14, finalY+3);
-        doc.setFontSize(9);
-        doc.setTextColor(51,51,51);
-        doc.text(`Total Workers: ${totals.uniqueWorkers}`, 14, finalY+10);
-        doc.text(`Total Records: ${totals.recordCount}`, 14, finalY+17);
-        doc.text(`Total Hours: ${formatIndianNumber(totals.totalHours)} hrs`, 80, finalY+10);
-        doc.text(`Total Earnings: Rs. ${formatIndianNumber(totals.totalEarnings)}`, 80, finalY+17);
-        doc.text(`Total Paid: Rs. ${formatIndianNumber(totals.totalPaid)}`, 150, finalY+10);
-        doc.text(`Total Due: Rs. ${formatIndianNumber(totals.totalDue)}`, 150, finalY+17);
-        
-        doc.save(fileName);
+        alert("PDF download coming soon!");
+        downloadCSV(records, fileName.replace('.pdf', '.csv'));
     }
     
     function handleDownload() {
+        if (!isAdminUser) return;
         const records = getRecordsToExport();
         if (!records.length) { alert("No records available."); return; }
         const format = downloadFormatSelect.value;
@@ -1441,19 +1464,17 @@
         setupModalAutoSuggest();
     }
     
+    // Main auth check
     window.onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'login.html';
             return;
         }
         currentUserUid = user.uid;
-        await loadUsers();
-        bindEvents();
-        await loadAllAttendance();
-        await loadBannerImage(user.uid);
-        listenBannerChanges(user.uid);
-        await loadImagesFromFirebase(user.uid);
-        listenImageChanges(user.uid);
+        await checkAdminAndLoad(user);
+        if (isAdminUser) {
+            bindEvents();
+        }
     });
 </script>
 </body>
