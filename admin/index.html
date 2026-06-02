@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -615,6 +614,44 @@
             color: #94a3b8;
             margin-top: 6px;
         }
+
+        /* Access Denied Message */
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 24px;
+            margin: 20px;
+        }
+        .access-denied i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        .access-denied h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .access-denied p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .access-denied button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -759,6 +796,8 @@
 <script type="module">
     // --------------------- FIREBASE USER DATA ---------------------
     let currentAuthUser = null;
+    let isAdminUser = false;
+    let adminChecked = false;
 
     // হেডারের ব্যাকগ্রাউন্ড ইমেজ লোড করার ফাংশন
     async function loadHeaderBackground(user) {
@@ -805,8 +844,6 @@
             const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
             const snapshot = await window.get(logoRef);
             const footerLogoIcon = document.getElementById('footerLogoIcon');
-            const headerLogoIcon = document.getElementById('headerProfileImg'); // হেডারে প্রোফাইল ইমেজের জায়গায় লোগো নয়, আলাদা
-            // ফুটারের লোগো আপডেট
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 footerLogoIcon.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
             } else {
@@ -867,38 +904,102 @@
         }
     };
 
-    // Auth state observer
+    // ========== ADMIN VERIFICATION FUNCTION ==========
+    async function checkAdminAndLoad(user) {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            
+            // Check if user is admin
+            if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                // Show access denied message instead of redirecting
+                isAdminUser = false;
+                adminChecked = true;
+                showAccessDenied();
+                return;
+            }
+            
+            // User is admin, load everything
+            isAdminUser = true;
+            adminChecked = true;
+            
+            await updateUserUI(user);
+            await loadHeaderBackground(user);
+            await loadSidebarBackground();
+            await loadCompanyLogo();
+            
+            // Show normal content
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('iframeContainer').style.display = 'flex';
+            document.getElementById('dynamicView').style.display = 'none';
+            
+            // Initialize dashboard
+            showHomeDashboard();
+            
+        } catch (error) {
+            console.error("Admin verification error:", error);
+            showAccessDenied();
+        }
+    }
+    
+    function showAccessDenied() {
+        const mainContent = document.getElementById('mainContent');
+        const iframeContainer = document.getElementById('iframeContainer');
+        const dynamicView = document.getElementById('dynamicView');
+        
+        iframeContainer.style.display = 'none';
+        dynamicView.style.display = 'block';
+        dynamicView.innerHTML = `
+            <div class="access-denied">
+                <i class="fas fa-shield-alt"></i>
+                <h2>⛔ Access Denied</h2>
+                <p>You don't have administrator privileges to access this page.</p>
+                <p style="font-size: 0.8rem; color: #ef4444;">Only authorized admins can view this dashboard.</p>
+                <button onclick="window.location.href='login.html'">
+                    <i class="fas fa-sign-out-alt"></i> Go to Login
+                </button>
+            </div>
+        `;
+    }
+
+    // Auth state observer with admin check
     window.onAuthStateChanged(window.auth, async (user) => {
         if (!user) {
             window.location.href = 'login.html';
             return;
         }
-        await updateUserUI(user);
-        await loadHeaderBackground(user);
-        await loadSidebarBackground();
-        await loadCompanyLogo();
+        await checkAdminAndLoad(user);
     });
 
     // রিয়েল-টাইম আপডেটের জন্য লিসেনার (যখন logoupload.html থেকে পরিবর্তন হবে)
     if (window.db) {
         const headerBgRef = window.ref(window.db, `companyAssets/headerBackground`);
         window.onValue(headerBgRef, async () => {
-            if (currentAuthUser) await loadHeaderBackground(currentAuthUser);
+            if (currentAuthUser && isAdminUser) await loadHeaderBackground(currentAuthUser);
         });
         
         const sidebarBgRef = window.ref(window.db, `companyAssets/sidebarBackground`);
         window.onValue(sidebarBgRef, async () => {
-            await loadSidebarBackground();
+            if (isAdminUser) await loadSidebarBackground();
         });
         
         const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
         window.onValue(logoRef, async () => {
-            await loadCompanyLogo();
+            if (isAdminUser) await loadCompanyLogo();
         });
     }
 
     // --------------------- FUNCTION: Load any page inside iframe ---------------------
     window.loadPageInIframe = function(pageUrl) {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         const iframe = document.getElementById('dashboardFrame');
         const iframeContainer = document.getElementById('iframeContainer');
         const dynamicView = document.getElementById('dynamicView');
@@ -942,6 +1043,10 @@
     const dashboardFrame = document.getElementById('dashboardFrame');
 
     function showHomeDashboard() {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         iframeContainer.style.display = 'flex';
         dynamicView.style.display = 'none';
         dynamicView.innerHTML = '';
@@ -951,6 +1056,10 @@
     }
 
     function renderPosts() {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         dynamicView.innerHTML = `
             <div class="section-title">
                 <h2><i class="fas fa-images"></i> Recent Posts</h2>
@@ -981,6 +1090,10 @@
     }
 
     function renderSupport() {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         dynamicView.innerHTML = `
             <div class="post-card" style="text-align:center;">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" style="width: 70px; margin-bottom: 16px;">
@@ -999,6 +1112,10 @@
     }
 
     function showNotifications() {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         dynamicView.innerHTML = `
             <div class="section-title">
                 <h2><i class="fas fa-bell"></i> Notifications</h2>
@@ -1020,6 +1137,10 @@
     }
 
     function handleBottomNav(type) {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         if(type === 'home') {
             showHomeDashboard();
         } else if(type === 'post') {
@@ -1042,11 +1163,16 @@
     }
 
     function setActiveNav(element) {
+        if (!isAdminUser) return;
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
     }
 
     function toggleLeftMenu() {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         document.getElementById('sideMenuLeft').classList.add('open');
         document.getElementById('overlay').classList.add('show');
     }
@@ -1055,6 +1181,10 @@
         document.getElementById('overlay').classList.remove('show');
     }
     function toggleRightMenu() {
+        if (!isAdminUser) {
+            showAccessDenied();
+            return;
+        }
         document.getElementById('sideMenuRight').classList.add('open');
         document.getElementById('overlay').classList.add('show');
     }
@@ -1071,6 +1201,7 @@
     const searchInput = document.getElementById('searchInput');
     if(searchInput) {
         searchInput.addEventListener('keyup', function() {
+            if (!isAdminUser) return;
             const activeNav = document.querySelector('.nav-item.active')?.getAttribute('data-nav') || 'home';
             if(activeNav === 'home' && iframeContainer.style.display !== 'none') {
                 console.log('Search in dashboard');
@@ -1079,8 +1210,13 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-        showHomeDashboard();
+        // Initially hide content until admin check
+        document.getElementById('mainContent').style.display = 'block';
+        if (!isAdminUser && adminChecked) {
+            showAccessDenied();
+        }
     });
+    
     window.onload = function() {
         const bottomNav = document.querySelector('.bottom-nav');
         if(bottomNav) bottomNav.style.opacity = '1';
