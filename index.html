@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>SP Construction | Premium Contractor App</title>
+    <title>SP Construction | Employee Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
@@ -32,7 +32,6 @@
         window.ref = ref;
         window.get = get;
         window.set = set;
-        window.onValue = onValue;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
@@ -73,24 +72,6 @@
             position: relative;
             z-index: 10;
             flex-shrink: 0;
-            background-size: cover;
-            background-position: center;
-            transition: background-image 0.3s ease;
-        }
-        .top-header.has-bg-image::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.55);
-            border-radius: 0 0 28px 28px;
-            pointer-events: none;
-        }
-        .header-row, .greeting {
-            position: relative;
-            z-index: 2;
         }
 
         .header-row {
@@ -192,7 +173,6 @@
             margin-top: 12px;
             color: white;
             text-align: center;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         .greeting h3 {
@@ -202,7 +182,7 @@
 
         .greeting p {
             font-size: 0.7rem;
-            opacity: 0.9;
+            opacity: 0.7;
             margin-top: 4px;
         }
 
@@ -375,7 +355,7 @@
         .side-menu-left.open { left: 0; }
         .side-menu-right.open { right: 0; }
 
-        /* Left Menu Header - Background Image Support */
+        /* Left Menu Header - Background Image Support (from companyAssets) */
         .side-menu-left .menu-header {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             padding: 40px 20px;
@@ -564,106 +544,50 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 14px rgba(245,158,11,0.3);
         }
-        
-        /* Footer Styles */
-        .app-footer {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 12px 20px;
-            text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            flex-shrink: 0;
-        }
-        .footer-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .footer-logo-icon {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .footer-logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .footer-logo-icon span {
-            font-size: 1rem;
-            font-weight: 800;
-            color: white;
-        }
-        .footer-text h4 {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: white;
-        }
-        .footer-text p {
-            font-size: 0.6rem;
-            color: #fcd34d;
-        }
-        .copyright {
-            font-size: 0.6rem;
-            color: #94a3b8;
-            margin-top: 6px;
-        }
     </style>
 </head>
 <body>
 
-<!-- LEFT SIDE MENU (background image loads from companyAssets) -->
+<!-- LEFT SIDE MENU (background image loads from companyAssets, visible to all users) -->
 <div class="side-menu-left" id="sideMenuLeft">
     <div class="menu-header" id="leftMenuHeader" style="background-image: url(''); background-size: cover; background-position: center;">
-        <!-- Background image will be loaded from companyAssets/sidebarBackground -->
+        <!-- Background image loads from Firebase companyAssets -->
     </div>
-    <div class="menu-item" onclick="loadPageInIframe('dashboard.html'); closeLeftMenu();">
-        <i class="fas fa-chart-line"></i> <span>Home</span>
+    <div class="menu-item" onclick="loadPageInIframe('user-dashboard.html'); closeLeftMenu();">
+        <i class="fas fa-chart-line"></i> <span>My Dashboard</span>
     </div>
     <div class="menu-item" onclick="loadPageInIframe('all-attendance.html'); closeLeftMenu();">
-        <i class="fas fa-calendar-check"></i> <span>User Attendance</span>
+        <i class="fas fa-calendar-check"></i> <span>My Attendance</span>
     </div>
-    <div class="menu-item" onclick="loadPageInIframe('all-users.html'); closeLeftMenu();">
-        <i class="fas fa-users"></i> <span>User's List</span>
+    <div class="menu-item" onclick="loadPageInIframe('profile.html'); closeLeftMenu();">
+        <i class="fas fa-user"></i> <span>My Profile</span>
     </div>
-    <div class="menu-item" onclick="loadPageInIframe('all-payments.html'); closeLeftMenu();">
-        <i class="fas fa-money-bill-wave"></i> <span> Company Payment History</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('attendantcard.html'); closeLeftMenu();">
-        <i class="fas fa-building"></i> <span>User Card</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('projects.html'); closeLeftMenu();">
-        <i class="fas fa-building"></i> <span>Projects</span>
+    <div class="menu-item" onclick="loadPageInIframe('user-attendant-card.html'); closeLeftMenu();">
+        <i class="fas fa-id-card"></i> <span>My ID Card</span>
     </div>
     <div class="menu-item" onclick="loadPageInIframe('work-calendar.html'); closeLeftMenu();">
         <i class="fas fa-calendar-alt"></i> <span>Work Calendar</span>
+    </div>
+    <div class="menu-item" onclick="loadPageInIframe('projects.html'); closeLeftMenu();">
+        <i class="fas fa-building"></i> <span>Projects</span>
     </div>
     <div class="menu-item" onclick="loadPageInIframe('report-archive.html'); closeLeftMenu();">
         <i class="fas fa-folder-open"></i> <span>Report Archive</span>
     </div>
 </div>
 
-<!-- RIGHT SIDE MENU (Dynamic from Firebase) -->
+<!-- RIGHT SIDE MENU (Profile & Account) -->
 <div class="side-menu-right" id="sideMenuRight">
     <div class="menu-header" id="rightMenuHeader">
         <img id="rightMenuAvatar" class="menu-logo" src="https://placehold.co/90x90?text=User" alt="Profile Logo">
         <h3 id="rightMenuName">Loading...</h3>
-        <p id="rightMenuPlan" style="font-size:0.7rem; margin-top:5px;">Contractor · Premium Plan</p>
+        <p id="rightMenuPlan" style="font-size:0.7rem; margin-top:5px;">Employee · Active</p>
     </div>
     <div class="menu-item" onclick="closeRightMenu(); window.location.href='profile.html'">
-        <i class="fas fa-user"></i> <span>Profile</span>
+        <i class="fas fa-user"></i> <span>My Profile</span>
     </div>
     <div class="menu-item" onclick="closeRightMenu(); alert('⚙️ Settings Coming Soon')">
         <i class="fas fa-cog"></i> <span>Settings</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); window.location.href='logoupload.html'">
-        <i class="fas fa-camera"></i> <span>Logo Upload</span>
     </div>
     <div class="menu-item" onclick="closeRightMenu(); alert('🔔 Notification Preferences')">
         <i class="fas fa-bell"></i> <span>Notifications</span>
@@ -684,7 +608,7 @@
 <!-- MAIN APP -->
 <div class="app-wrapper">
     <!-- Top Header -->
-    <div class="top-header" id="topHeader">
+    <div class="top-header">
         <div class="header-row">
             <div class="menu-icon" onclick="toggleLeftMenu()">
                 <span></span>
@@ -700,7 +624,7 @@
             </div>
         </div>
         <div class="greeting">
-            <h3>👷 Welcome, SP Construction</h3>
+            <h3 id="greetingText">👷 Welcome, Employee</h3>
             <p>View your work progress on the dashboard</p>
         </div>
     </div>
@@ -708,30 +632,14 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="iframe-container" id="iframeContainer">
-            <iframe class="dashboard-iframe" id="dashboardFrame" src="dashboard.html" title="SP Construction Dashboard"></iframe>
+            <iframe class="dashboard-iframe" id="dashboardFrame" src="user-dashboard.html" title="SP Construction Dashboard"></iframe>
         </div>
         <div class="dynamic-view" id="dynamicView"></div>
     </div>
-    
-    <!-- Footer Section with Company Logo -->
-    <div class="app-footer" id="appFooter">
-        <div class="footer-content">
-            <div class="footer-logo-icon" id="footerLogoIcon">
-                <span>SP</span>
-            </div>
-            <div class="footer-text">
-                <h4>SP CONSTRUCTION</h4>
-                <p>BUILDING DREAMS TOGETHER</p>
-            </div>
-        </div>
-        <div class="copyright">
-            <i class="far fa-copyright"></i> 2026 SP CONSTRUCTION | All Rights Reserved
-        </div>
-    </div>
 
-    <!-- Bottom Navigation - Dark -->
+    <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); loadPageInIframe('dashboard.html');">
+        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); loadPageInIframe('user-dashboard.html');">
             <i class="fas fa-home"></i>
             <div class="nav-label">Home</div>
         </div>
@@ -759,64 +667,7 @@
     // --------------------- FIREBASE USER DATA ---------------------
     let currentAuthUser = null;
 
-    // হেডারের ব্যাকগ্রাউন্ড ইমেজ লোড করার ফাংশন
-    async function loadHeaderBackground(user) {
-        if (!user) return;
-        try {
-            const headerBgRef = window.ref(window.db, `companyAssets/headerBackground`);
-            const snapshot = await window.get(headerBgRef);
-            const topHeader = document.getElementById('topHeader');
-            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                topHeader.style.backgroundImage = `url(${snapshot.val()})`;
-                topHeader.classList.add('has-bg-image');
-            } else {
-                topHeader.style.backgroundImage = '';
-                topHeader.classList.remove('has-bg-image');
-                topHeader.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
-            }
-        } catch (err) {
-            console.warn("Error loading header background:", err);
-        }
-    }
-
-    // সাইডবার মেনুর ব্যাকগ্রাউন্ড ইমেজ লোড করার ফাংশন
-    async function loadSidebarBackground() {
-        try {
-            const sidebarBgRef = window.ref(window.db, `companyAssets/sidebarBackground`);
-            const snapshot = await window.get(sidebarBgRef);
-            const leftHeader = document.getElementById('leftMenuHeader');
-            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                leftHeader.style.backgroundImage = `url(${snapshot.val()})`;
-                leftHeader.style.backgroundSize = 'cover';
-                leftHeader.style.backgroundPosition = 'center';
-            } else {
-                leftHeader.style.backgroundImage = '';
-                leftHeader.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
-            }
-        } catch (err) {
-            console.warn("Error loading sidebar background:", err);
-        }
-    }
-
-    // ফুটার ও হেডারে কোম্পানির লোগো লোড করার ফাংশন
-    async function loadCompanyLogo() {
-        try {
-            const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
-            const snapshot = await window.get(logoRef);
-            const footerLogoIcon = document.getElementById('footerLogoIcon');
-            const headerLogoIcon = document.getElementById('headerProfileImg'); // হেডারে প্রোফাইল ইমেজের জায়গায় লোগো নয়, আলাদা
-            // ফুটারের লোগো আপডেট
-            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                footerLogoIcon.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
-            } else {
-                footerLogoIcon.innerHTML = `<span>SP</span>`;
-            }
-        } catch (err) {
-            console.warn("Error loading company logo:", err);
-        }
-    }
-
-    // ইউজারের প্রোফাইল পিকচার ও তথ্য আপডেট
+    // Update header profile & right menu with user data
     async function updateUserUI(user) {
         if (!user) return;
         currentAuthUser = user;
@@ -825,6 +676,7 @@
             const snapshot = await window.get(userRef);
             const data = snapshot.val() || {};
             
+            // Header avatar
             const headerImg = document.getElementById('headerAvatar');
             if (headerImg) {
                 if (data.profilePicture && data.profilePicture.startsWith('data:image')) {
@@ -834,6 +686,14 @@
                 }
             }
             
+            // Greeting with name
+            const greetingText = document.getElementById('greetingText');
+            let firstName = data.firstName || data.fullName?.split(' ')[0] || user.email?.split('@')[0] || 'Employee';
+            if (greetingText) {
+                greetingText.innerHTML = `👷 Welcome, ${firstName}`;
+            }
+            
+            // Right menu avatar & name
             const rightAvatar = document.getElementById('rightMenuAvatar');
             const rightName = document.getElementById('rightMenuName');
             const rightPlan = document.getElementById('rightMenuPlan');
@@ -849,8 +709,8 @@
             let fullName = (data.firstName && data.lastName) ? `${data.firstName} ${data.lastName}` : (data.fullName || user.displayName || user.email?.split('@')[0] || 'Profile');
             if (rightName) rightName.innerText = fullName;
             
-            let planText = data.plan ? `${data.plan} Plan` : 'Premium Plan';
-            if (rightPlan) rightPlan.innerText = `Contractor · ${planText}`;
+            let planText = data.plan ? `${data.plan} Plan` : 'Active Member';
+            if (rightPlan) rightPlan.innerText = `Employee · ${planText}`;
         } catch (err) {
             console.warn("Error loading user data", err);
         }
@@ -866,34 +726,24 @@
         }
     };
 
-    // Auth state observer
-    window.onAuthStateChanged(window.auth, async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
+    // --------------------- LEFT MENU BACKGROUND LOAD FROM COMPANY ASSETS ---------------------
+    async function loadLeftMenuBackground() {
+        try {
+            // Load from companyAssets/sidebarBackground (shared across all users)
+            const bgRef = window.ref(window.db, 'companyAssets/sidebarBackground');
+            const snapshot = await window.get(bgRef);
+            const bgBase64 = snapshot.val();
+            const leftHeader = document.getElementById('leftMenuHeader');
+            if (bgBase64 && bgBase64.startsWith('data:image')) {
+                leftHeader.style.backgroundImage = `url(${bgBase64})`;
+                leftHeader.style.backgroundSize = 'cover';
+                leftHeader.style.backgroundPosition = 'center';
+            } else {
+                leftHeader.style.backgroundImage = '';
+            }
+        } catch (err) {
+            console.warn("Error loading left menu background", err);
         }
-        await updateUserUI(user);
-        await loadHeaderBackground(user);
-        await loadSidebarBackground();
-        await loadCompanyLogo();
-    });
-
-    // রিয়েল-টাইম আপডেটের জন্য লিসেনার (যখন logoupload.html থেকে পরিবর্তন হবে)
-    if (window.db) {
-        const headerBgRef = window.ref(window.db, `companyAssets/headerBackground`);
-        window.onValue(headerBgRef, async () => {
-            if (currentAuthUser) await loadHeaderBackground(currentAuthUser);
-        });
-        
-        const sidebarBgRef = window.ref(window.db, `companyAssets/sidebarBackground`);
-        window.onValue(sidebarBgRef, async () => {
-            await loadSidebarBackground();
-        });
-        
-        const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
-        window.onValue(logoRef, async () => {
-            await loadCompanyLogo();
-        });
     }
 
     // --------------------- FUNCTION: Load any page inside iframe ---------------------
@@ -908,7 +758,7 @@
         dynamicView.innerHTML = '';
     };
 
-    // --------------------- ORIGINAL APP FUNCTIONALITY (posts, notifications, etc.) ---------------------
+    // --------------------- APP FUNCTIONALITY (posts, notifications, etc.) ---------------------
     const postsData = [
         {
             id: 1,
@@ -945,7 +795,7 @@
         dynamicView.style.display = 'none';
         dynamicView.innerHTML = '';
         if(dashboardFrame && dashboardFrame.src) {
-            dashboardFrame.src = dashboardFrame.src;
+            dashboardFrame.src = 'user-dashboard.html';
         }
     }
 
@@ -1084,6 +934,17 @@
         const bottomNav = document.querySelector('.bottom-nav');
         if(bottomNav) bottomNav.style.opacity = '1';
     };
+
+    // Auth state observer
+    window.onAuthStateChanged(window.auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        currentAuthUser = user;
+        await updateUserUI(user);
+        await loadLeftMenuBackground();
+    });
 
     // Expose global functions
     window.setActiveNav = setActiveNav;
