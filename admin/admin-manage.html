@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Admins | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .glass-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 32px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        h1 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; }
+        .subtitle { color: #64748b; margin-bottom: 30px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+        }
+        .badge-admin {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-user {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .btn {
+            padding: 6px 16px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .btn-primary { background: #f59e0b; color: white; }
+        .btn-primary:hover { background: #d97706; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e293b;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .search-box {
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 40px;
+            width: 300px;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .loading.show { display: flex; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="loading" id="loading"><div class="spinner"></div></div>
+<div class="container">
+    <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <div class="glass-card">
+        <h1><i class="fas fa-user-shield"></i> Admin Management</h1>
+        <p class="subtitle">Grant or revoke admin permissions to users</p>
+        <input type="text" id="searchInput" class="search-box" placeholder="Search by name or email...">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>User</th><th>Email</th><th>Role</th><th>Member Since</th><th>Action</th></tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+        authDomain: "sp-build-official.firebaseapp.com",
+        projectId: "sp-build-official",
+        storageBucket: "sp-build-official.firebasestorage.app",
+        messagingSenderId: "377403616440",
+        appId: "1:377403616440:web:bfae56e748f05de22a184d",
+        databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+    let currentAdminUid = null;
+    
+    function showLoading(show) { document.getElementById('loading').classList.toggle('show', show); }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    async function loadUsers() {
+        showLoading(true);
+        try {
+            const snapshot = await get(ref(database, 'users'));
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                const usersList = Object.entries(users).map(([id, data]) => ({ id, ...data }));
+                displayUsers(usersList);
+            }
+        } catch(e) { console.error(e); }
+        showLoading(false);
+    }
+    
+    function displayUsers(users) {
+        const tbody = document.getElementById('usersTableBody');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        
+        const filtered = users.filter(u => 
+            (u.fullName && u.fullName.toLowerCase().includes(searchTerm)) ||
+            (u.email && u.email.toLowerCase().includes(searchTerm)) ||
+            (u.firstName && u.firstName.toLowerCase().includes(searchTerm))
+        );
+        
+        tbody.innerHTML = filtered.map(u => `
+            <tr>
+                <td><strong>${escapeHtml(u.fullName || u.firstName + ' ' + u.lastName || 'N/A')}</strong></td>
+                <td>${escapeHtml(u.email || 'N/A')}</td>
+                <td><span class="${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role === 'admin' ? '👑 Admin' : '👤 User'}</span></td>
+                <td>${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A'}</td>
+                <td>
+                    ${u.role === 'admin' ? 
+                        `<button class="btn btn-danger" onclick="revokeAdmin('${u.uid}')"><i class="fas fa-ban"></i> Revoke</button>` :
+                        `<button class="btn btn-primary" onclick="makeAdmin('${u.uid}')"><i class="fas fa-user-shield"></i> Make Admin</button>`
+                    }
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    window.makeAdmin = async function(uid) {
+        if (!confirm("⚠️ Are you sure you want to make this user an ADMIN?\n\nThey will have FULL access to dashboard, payments, attendance, and all data.")) return;
+        showLoading(true);
+        try {
+            await update(ref(database, `users/${uid}`), { role: 'admin', isAdmin: true });
+            alert("✅ User has been promoted to ADMIN!");
+            loadUsers();
+        } catch(e) { alert("Failed: " + e.message); }
+        showLoading(false);
+    };
+    
+    window.revokeAdmin = async function(uid) {
+        if (uid === currentAdminUid) {
+            alert("❌ You cannot revoke your own admin privileges!");
+            return;
+        }
+        if (!confirm("⚠️ Are you sure you want to revoke ADMIN privileges from this user?\n\nThey will become a regular user.")) return;
+        showLoading(true);
+        try {
+            await update(ref(database, `users/${uid}`), { role: 'user', isAdmin: false });
+            alert("✅ Admin privileges revoked!");
+            loadUsers();
+        } catch(e) { alert("Failed: " + e.message); }
+        showLoading(false);
+    };
+    
+    document.getElementById('searchInput').addEventListener('input', () => loadUsers());
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        const userSnap = await get(ref(database, `users/${user.uid}`));
+        const userData = userSnap.val();
+        if (userData?.role !== 'admin') {
+            alert("❌ Access Denied! Admin privileges required.");
+            window.location.href = 'index-user.html';
+            return;
+        }
+        currentAdminUid = user.uid;
+        loadUsers();
+    });
+</script>
+</body>
+</html>
