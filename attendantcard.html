@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>My Attendance Card | SP Construction</title>
+    <title>Attendance Card | SP Construction (Admin)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -12,7 +12,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
@@ -35,9 +35,6 @@
         window.get = get;
         window.onValue = onValue;
         window.onAuthStateChanged = onAuthStateChanged;
-        window.query = query;
-        window.orderByChild = orderByChild;
-        window.equalTo = equalTo;
     </script>
     
     <style>
@@ -56,7 +53,6 @@
             margin: 0 auto;
         }
         
-        /* Header Section */
         .header {
             background: #ffffff;
             border-radius: 28px;
@@ -129,7 +125,6 @@
             transform: translateY(-2px);
         }
         
-        /* Search Section */
         .search-section {
             background: #ffffff;
             border-radius: 24px;
@@ -159,7 +154,6 @@
             color: #1e293b;
         }
         
-        /* Search Input with Autocomplete */
         .search-row {
             margin-bottom: 15px;
             position: relative;
@@ -203,7 +197,6 @@
             display: block;
         }
         
-        /* Autocomplete Dropdown */
         .autocomplete-dropdown {
             position: absolute;
             top: 100%;
@@ -252,19 +245,29 @@
             width: 14px;
         }
         
-        /* Date Row */
+        /* Editable Date Row */
         .date-row {
             display: flex;
             gap: 12px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         .date-select {
             flex: 1;
             position: relative;
+            min-width: 140px;
         }
-        .date-select select {
+        .date-select label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+        .editable-select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-radius: 50px;
             border: 1px solid #e2e8f0;
             background: #f8fafc;
@@ -275,22 +278,37 @@
             outline: none;
             transition: 0.2s;
             appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
         }
-        .date-select select:focus {
+        .editable-select:focus {
             border-color: #f59e0b;
             box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
         }
-        .date-select i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            pointer-events: none;
-            font-size: 0.8rem;
+        .custom-year-input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: #1e293b;
+            outline: none;
+            transition: 0.2s;
+            min-width: 80px;
+        }
+        .custom-year-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
+        }
+        .year-input-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
         
-        /* Action Buttons */
         .action-row {
             display: flex;
             gap: 12px;
@@ -336,7 +354,6 @@
             transform: translateY(-2px);
         }
         
-        /* Selected User Info */
         .selected-user-info {
             background: #fef3c7;
             border-radius: 40px;
@@ -365,7 +382,6 @@
             font-weight: 600;
         }
         
-        /* Filter Display Badge */
         .filter-display {
             text-align: center;
             margin-bottom: 15px;
@@ -380,7 +396,6 @@
             display: inline-block;
         }
         
-        /* Hero Section */
         .hero-section {
             background: linear-gradient(115deg, #ffffff 0%, #fef7e0 100%);
             border-radius: 32px;
@@ -414,7 +429,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        /* Loading */
         .loading {
             display: none;
             position: fixed;
@@ -435,7 +449,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Toast Message */
         .toast-message {
             position: fixed;
             bottom: 30px;
@@ -454,7 +467,6 @@
         }
         .toast-message.show { transform: translateX(-50%) translateY(0); }
         
-        /* Premium Card */
         .premium-card {
             background: #ffffff;
             border-radius: 28px;
@@ -466,7 +478,6 @@
         }
         .premium-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
         
-        /* Card Header */
         .card-header {
             background: linear-gradient(145deg, #1e293b, #0f172a);
             padding: 20px 22px;
@@ -553,7 +564,6 @@
             font-weight: 500;
         }
         
-        /* User Section */
         .user-section {
             display: flex;
             align-items: center;
@@ -605,7 +615,6 @@
             color: #f59e0b;
         }
         
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -654,7 +663,6 @@
         .hours-value { color: #6b21a5; }
         .dailyrate-value { color: #c2410c; }
         
-        /* Card Footer */
         .card-footer {
             background: #f8fafc;
             padding: 16px 22px;
@@ -685,7 +693,6 @@
             box-shadow: 0 4px 15px rgba(34,197,94,0.4);
         }
         
-        /* Banner Section */
         .banner-section {
             position: relative;
             margin-bottom: 24px;
@@ -722,7 +729,6 @@
             opacity: 0.7;
         }
         
-        /* Footer Section */
         .footer-section {
             background: rgba(255,255,255,0.5);
             backdrop-filter: blur(8px);
@@ -734,7 +740,6 @@
             border: 1px solid rgba(245,158,11,0.2);
         }
         
-        /* No Result */
         .no-result {
             text-align: center;
             padding: 50px;
@@ -761,6 +766,9 @@
             .user-details h2 { font-size: 1rem; }
             .download-btn { padding: 10px 20px; font-size: 0.75rem; }
             .toast-message { white-space: normal; text-align: center; max-width: 85%; }
+            .date-select { min-width: 100%; }
+            .year-input-wrapper { flex-direction: column; }
+            .custom-year-input { width: 100%; }
         }
     </style>
 </head>
@@ -769,26 +777,23 @@
 <div class="loading" id="loading"><div class="spinner"></div></div>
 
 <div class="container">
-    <!-- Header Section -->
     <div class="header">
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
                 <h1>SP CONSTRUCTION</h1>
-                <p>ATTENDANCE CARD</p>
+                <p>ADMIN - ATTENDANCE CARD</p>
             </div>
         </div>
-        <a href="user-dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     </div>
     
-    <!-- Search Section -->
     <div class="search-section">
         <div class="search-title">
             <i class="fas fa-search"></i>
-            <h3>Search Worker</h3>
+            <h3>Search Any Worker (Admin)</h3>
         </div>
         
-        <!-- Search Input with Autocomplete -->
         <div class="search-row">
             <div class="search-input-wrapper">
                 <div class="search-icon"><i class="fas fa-search"></i></div>
@@ -798,16 +803,16 @@
             <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
         </div>
         
-        <!-- Selected User Info -->
         <div class="selected-user-info" id="selectedUserInfo">
             <span><i class="fas fa-check-circle"></i> Selected: <strong id="selectedUserName"></strong> (<span id="selectedUserId"></span>)</span>
             <button class="clear-selection" id="clearSelectionBtn"><i class="fas fa-times"></i> Change</button>
         </div>
         
-        <!-- Date Selection -->
+        <!-- Month and Year Filter -->
         <div class="date-row">
             <div class="date-select">
-                <select id="monthSelect">
+                <label><i class="fas fa-calendar-alt"></i> Select Month</label>
+                <select id="monthSelect" class="editable-select">
                     <option value="">All Months</option>
                     <option value="1">January</option>
                     <option value="2">February</option>
@@ -822,38 +827,36 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
-                <i class="fas fa-chevron-down"></i>
             </div>
             <div class="date-select">
-                <select id="yearSelect">
-                    <option value="">All Years</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
+                <label><i class="fas fa-calendar-week"></i> Select Year (Type or Choose)</label>
+                <div class="year-input-wrapper">
+                    <select id="yearSelect" class="editable-select" style="flex: 2;">
+                        <option value="">All Years</option>
+                    </select>
+                    <input type="number" id="customYearInput" class="custom-year-input" placeholder="Or type year" style="flex: 1;" value="">
+                </div>
             </div>
         </div>
         
-        <!-- Action Buttons -->
         <div class="action-row">
             <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Search</button>
             <button class="reset-btn" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
         </div>
     </div>
     
-    <!-- Filter Display Badge -->
     <div class="filter-display" id="filterDisplay">
         <span class="selected-filter-badge" id="searchDisplayBadge"><i class="fas fa-globe"></i> Showing all records</span>
     </div>
     
-    <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-text">
-            <h1><i class="fas fa-id-card" style="color: #f59e0b;"></i> My ID Card</h1>
-            <p>Download your attendance card</p>
+            <h1><i class="fas fa-id-card" style="color: #f59e0b;"></i> Attendance Card</h1>
+            <p>Search & download any worker's card</p>
         </div>
         <div class="date-badge" id="currentDate"></div>
     </div>
     
-    <!-- Card Container -->
     <div id="cardContainer">
         <div class="no-result">
             <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
@@ -861,7 +864,6 @@
         </div>
     </div>
     
-    <!-- Banner Section -->
     <div class="banner-section" id="bannerSection">
         <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
@@ -871,7 +873,6 @@
         </div>
     </div>
     
-    <!-- Footer Section -->
     <div class="footer-section">
         <p><i class="fas fa-shield-alt"></i> SP CONSTRUCTION | Official Attendance Card</p>
     </div>
@@ -893,6 +894,7 @@
     let allUsersList = [];
     let selectedWorker = null;
     let currentWorkerId = null;
+    let allAttendanceCache = null;
     
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
@@ -931,19 +933,21 @@
         return months[month - 1];
     }
     
+    // ✅ Modified: Year dropdown starts from CURRENT YEAR (2026) to future years only
     function initYearSelect() {
         const yearSelect = document.getElementById('yearSelect');
-        const currentYear = new Date().getFullYear();
+        const currentYear = new Date().getFullYear(); // 2026
         yearSelect.innerHTML = '<option value="">All Years</option>';
-        for (let year = currentYear - 3; year <= currentYear + 2; year++) {
+        // Start from current year (2026) to 10 years ahead
+        for (let year = currentYear; year <= currentYear + 10; year++) {
             const option = document.createElement('option');
             option.value = year;
             option.textContent = year;
             yearSelect.appendChild(option);
         }
+        yearSelect.value = "";
     }
     
-    // Load all users for autocomplete
     async function loadAllUsers() {
         try {
             const usersRef = window.ref(window.db, 'users');
@@ -951,13 +955,51 @@
             if (snapshot.exists()) {
                 const users = snapshot.val();
                 allUsersList = Object.values(users);
+                console.log(`✅ Loaded ${allUsersList.length} users from database`);
+            } else {
+                console.log(`⚠️ No users found in database`);
             }
         } catch (error) {
             console.error("Error loading users:", error);
         }
     }
     
-    // Autocomplete functionality
+    async function loadAllAttendanceCache() {
+        if (allAttendanceCache !== null) return allAttendanceCache;
+        
+        try {
+            const attendanceRef = window.ref(window.db, 'attendance');
+            const snapshot = await window.get(attendanceRef);
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                allAttendanceCache = Object.values(data);
+                console.log(`✅ Loaded ${allAttendanceCache.length} total attendance records`);
+            } else {
+                allAttendanceCache = [];
+                console.log(`⚠️ No attendance records found`);
+            }
+            return allAttendanceCache;
+        } catch (error) {
+            console.error("Error loading attendance cache:", error);
+            allAttendanceCache = [];
+            return allAttendanceCache;
+        }
+    }
+    
+    function filterAttendanceByWorkerId(workerIdValue) {
+        if (!allAttendanceCache) return [];
+        if (!workerIdValue) return [];
+        
+        const searchId = workerIdValue.toString().trim();
+        const records = allAttendanceCache.filter(record => {
+            const recordWorkerId = (record.workerId || '').toString().trim();
+            return recordWorkerId.toLowerCase() === searchId.toLowerCase();
+        });
+        
+        console.log(`🔍 Found ${records.length} records for worker ID: ${workerIdValue}`);
+        return records;
+    }
+    
     function setupAutocomplete() {
         const searchInput = document.getElementById('searchInput');
         const dropdown = document.getElementById('autocompleteDropdown');
@@ -990,7 +1032,7 @@
                 const emailText = user.email || 'N/A';
                 const mobileText = user.mobile || user.phone || 'N/A';
                 return `
-                    <div class="autocomplete-item" data-user='${JSON.stringify(user)}'>
+                    <div class="autocomplete-item" data-user='${JSON.stringify(user).replace(/'/g, "&#39;")}'>
                         <div class="autocomplete-name">${escapeHtml(displayName)}</div>
                         <div class="autocomplete-details">
                             <span><i class="fas fa-qrcode"></i> ${escapeHtml(userIdText)}</span>
@@ -1001,12 +1043,19 @@
                 `;
             }).join('');
             
-            dropdown.querySelectorAll('.autocomplete-item[data-user]').forEach(item => {
-                item.addEventListener('click', () => {
-                    const user = JSON.parse(item.getAttribute('data-user'));
-                    selectUser(user);
-                    dropdown.classList.remove('show');
-                });
+            dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                const userAttr = item.getAttribute('data-user');
+                if (userAttr) {
+                    try {
+                        const user = JSON.parse(userAttr);
+                        item.addEventListener('click', () => {
+                            selectUser(user);
+                            dropdown.classList.remove('show');
+                        });
+                    } catch(e) {
+                        console.error("Error parsing user data:", e);
+                    }
+                }
             });
             
             dropdown.classList.add('show');
@@ -1031,50 +1080,70 @@
         document.getElementById('clearSearch').classList.add('show');
         
         currentWorkerId = user.userId;
+        console.log(`🔍 Selected user: ${displayName} (ID: ${currentWorkerId})`);
         
-        // Load attendance for selected user
         loadWorkerAttendance(currentWorkerId);
     }
     
     function clearSelectedUser() {
         selectedWorker = null;
-        currentWorkerId = null;
+        currentWorkerId = userId;
         document.getElementById('searchInput').value = '';
         document.getElementById('selectedUserInfo').classList.remove('show');
         document.getElementById('clearSearch').classList.remove('show');
         
-        // Reload current logged-in user's attendance
+        console.log(`🔄 Reset to current user: ${userFullName} (ID: ${userId})`);
         loadWorkerAttendance(userId);
     }
     
-    // Load attendance for a specific worker
+    function getSelectedYear() {
+        const yearSelect = document.getElementById('yearSelect');
+        const customYearInput = document.getElementById('customYearInput');
+        
+        if (customYearInput.value && customYearInput.value.trim() !== '') {
+            const year = parseInt(customYearInput.value.trim());
+            if (!isNaN(year) && year > 1900 && year < 3000) {
+                return year.toString();
+            }
+        }
+        return yearSelect.value;
+    }
+    
     async function loadWorkerAttendance(workerIdValue) {
-        if (!workerIdValue) return;
+        if (!workerIdValue) {
+            console.log(`❌ Cannot load attendance: No worker ID provided`);
+            showToast('No worker ID found', true);
+            return;
+        }
         
         showLoading(true);
+        console.log(`📊 Loading attendance for worker ID: "${workerIdValue}"`);
         
         try {
-            const attendanceQuery = window.query(
-                window.ref(window.db, 'attendance'),
-                window.orderByChild('workerId'),
-                window.equalTo(workerIdValue)
-            );
-            const snapshot = await window.get(attendanceQuery);
-            let records = [];
-            if (snapshot.exists()) {
-                const allData = snapshot.val();
-                records = Object.values(allData);
+            await loadAllAttendanceCache();
+            
+            let records = filterAttendanceByWorkerId(workerIdValue);
+            
+            if (records.length > 0) {
+                console.log(`✅ Found ${records.length} records for worker ID: ${workerIdValue}`);
+                if (records[0]) {
+                    console.log(`📋 First record sample:`, records[0]);
+                }
+            } else {
+                console.log(`❌ No attendance records found for worker ID: "${workerIdValue}"`);
+                showToast(`No attendance records found for this worker`, true);
             }
+            
             records.sort((a, b) => new Date(b.date) - new Date(a.date));
             
             allAttendanceRecords = records;
             currentDisplayRecords = [...records];
             
-            // Apply current date filters if any
             applyDateFilters();
             
         } catch (error) {
             console.error("Error loading attendance:", error);
+            showToast('Error loading attendance data', true);
             allAttendanceRecords = [];
             currentDisplayRecords = [];
             applyDateFilters();
@@ -1083,10 +1152,9 @@
         showLoading(false);
     }
     
-    // Apply date filters to current records
     function applyDateFilters() {
         const selectedMonth = document.getElementById('monthSelect').value;
-        const selectedYear = document.getElementById('yearSelect').value;
+        const selectedYear = getSelectedYear();
         
         let filtered = [...allAttendanceRecords];
         
@@ -1097,7 +1165,7 @@
                 return parseInt(recordMonth) === parseInt(selectedMonth);
             });
         }
-        if (selectedYear) {
+        if (selectedYear && selectedYear !== '') {
             filtered = filtered.filter(record => {
                 if (!record.date) return false;
                 const recordYear = record.date.split('-')[0];
@@ -1106,8 +1174,8 @@
         }
         
         currentDisplayRecords = filtered;
+        console.log(`📅 After date filter: ${currentDisplayRecords.length} records`);
         
-        // Build filter display text
         let filterParts = [];
         if (selectedWorker) {
             const workerName = selectedWorker.fullName || `${selectedWorker.firstName || ''} ${selectedWorker.lastName || ''}`.trim() || 'Worker';
@@ -1116,7 +1184,7 @@
             filterParts.push(`Worker: ${userFullName}`);
         }
         if (selectedMonth) filterParts.push(`Month: ${getMonthName(parseInt(selectedMonth))}`);
-        if (selectedYear) filterParts.push(`Year: ${selectedYear}`);
+        if (selectedYear && selectedYear !== '') filterParts.push(`Year: ${selectedYear}`);
         
         if (filterParts.length === 0) {
             document.getElementById('searchDisplayBadge').innerHTML = `<i class="fas fa-globe"></i> Showing all records`;
@@ -1126,7 +1194,6 @@
         
         const stats = calculateStats(currentDisplayRecords);
         
-        // Determine which user to display
         let displayUser;
         if (selectedWorker) {
             displayUser = {
@@ -1149,7 +1216,6 @@
         renderCard(stats, displayUser, displayUser.photo, companyLogoBase64);
     }
     
-    // Load company assets
     async function loadCompanyLogo() {
         try {
             const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
@@ -1203,10 +1269,11 @@
         }
     }
     
-    // Load current logged-in user
     async function loadCurrentUser() {
         const user = window.auth.currentUser;
         if (!user) return null;
+        
+        console.log(`👤 Logged in user email: ${user.email}`);
         
         try {
             const usersRef = window.ref(window.db, 'users');
@@ -1217,23 +1284,24 @@
                     if (users[key].email === user.email) {
                         currentUserData = users[key];
                         userFullName = currentUserData.fullName || `${currentUserData.firstName || ''} ${currentUserData.lastName || ''}`.trim() || user.email.split('@')[0];
-                        userId = currentUserData.userId || user.uid?.substring(0, 8) || 'EMP001';
+                        userId = currentUserData.userId || user.uid?.substring(0, 8) || 'ADMIN001';
                         userMobile = currentUserData.mobile || 'N/A';
                         userEmail = currentUserData.email || user.email;
                         userProfilePic = currentUserData.profilePicture || null;
+                        console.log(`✅ Loaded admin user: ${userFullName} (ID: ${userId})`);
                         break;
                     }
                 }
             }
             
             if (!currentUserData) {
-                userFullName = user.email?.split('@')[0] || 'Worker';
-                userId = user.uid?.substring(0, 8) || 'EMP001';
+                userFullName = user.email?.split('@')[0] || 'Admin';
+                userId = user.uid?.substring(0, 8) || 'ADMIN001';
                 userMobile = 'N/A';
                 userEmail = user.email || 'N/A';
+                console.log(`⚠️ Admin user not found in users collection, using fallback: ${userFullName} (ID: ${userId})`);
             }
             
-            // Load logged-in user's attendance
             currentWorkerId = userId;
             await loadWorkerAttendance(userId);
             
@@ -1244,7 +1312,6 @@
         }
     }
     
-    // Calculate stats from records
     function calculateStats(records) {
         let totalPresent = 0;
         let totalHours = 0;
@@ -1279,6 +1346,8 @@
         const totalDue = totalEarnings - totalPaid;
         const avgDailyEarning = totalPresent > 0 ? totalEarnings / totalPresent : 0;
         
+        console.log(`📊 Stats calculated - Present: ${totalPresent}, Earnings: ${totalEarnings}, Paid: ${totalPaid}, Due: ${totalDue}`);
+        
         return {
             totalPresent: totalPresent,
             totalHours: totalHours,
@@ -1291,30 +1360,26 @@
         };
     }
     
-    // Perform search with filters
     async function performSearch() {
-        const selectedMonth = document.getElementById('monthSelect').value;
-        const selectedYear = document.getElementById('yearSelect').value;
-        
         if (selectedWorker) {
             currentWorkerId = selectedWorker.userId;
+            console.log(`🔍 Searching for worker: ${selectedWorker.fullName || selectedWorker.firstName} (ID: ${currentWorkerId})`);
             await loadWorkerAttendance(currentWorkerId);
         } else {
-            await loadWorkerAttendance(userId);
+            showToast('Please select a worker from the dropdown', true);
+            console.log(`⚠️ Search clicked but no worker selected`);
         }
     }
     
-    // Reset all filters
     function resetFilters() {
         clearSelectedUser();
         document.getElementById('monthSelect').value = '';
         document.getElementById('yearSelect').value = '';
-        
-        // Reload current user's attendance
+        document.getElementById('customYearInput').value = '';
+        console.log(`🔄 Reset all filters, loading current user attendance`);
         loadWorkerAttendance(userId);
     }
     
-    // Clear search input
     function setupClearButton() {
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearch');
@@ -1335,7 +1400,6 @@
         });
     }
     
-    // PDF Download
     async function downloadCardAsPDF(cardElement, employeeName, employeeId) {
         if (!cardElement) {
             showToast('❌ Card not found', true);
@@ -1403,7 +1467,6 @@
         }
     }
     
-    // Render the card
     function renderCard(stats, userInfo, profilePic, companyLogo) {
         const container = document.getElementById('cardContainer');
         const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -1502,7 +1565,6 @@
         }
     }
     
-    // Listen for real-time updates
     function listenForUpdates() {
         const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
         window.onValue(logoRef, (snapshot) => {
@@ -1527,22 +1589,38 @@
             }
         });
         
-        // Listen for attendance changes for current user
-        if (currentWorkerId) {
-            const attendanceQuery = window.query(
-                window.ref(window.db, 'attendance'),
-                window.orderByChild('workerId'),
-                window.equalTo(currentWorkerId)
-            );
-            window.onValue(attendanceQuery, () => {
-                if (currentWorkerId) {
-                    loadWorkerAttendance(currentWorkerId);
-                }
-            });
-        }
+        const attendanceRef = window.ref(window.db, 'attendance');
+        window.onValue(attendanceRef, () => {
+            allAttendanceCache = null;
+            if (currentWorkerId) {
+                loadWorkerAttendance(currentWorkerId);
+            }
+        });
     }
     
-    // Main function
+    function setupYearInputEvents() {
+        const yearSelect = document.getElementById('yearSelect');
+        const customYearInput = document.getElementById('customYearInput');
+        
+        yearSelect.addEventListener('change', function() {
+            if (this.value !== '') {
+                customYearInput.value = '';
+            }
+            if (currentWorkerId) {
+                applyDateFilters();
+            }
+        });
+        
+        customYearInput.addEventListener('input', function() {
+            if (this.value !== '') {
+                yearSelect.value = '';
+            }
+            if (currentWorkerId) {
+                applyDateFilters();
+            }
+        });
+    }
+    
     window.onAuthStateChanged(window.auth, async (user) => {
         if (!user) {
             window.location.href = 'login.html';
@@ -1550,6 +1628,7 @@
         }
         
         showLoading(true);
+        console.log(`🚀 App starting, user authenticated: ${user.email}`);
         
         initYearSelect();
         await loadAllUsers();
@@ -1560,17 +1639,14 @@
         
         setupAutocomplete();
         setupClearButton();
+        setupYearInputEvents();
         
         document.getElementById('searchBtn').addEventListener('click', performSearch);
         document.getElementById('resetBtn').addEventListener('click', resetFilters);
         document.getElementById('clearSelectionBtn').addEventListener('click', clearSelectedUser);
         document.getElementById('monthSelect').addEventListener('change', () => {
             if (currentWorkerId) {
-                applyDateFilters();
-            }
-        });
-        document.getElementById('yearSelect').addEventListener('change', () => {
-            if (currentWorkerId) {
+                console.log(`📅 Month filter changed to: ${document.getElementById('monthSelect').value}`);
                 applyDateFilters();
             }
         });
@@ -1578,6 +1654,7 @@
         listenForUpdates();
         
         showLoading(false);
+        console.log(`✅ App ready!`);
     });
 </script>
 </body>
