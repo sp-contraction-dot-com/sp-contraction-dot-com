@@ -175,6 +175,7 @@
         .card-5 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .card-6 { background: linear-gradient(135deg, #ec489a, #db2777); }
         .card-7 { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+        .card-8 { background: linear-gradient(135deg, #14b8a6, #0f766e); }
         
         @media (max-width: 550px) {
             .stat-card { padding: 12px 10px; }
@@ -497,6 +498,7 @@
         </div>
     </div>
     
+    <!-- STATS GRID: 8 Cards (added 8th card for Total Due to Workers) -->
     <div class="stats-grid">
         <div class="stat-card card-1"><div class="stat-info"><h4><i class="fas fa-users"></i> Registered Users</h4><div class="value" id="totalRegisteredUsers">0</div><div class="sub-text">Total Accounts</div></div><div class="stat-icon"><i class="fas fa-user-plus"></i></div></div>
         <div class="stat-card card-2"><div class="stat-info"><h4><i class="fas fa-hard-hat"></i> Active Workers</h4><div class="value" id="totalWorkers">0</div><div class="sub-text">Currently Working</div></div><div class="stat-icon"><i class="fas fa-briefcase"></i></div></div>
@@ -505,6 +507,8 @@
         <div class="stat-card card-5"><div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Paid to Workers</h4><div class="value" id="totalPaidToUser">₹0</div><div class="sub-text">Amount Disbursed</div></div><div class="stat-icon"><i class="fas fa-wallet"></i></div></div>
         <div class="stat-card card-6"><div class="stat-info"><h4><i class="fas fa-building"></i> Company Paid</h4><div class="value" id="totalCompanyPaid">₹0</div><div class="sub-text">Received from Companies</div></div><div class="stat-icon"><i class="fas fa-church"></i></div></div>
         <div class="stat-card card-7"><div class="stat-info"><h4><i class="fas fa-clock"></i> Company Due</h4><div class="value" id="totalCompanyDue">₹0</div><div class="sub-text">Outstanding Balance</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
+        <!-- NEW CARD: Total Due to Workers (Remaining payable to workers after deductions) -->
+        <div class="stat-card card-8"><div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4><div class="value" id="totalDueToWorkers">₹0</div><div class="sub-text">Pending salary</div></div><div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div></div>
     </div>
     
     <div class="charts-row">
@@ -735,10 +739,15 @@
         let companyPaid = allPaymentRecords.reduce((s,p)=>s+(p.companyPaid||0),0);
         let companyDue = allPaymentRecords.reduce((s,p)=>s+((p.totalEarning||0)-(p.companyPaid||0)),0);
         
+        // Calculate Total Due to Workers: Total Earnings - Total Paid To Workers
+        let totalDueToWorkers = totalEarn - totalPaidToWorker;
+        if (totalDueToWorkers < 0) totalDueToWorkers = 0;
+        
         document.getElementById('totalEarnings').innerHTML = '₹' + formatNumber(totalEarn);
         document.getElementById('totalPaidToUser').innerHTML = '₹' + formatNumber(totalPaidToWorker);
         document.getElementById('totalCompanyPaid').innerHTML = '₹' + formatNumber(companyPaid);
         document.getElementById('totalCompanyDue').innerHTML = '₹' + formatNumber(companyDue);
+        document.getElementById('totalDueToWorkers').innerHTML = '₹' + formatNumber(totalDueToWorkers);
     }
     
     function getUserAvatarHTML(user) {
@@ -770,7 +779,7 @@
                 <td>${escapeHtml(u.mobile || u.phone || 'N/A')}</td>
                 <td style="color:#f59e0b;">${escapeHtml(u.userId || u.uid?.slice(0,8) || 'N/A')}</td>
                 <td>${escapeHtml(regDate)}</td>
-               </tr>`;
+                </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -794,7 +803,7 @@
                 <td>${r.hours || 0}</td>
                 <td>₹${formatNumber(r.earnings || 0)}</td>
                 <td>${escapeHtml(r.workDesc || '-')}</td>
-               </tr>`;
+                </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -817,7 +826,7 @@
                 <td class="amount-positive">₹${formatNumber(p.totalEarning || 0)}</td>
                 <td class="amount-positive">₹${formatNumber(p.companyPaid || 0)}</td>
                 <td style="color:${dueColor};">₹${formatNumber(due)}</td>
-               </tr>`;
+                </tr>`;
         }
         tbody.innerHTML = html;
     }
