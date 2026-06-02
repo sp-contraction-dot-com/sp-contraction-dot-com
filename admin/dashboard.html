@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Dashboard | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, onValue, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.onValue = onValue;
+        window.set = set;
+        window.signOut = signOut;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 24px;
+            padding: 16px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-text h1 { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+        .logo-text p { font-size: 0.55rem; color: #94a3b8; letter-spacing: 1px; }
+        .nav-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #475569;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .nav-btn:hover { background: #f59e0b; color: white; }
+        .welcome-badge {
+            background: #fef3c7;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: #d97706;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: #dc2626; }
+        
+        /* Banner Section */
+        .banner-section {
+            position: relative;
+            margin-bottom: 28px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            background: #e2e8f0;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            transition: 0.3s;
+        }
+        .banner-placeholder {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .banner-placeholder i {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+        .banner-placeholder p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        /* Section Divider Styles */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 30px 0 18px 0;
+        }
+        .section-divider i {
+            font-size: 1.2rem;
+            background: #fef3c7;
+            padding: 8px 10px;
+            border-radius: 14px;
+            color: #f59e0b;
+        }
+        .section-divider h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .section-divider span {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #e2e8f0, transparent);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 800px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+        
+        .stat-card {
+            border-radius: 24px;
+            padding: 18px 16px;
+            transition: all 0.3s;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-info h4 { font-size: 0.65rem; font-weight: 600; margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.9; }
+        .stat-card .value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+        .stat-card .sub-text { font-size: 0.55rem; opacity: 0.8; margin-top: 4px; }
+        .stat-icon { width: 46px; height: 46px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        
+        /* Company Section Card Colors */
+        .card-company-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .card-company-2 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .card-company-3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .card-company-4 { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .card-company-5 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        /* Workers Section Card Colors */
+        .card-worker-1 { background: linear-gradient(135deg, #10b981, #059669); }
+        .card-worker-2 { background: linear-gradient(135deg, #ec489a, #db2777); }
+        .card-worker-3 { background: linear-gradient(135deg, #14b8a6, #0f766e); }
+        .card-worker-4 { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+        .card-worker-5 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        
+        @media (max-width: 550px) {
+            .stat-card { padding: 12px 10px; }
+            .stat-card .value { font-size: 1.1rem; }
+            .stat-icon { width: 36px; height: 36px; font-size: 1rem; }
+            .stat-info h4 { font-size: 0.55rem; }
+        }
+        
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 800px) { .charts-row { grid-template-columns: 1fr; gap: 20px; } }
+        
+        .chart-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+            transition: all 0.3s;
+        }
+        .chart-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .chart-card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: #1e293b;
+            border-left: 4px solid #f59e0b;
+            padding-left: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .canvas-wrapper { position: relative; width: 100%; min-height: 250px; }
+        canvas { max-width: 100%; height: auto !important; min-height: 200px; }
+        
+        .data-section {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eef2f6;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title i { font-size: 1.2rem; color: #f59e0b; background: #fef3c7; padding: 8px; border-radius: 12px; }
+        .section-title h3 { font-size: 1rem; font-weight: 700; color: #1e293b; }
+        .more-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #f59e0b;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .more-btn:hover {
+            background: #f59e0b;
+            color: white;
+        }
+        .table-container { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 0.8rem;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .badge-present { background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; display: inline-block; }
+        .badge-absent { background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; display: inline-block; }
+        .badge-halfday { background: #fff3e3; color: #d97706; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; display: inline-block; }
+        .amount-positive { color: #15803d; font-weight: 600; }
+        
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .action-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
+        .action-btn-secondary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        
+        /* Footer - White Background */
+        .footer {
+            background: white;
+            border-radius: 28px 28px 24px 24px;
+            padding: 40px 30px 30px;
+            margin-top: 30px;
+            color: #1e293b;
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f6;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .footer-brand .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .footer-brand .footer-logo .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .footer-brand .footer-logo .logo-icon span {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+        }
+        .footer-brand .footer-logo .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .footer-brand .footer-logo h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .footer-brand p {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+        .footer-links h4, .footer-contact h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: #f59e0b;
+            letter-spacing: 1px;
+        }
+        .footer-links ul, .footer-contact ul {
+            list-style: none;
+        }
+        .footer-links li, .footer-contact li {
+            margin-bottom: 12px;
+        }
+        .footer-links a {
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-links a:hover {
+            color: #f59e0b;
+            transform: translateX(5px);
+        }
+        .footer-contact li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+        .footer-contact i {
+            width: 24px;
+            color: #f59e0b;
+        }
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-icons a {
+            width: 36px;
+            height: 36px;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            transition: 0.2s;
+        }
+        .social-icons a:hover {
+            background: #f59e0b;
+            color: white;
+            transform: translateY(-3px);
+        }
+        .footer-bottom {
+            border-top: 1px solid #eef2f6;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        @media (max-width: 768px) {
+            .footer {
+                padding: 30px 20px 20px;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading.show { display: flex; }
+        .spinner { width: 45px; height: 45px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+            <div class="logo-text">
+                <h1>SP CONSTRUCTION</h1>
+                <p>ADMIN DASHBOARD</p>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            
+        </div>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+        <div>
+            <h2 style="font-size: 1.3rem; font-weight: 700; color: #1e293b;">Welcome back, <span id="welcomeName">Admin</span>! 👋</h2>
+            <p style="font-size: 0.75rem; color: #64748b; margin-top: 4px;"><i class="fas fa-chart-line" style="color: #f59e0b;"></i> Real-time construction intelligence dashboard</p>
+        </div>
+        <div class="welcome-badge">
+            <i class="fas fa-calendar-alt"></i> <span id="liveDate"></span>
+        </div>
+    </div>
+    
+    <!-- BANNER SECTION -->
+    <div class="banner-section" id="bannerSection" style="background-size: cover; background-position: center;">
+        <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
+            <div class="banner-placeholder" id="bannerPlaceholder">
+                <i class="fas fa-image"></i>
+                <p>Dashboard banner image will appear here</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========== SECTION 1: COMPANY FINANCIAL INSIGHTS ========== -->
+    <div class="section-divider">
+        <i class="fas fa-building"></i>
+        <h2>COMPANY FINANCIAL INSIGHTS</h2>
+        <span></span>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card card-company-1">
+            <div class="stat-info">
+                <h4><i class="fas fa-coins"></i> Total Earnings</h4>
+                <div class="value" id="totalEarnings">₹0</div>
+                <div class="sub-text">All Time Revenue</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        </div>
+        <div class="stat-card card-company-2">
+            <div class="stat-info">
+                <h4><i class="fas fa-building"></i> Company Paid</h4>
+                <div class="value" id="totalCompanyPaid">₹0</div>
+                <div class="sub-text">Received from Companies</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        </div>
+        <div class="stat-card card-company-3">
+            <div class="stat-info">
+                <h4><i class="fas fa-clock"></i> Company Due</h4>
+                <div class="value" id="totalCompanyDue">₹0</div>
+                <div class="sub-text">Outstanding Balance</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+        <div class="stat-card card-company-4">
+            <div class="stat-info">
+                <h4><i class="fas fa-calendar-day"></i> Today's Receivable</h4>
+                <div class="value" id="todaysReceivable">₹0</div>
+                <div class="sub-text">Earned today from companies</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-sun"></i></div>
+        </div>
+        <div class="stat-card card-company-5">
+            <div class="stat-info">
+                <h4><i class="fas fa-chart-line"></i> Total Company Due</h4>
+                <div class="value" id="totalCompanyDueCumulative">₹0</div>
+                <div class="sub-text">Previous Due + Today's Receivable</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
+        </div>
+    </div>
+    
+    <!-- ========== SECTION 2: WORKERS & ATTENDANCE ========== -->
+    <div class="section-divider">
+        <i class="fas fa-hard-hat"></i>
+        <h2>WORKERS & ATTENDANCE</h2>
+        <span></span>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card card-worker-1">
+            <div class="stat-info">
+                <h4><i class="fas fa-users"></i> Registered Users</h4>
+                <div class="value" id="totalRegisteredUsers">0</div>
+                <div class="sub-text">Total Accounts</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+        </div>
+        <div class="stat-card card-worker-2">
+            <div class="stat-info">
+                <h4><i class="fas fa-hard-hat"></i> Active Workers</h4>
+                <div class="value" id="totalWorkers">0</div>
+                <div class="sub-text">Currently Working</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+        </div>
+        <div class="stat-card card-worker-3">
+            <div class="stat-info">
+                <h4><i class="fas fa-check-circle"></i> Present Today</h4>
+                <div class="value" id="presentToday">0</div>
+                <div class="sub-text">Today's Attendance</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-sun"></i></div>
+        </div>
+        <div class="stat-card card-worker-4">
+            <div class="stat-info">
+                <h4><i class="fas fa-wallet"></i> Paid to Workers</h4>
+                <div class="value" id="totalPaidToUser">₹0</div>
+                <div class="sub-text">Amount Disbursed</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        </div>
+        <div class="stat-card card-worker-5">
+            <div class="stat-info">
+                <h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4>
+                <div class="value" id="totalDueToWorkers">₹0</div>
+                <div class="sub-text">Pending salary</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        </div>
+    </div>
+    
+    <!-- CHARTS SECTION -->
+    <div class="charts-row">
+        <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Weekly Attendance Rate (%)</h3><div class="canvas-wrapper"><canvas id="attendanceRateChart"></canvas></div></div>
+        <div class="chart-card"><h3><i class="fas fa-chart-bar"></i> Weekly Payment Trend (₹)</h3><div class="canvas-wrapper"><canvas id="weeklyPaymentChart"></canvas></div></div>
+    </div>
+    <div class="charts-row">
+        <div class="chart-card"><h3><i class="fas fa-chart-pie"></i> Company Payment vs Due</h3><div class="canvas-wrapper"><canvas id="paymentPieChart"></canvas></div></div>
+        <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Daily Earnings Trend (₹)</h3><div class="canvas-wrapper"><canvas id="dailyEarningChart"></canvas></div></div>
+    </div>
+    
+    <!-- Registered Users List (last 10) -->
+    <div class="data-section">
+        <div class="section-header">
+            <div class="section-title"><i class="fas fa-users"></i><h3>Registered Users List</h3></div>
+            <a href="all-users.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Company Payment Records (last 10) -->
+    <div class="data-section">
+        <div class="section-header">
+            <div class="section-title"><i class="fas fa-building"></i><h3>Company Payment Records</h3></div>
+            <a href="all-payments.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr>
+                </thead>
+                <tbody id="companyPaymentTableBody">
+                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Worker Attendance Records (last 10) -->
+    <div class="data-section">
+        <div class="section-header">
+            <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Worker Attendance Records</h3></div>
+            <a href="all-attendance.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="quick-actions">
+        <a href="attendance.html" class="action-btn"><i class="fas fa-plus-circle"></i> Add Attendance</a>
+        <a href="financial-report.html" class="action-btn action-btn-secondary"><i class="fas fa-file-invoice-dollar"></i> Payment Report</a>
+        <a href="profile.html" class="action-btn"><i class="fas fa-user-edit"></i> View Profile</a>
+    </div>
+    
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-icon" id="footerLogoIcon"><span>SP</span></div>
+                    <h2>SP CONSTRUCTION</h2>
+                </div>
+                <p>Building dreams with quality and precision. Trusted contractor for residential and commercial projects across the region.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="attendance.html"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+                    <li><a href="financial-report.html"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                    <li><a href="worker-list.html"><i class="fas fa-users"></i> Workers</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>Contact Info</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra</li>
+                    <li><i class="fas fa-phone-alt"></i> +91 98674 78423</li>
+                    <li><i class="fas fa-envelope"></i> spbuild.official@gmail.com</li>
+                    <li><i class="fas fa-clock"></i> Mon - Sat: 9:00 AM - 6:00 PM</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 SP Construction. All rights reserved. | Developed with <i class="fas fa-heart" style="color: #ef4444;"></i> by SP Tech Team</p>
+        </div>
+    </footer>
+</div>
+
+<script type="module">
+    let allAttendanceRecords = [];
+    let allPaymentRecords = [];
+    let allUsers = [];
+    let totalRegisteredUsersCount = 0;
+    let attendanceRateChart = null, weeklyPaymentChart = null, paymentPieChart = null, dailyEarningChart = null;
+    let currentAuthUser = null;
+    
+    const COMPANY_ASSETS_PATH = 'companyAssets';
+    
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            const footerLogoIcon = document.getElementById('footerLogoIcon');
+            const headerLogoIcon = document.getElementById('headerLogo');
+            
+            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                const logoUrl = snapshot.val();
+                if (footerLogoIcon) footerLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Company Logo">`;
+                if (headerLogoIcon) headerLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Company Logo">`;
+            } else {
+                if (footerLogoIcon) footerLogoIcon.innerHTML = `<span>SP</span>`;
+                if (headerLogoIcon) headerLogoIcon.innerHTML = `<span>SP</span>`;
+            }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+        }
+    }
+    
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
+            const snapshot = await window.get(bannersRef);
+            const bannerSection = document.getElementById('bannerSection');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerSection.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerSection.style.backgroundSize = 'cover';
+                    bannerSection.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            bannerSection.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
+    function formatNumber(value) {
+        if (value === null || value === undefined) return '0';
+        let num = parseFloat(value);
+        if (isNaN(num)) return '0';
+        return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('show', show);
+    }
+    
+    function updateLiveDate() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('liveDate').innerHTML = new Date().toLocaleDateString('en-US', options);
+    }
+    updateLiveDate();
+    setInterval(updateLiveDate, 60000);
+    
+    async function loadDashboardData() {
+        showLoading(true);
+        try {
+            const attSnap = await window.get(window.ref(window.db, 'attendance'));
+            allAttendanceRecords = attSnap.exists() ? Object.entries(attSnap.val()).map(([id, data]) => ({ id, ...data })).sort((a,b)=>new Date(b.date)-new Date(a.date)) : [];
+            
+            const paySnap = await window.get(window.ref(window.db, 'companyDailyPayments'));
+            allPaymentRecords = paySnap.exists() ? Object.entries(paySnap.val()).map(([id, data]) => ({ id, ...data })).sort((a,b)=>new Date(b.date)-new Date(a.date)) : [];
+            
+            const usersSnap = await window.get(window.ref(window.db, 'users'));
+            if (usersSnap.exists()) {
+                allUsers = Object.values(usersSnap.val());
+                totalRegisteredUsersCount = allUsers.length;
+            } else totalRegisteredUsersCount = 0;
+            document.getElementById('totalRegisteredUsers').textContent = totalRegisteredUsersCount;
+            
+            const user = window.auth.currentUser;
+            if (user) {
+                currentAuthUser = user;
+                const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
+                if (userSnap.exists()) {
+                    let name = userSnap.val().fullName || userSnap.val().firstName || 'Admin';
+                    document.getElementById('welcomeName').innerHTML = name.split(' ')[0];
+                } else {
+                    document.getElementById('welcomeName').innerHTML = user.email?.split('@')[0] || 'Admin';
+                }
+            }
+            
+            await loadCompanyLogo();
+            await loadBannerImage();
+            
+            updateStats();
+            updateUsersTable();
+            updateAttendanceTable();
+            updateCompanyPaymentTable();
+            updateCharts();
+        } catch(e) { console.error(e); }
+        showLoading(false);
+    }
+    
+    function updateStats() {
+        let uniqueWorkers = new Set(allAttendanceRecords.map(r=>r.workerId)).size;
+        document.getElementById('totalWorkers').textContent = uniqueWorkers;
+        
+        let today = new Date().toISOString().split('T')[0];
+        let presentCount = allAttendanceRecords.filter(r=>r.date===today && r.status==='present').length;
+        document.getElementById('presentToday').textContent = presentCount;
+        
+        let totalEarn = allAttendanceRecords.reduce((s,r)=>s+(r.earnings||0),0);
+        let totalPaidToWorker = allAttendanceRecords.reduce((s,r)=>s+(r.paid||0),0);
+        let companyPaid = allPaymentRecords.reduce((s,p)=>s+(p.companyPaid||0),0);
+        let previousCompanyDue = allPaymentRecords.reduce((s,p)=>s+((p.totalEarning||0)-(p.companyPaid||0)),0);
+        
+        let todaysEarnings = allAttendanceRecords.filter(r=>r.date===today).reduce((s,r)=>s+(r.earnings||0),0);
+        let todaysCompanyPaid = allPaymentRecords.filter(p=>p.date===today).reduce((s,p)=>s+(p.companyPaid||0),0);
+        let todaysReceivable = todaysEarnings - todaysCompanyPaid;
+        if (todaysReceivable < 0) todaysReceivable = 0;
+        
+        let totalCompanyDueCumulative = previousCompanyDue + todaysReceivable;
+        let totalDueToWorkers = totalEarn - totalPaidToWorker;
+        if (totalDueToWorkers < 0) totalDueToWorkers = 0;
+        
+        document.getElementById('totalEarnings').innerHTML = '₹' + formatNumber(totalEarn);
+        document.getElementById('totalPaidToUser').innerHTML = '₹' + formatNumber(totalPaidToWorker);
+        document.getElementById('totalCompanyPaid').innerHTML = '₹' + formatNumber(companyPaid);
+        document.getElementById('totalCompanyDue').innerHTML = '₹' + formatNumber(previousCompanyDue);
+        document.getElementById('totalDueToWorkers').innerHTML = '₹' + formatNumber(totalDueToWorkers);
+        document.getElementById('todaysReceivable').innerHTML = '₹' + formatNumber(todaysReceivable);
+        document.getElementById('totalCompanyDueCumulative').innerHTML = '₹' + formatNumber(totalCompanyDueCumulative);
+    }
+    
+    function getUserAvatarHTML(user) {
+        if (user.profilePicture && user.profilePicture.startsWith('data:image')) {
+            return `<img src="${user.profilePicture}" class="user-avatar" style="object-fit:cover;">`;
+        } else {
+            let name = user.fullName || (user.firstName + ' ' + user.lastName).trim() || user.email?.charAt(0) || 'U';
+            let initial = name.charAt(0).toUpperCase();
+            return `<div class="user-avatar" style="background:#f59e0b; color:white;">${initial}</div>`;
+        }
+    }
+    
+    function updateUsersTable() {
+        let tbody = document.getElementById('usersTableBody');
+        let sortedUsers = [...allUsers].sort((a,b) => new Date(b.registeredAt || 0) - new Date(a.registeredAt || 0));
+        let last10 = sortedUsers.slice(0, 10);
+        if (!last10.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 No users found</td></tr>';
+            return;
+        }
+        let html = '';
+        for (let u of last10) {
+            let fullName = u.fullName || (u.firstName + ' ' + u.lastName).trim() || u.email?.split('@')[0] || 'N/A';
+            let regDate = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A';
+            html += `<tr>
+                <td>${getUserAvatarHTML(u)}</td>
+                <td><strong>${escapeHtml(fullName)}</strong></td>
+                <td>${escapeHtml(u.email || 'N/A')}</td>
+                <td>${escapeHtml(u.mobile || u.phone || 'N/A')}</td>
+                <td style="color:#f59e0b;">${escapeHtml(u.userId || u.uid?.slice(0,8) || 'N/A')}</td>
+                <td>${escapeHtml(regDate)}</td>
+            </tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+    
+    function updateAttendanceTable() {
+        let tbody = document.getElementById('attendanceTableBody');
+        let last10 = allAttendanceRecords.slice(0, 10);
+        if (!last10.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">📭 No attendance records found</td></tr>';
+            return;
+        }
+        let html = '';
+        for (let r of last10) {
+            let badge = r.status === 'present' ? 'badge-present' : (r.status === 'absent' ? 'badge-absent' : 'badge-halfday');
+            let text = r.status === 'present' ? 'Present' : (r.status === 'absent' ? 'Absent' : 'Half Day');
+            html += `<tr>
+                <td>${r.date || 'N/A'}</td>
+                <td><strong>${escapeHtml(r.workerName || 'N/A')}</strong></td>
+                <td style="color:#f59e0b;">${escapeHtml(r.workerId || 'N/A')}</td>
+                <td><span class="${badge}">${text}</span></td>
+                <td>${r.hours || 0}</td>
+                <td>₹${formatNumber(r.earnings || 0)}</td>
+                <td>${escapeHtml(r.workDesc || '-')}</td>
+            </tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+    
+    function updateCompanyPaymentTable() {
+        let tbody = document.getElementById('companyPaymentTableBody');
+        let last10 = allPaymentRecords.slice(0, 10);
+        if (!last10.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 No payment records found</td></tr>';
+            return;
+        }
+        let html = '';
+        for (let p of last10) {
+            const due = (p.totalEarning - p.companyPaid) || 0;
+            const dueColor = due < 0 ? '#dc2626' : '#15803d';
+            html += `<tr>
+                <td>${p.date || 'N/A'}</td>
+                <td><strong>${escapeHtml(p.companyName || 'N/A')}</strong></td>
+                <td>${p.totalWorker || 0}</td>
+                <td class="amount-positive">₹${formatNumber(p.totalEarning || 0)}</td>
+                <td class="amount-positive">₹${formatNumber(p.companyPaid || 0)}</td>
+                <td style="color:${dueColor};">₹${formatNumber(due)}</td>
+            </tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+    
+    function updateCharts() {
+        let last7 = [];
+        for (let i = 6; i >= 0; i--) {
+            let d = new Date();
+            d.setDate(d.getDate() - i);
+            last7.push(d.toISOString().split('T')[0]);
+        }
+        
+        let attRates = last7.map(d => {
+            let dayRec = allAttendanceRecords.filter(r => r.date === d);
+            if (!dayRec.length) return 0;
+            let present = dayRec.filter(r => r.status === 'present').length;
+            return (present / dayRec.length) * 100;
+        });
+        
+        let weekPay = last7.map(d => allPaymentRecords.filter(p => p.date === d).reduce((s,p) => s + (p.companyPaid || 0), 0));
+        let dailyEarn = last7.map(d => allAttendanceRecords.filter(r => r.date === d).reduce((s,r) => s + (r.earnings || 0), 0));
+        
+        let totalPaid = 0, totalDue = 0;
+        allPaymentRecords.forEach(p => {
+            totalPaid += p.companyPaid || 0;
+            totalDue += (p.totalEarning || 0) - (p.companyPaid || 0);
+        });
+        
+        const ctx1 = document.getElementById('attendanceRateChart')?.getContext('2d');
+        const ctx2 = document.getElementById('weeklyPaymentChart')?.getContext('2d');
+        const ctx3 = document.getElementById('paymentPieChart')?.getContext('2d');
+        const ctx4 = document.getElementById('dailyEarningChart')?.getContext('2d');
+        
+        if (!ctx1 || !ctx2 || !ctx3 || !ctx4) return;
+        
+        if (attendanceRateChart) attendanceRateChart.destroy();
+        if (weeklyPaymentChart) weeklyPaymentChart.destroy();
+        if (paymentPieChart) paymentPieChart.destroy();
+        if (dailyEarningChart) dailyEarningChart.destroy();
+        
+        attendanceRateChart = new Chart(ctx1, {
+            type: 'line',
+            data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Attendance Rate (%)', data: attRates, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#f59e0b', pointRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + '%' } } }, scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+        
+        weeklyPaymentChart = new Chart(ctx2, {
+            type: 'bar',
+            data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Company Payment (₹)', data: weekPay, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8 }] },
+            options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + formatNumber(ctx.raw) } } } }
+        });
+        
+        paymentPieChart = new Chart(ctx3, {
+            type: 'doughnut',
+            data: { labels: ['Company Paid', 'Company Due'], datasets: [{ data: [totalPaid, Math.abs(totalDue)], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] },
+            options: { responsive: true, cutout: '55%', plugins: { tooltip: { callbacks: { label: (ctx) => ctx.label + ': ₹' + formatNumber(ctx.raw) } } } }
+        });
+        
+        dailyEarningChart = new Chart(ctx4, {
+            type: 'line',
+            data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Daily Earnings (₹)', data: dailyEarn, borderColor: '#ec489a', backgroundColor: 'rgba(236,72,153,0.1)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#ec489a', pointRadius: 4 }] },
+            options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + formatNumber(ctx.raw) } } } }
+        });
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+    
+    window.handleLogout = async function() {
+        showLoading(true);
+        try {
+            await window.signOut(window.auth);
+            window.location.href = 'login.html';
+        } catch(e) { alert('Logout failed'); showLoading(false); }
+    };
+    
+    function listenRealTime() {
+        window.onValue(window.ref(window.db, 'attendance'), () => loadDashboardData());
+        window.onValue(window.ref(window.db, 'companyDailyPayments'), () => loadDashboardData());
+        window.onValue(window.ref(window.db, 'users'), () => loadDashboardData());
+        window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`), () => loadCompanyLogo());
+        window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
+    }
+    
+    window.onAuthStateChanged(window.auth, (user) => {
+        if (!user) window.location.href = 'login.html';
+        else { loadDashboardData(); listenRealTime(); }
+    });
+</script>
+</body>
+</html>
