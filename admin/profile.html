@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>My Profile | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.signOut = signOut;
+        window.updateProfile = updateProfile;
+        window.ref = ref;
+        window.get = get;
+        window.update = update;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0f1e;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container { max-width: 750px; margin: 0 auto; }
+        
+        .glass-header {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .icon-btn {
+            background: rgba(255,255,255,0.05);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+        .icon-btn:hover { background: #f59e0b; transform: translateY(-2px); }
+        .logo-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-mini .icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+        }
+        .logo-mini span { font-size: 1rem; color: white; font-weight: 600; letter-spacing: 0.5px; }
+        
+        .profile-card {
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        
+        .cover {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            padding: 20px 20px 50px 20px;
+            position: relative;
+        }
+        .avatar-wrap {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: pointer;
+        }
+        .avatar-frame {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            padding: 3px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+        }
+        .camera-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #f59e0b;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+        
+        .info-section {
+            padding: 55px 20px 20px;
+            text-align: center;
+        }
+        .name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .user-id {
+            background: #fef3c7;
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #d97706;
+            margin-top: 6px;
+        }
+        .verify-badge {
+            margin-top: 8px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 30px;
+        }
+        .verified { background: #22c55e15; color: #15803d; border: 1px solid #22c55e30; }
+        .not-verified { background: #ef444415; color: #b91c1c; border: 1px solid #ef444430; }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px 16px;
+            margin: 25px 0 20px;
+            text-align: left;
+        }
+        .info-row {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            border: 1px solid #eef2f6;
+        }
+        .info-label {
+            font-weight: 700;
+            color: #f59e0b;
+            min-width: 70px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .info-value {
+            color: #1e293b;
+            font-weight: 500;
+            word-break: break-word;
+            flex: 1;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 3px 8px rgba(245,158,11,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-card {
+            background: white;
+            border-radius: 36px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .modal-header h3 { font-size: 1.3rem; font-weight: 800; color: #f59e0b; }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 0.85rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+        .pic-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .pic-preview {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #f59e0b;
+        }
+        .file-label {
+            background: #f1f5f9;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .upload-status {
+            font-size: 0.7rem;
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            background: #f1f5f9;
+        }
+        .status-loading {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .status-success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .status-error {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading.show { display: flex; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #f59e0b; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            z-index: 2100;
+            animation: fadeUp 0.2s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        @media (max-width: 550px) {
+            .info-grid { grid-template-columns: 1fr; gap: 8px; }
+            .info-row { padding: 8px 12px; }
+            .btn-group { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+            <button class="close-modal" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+            <div class="form-group">
+                <label>Profile Picture</label>
+                <div class="pic-row">
+                    <img id="modalPreview" class="pic-preview" src="https://via.placeholder.com/70?text=Img" alt="preview">
+                    <label class="file-label" for="picUpload"><i class="fas fa-upload"></i> Choose Image</label>
+                    <input type="file" id="picUpload" accept="image/jpeg,image/png,image/jpg,image/webp,image/heic" style="display: none;">
+                </div>
+                <div id="uploadStatus" class="upload-status"></div>
+            </div>
+            <div class="form-group"><label>First Name</label><input type="text" id="editFname"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="editLname"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="editEmail" readonly></div>
+            <div class="form-group"><label>Phone</label><input type="tel" id="editPhone"></div>
+            <div class="form-group"><label>Aadhar Number</label><input type="text" id="editAadhar" placeholder="12-digit Aadhar"></div>
+            <div class="form-group"><label>Date of Birth</label><input type="date" id="editDob"></div>
+            <div class="form-group"><label>Position</label><input type="text" id="editPosition"></div>
+            <div class="form-group"><label>Company</label><input type="text" id="editCompany"></div>
+            <div class="form-group"><label>Address</label><input type="text" id="editAddress"></div>
+        </div>
+        <div class="btn-group" style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+            <button class="btn btn-danger" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="glass-header">
+        <div class="icon-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></div>
+        <div class="logo-mini">
+            <div class="icon">SP</div>
+            <span>SP CONSTRUCTION</span>
+        </div>
+        <div class="icon-btn" onclick="refreshProfile()"><i class="fas fa-sync-alt"></i></div>
+    </div>
+
+    <div class="profile-card">
+        <div class="cover">
+            <div class="avatar-wrap" id="avatarTrigger">
+                <div class="avatar-frame">
+                    <div id="avatarDisplay" class="avatar-img">
+                        <span id="avatarInitials">SP</span>
+                    </div>
+                </div>
+                <div class="camera-badge"><i class="fas fa-camera"></i></div>
+            </div>
+        </div>
+        <div class="info-section">
+            <div class="name" id="fullName">Loading...</div>
+            <div class="user-id"><i class="fas fa-id-card"></i> <span id="userIdSpan">-</span></div>
+            <div id="verifyBadge" class="verify-badge"></div>
+            
+            <div class="info-grid" id="infoGrid"></div>
+            
+            <div class="btn-group">
+                <button class="btn btn-primary" id="editBtn"><i class="fas fa-pen"></i> Edit Profile</button>
+                <button class="btn btn-danger" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    let currentUserData = {};
+    let currentAuth = null;
+    let selectedBase64 = null;
+    
+    function showLoading(show) { document.getElementById('loading').classList.toggle('show', show); }
+    function showToast(msg, isErr = false) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
+        t.style.background = isErr ? '#dc2626' : '#15803d';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2500);
+    }
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    // ========== ADVANCED IMAGE COMPRESSION THAT HANDLES ANY SIZE (30MB+ to under 5MB) ==========
+    async function smartCompressImage(file, onProgress) {
+        // Accept any image type including large megapixel photos
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    if (onProgress) onProgress(20);
+                    
+                    // Calculate optimal dimensions to ensure final size < 5MB
+                    // For very high resolution images, we use aggressive downscaling
+                    let width = img.width;
+                    let height = img.height;
+                    const maxPixels = 1024 * 1024; // 1 Megapixel target for safe compression under 5MB
+                    const currentPixels = width * height;
+                    
+                    // Adaptive scaling based on original size
+                    let scale = 1;
+                    if (currentPixels > maxPixels * 4) {
+                        scale = Math.sqrt(maxPixels / currentPixels) * 0.8;
+                    } else if (currentPixels > maxPixels * 2) {
+                        scale = Math.sqrt(maxPixels / currentPixels) * 0.9;
+                    } else if (currentPixels > maxPixels) {
+                        scale = Math.sqrt(maxPixels / currentPixels);
+                    }
+                    
+                    // Apply scaling but keep minimum reasonable size (400px)
+                    let newWidth = Math.max(400, Math.floor(width * scale));
+                    let newHeight = Math.max(400, Math.floor(height * scale));
+                    
+                    if (onProgress) onProgress(40);
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                    
+                    if (onProgress) onProgress(60);
+                    
+                    // Dynamic quality adjustment - start with 0.75, try to keep under 5MB
+                    let quality = 0.75;
+                    let attempt = 0;
+                    let finalBase64 = '';
+                    
+                    const tryCompress = () => {
+                        finalBase64 = canvas.toDataURL('image/jpeg', quality);
+                        const approxSize = Math.round((finalBase64.length * 3/4) / 1024); // KB approx
+                        
+                        if (onProgress) onProgress(70 + attempt * 10);
+                        
+                        if (approxSize > 4800 && quality > 0.45 && attempt < 3) {
+                            // Still too large, reduce quality
+                            quality -= 0.1;
+                            attempt++;
+                            tryCompress();
+                        } else {
+                            if (onProgress) onProgress(100);
+                            resolve(finalBase64);
+                        }
+                    };
+                    
+                    tryCompress();
+                };
+                img.onerror = () => reject(new Error("Failed to load image"));
+                img.src = e.target.result;
+            };
+            reader.onerror = () => reject(new Error("File reading failed"));
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    // Alternative: If image is already small, preserve it but still compress moderately
+    async function processProfileImage(file, onProgress) {
+        // Validate file size first - but we'll handle even 50MB files via compression
+        if (!file.type.match('image.*')) {
+            throw new Error('Please select a valid image file (JPEG, PNG, etc.)');
+        }
+        
+        // Show initial progress
+        if (onProgress) onProgress(5);
+        
+        // Always compress to ensure under 5MB with perfect quality/ratio
+        const compressedBase64 = await smartCompressImage(file, onProgress);
+        
+        // Final safety check: ensure base64 size is reasonable (max ~5MB = ~6.6 million chars base64)
+        if (compressedBase64.length > 7_000_000) {
+            // If somehow still too large, do one more aggressive compression
+            console.warn("Image still large, applying ultra compression");
+            const img = new Image();
+            const result = await new Promise((resolve) => {
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const targetPixels = 800 * 800;
+                    if (w * h > targetPixels) {
+                        const ratio = Math.sqrt(targetPixels / (w * h));
+                        w = Math.floor(w * ratio);
+                        h = Math.floor(h * ratio);
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', 0.65));
+                };
+                img.src = compressedBase64;
+            });
+            return result;
+        }
+        
+        return compressedBase64;
+    }
+    
+    function renderProfile(data, emailVerified) {
+        const avatarDiv = document.getElementById('avatarDisplay');
+        const initialsSpan = document.getElementById('avatarInitials');
+        if (data.profilePicture && data.profilePicture.startsWith('data:image')) {
+            avatarDiv.innerHTML = `<img src="${data.profilePicture}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        } else {
+            let first = data.firstName || '';
+            let last = data.lastName || '';
+            let init = (first.charAt(0)+last.charAt(0)).toUpperCase();
+            if (!init.trim()) init = 'SP';
+            initialsSpan.textContent = init;
+            avatarDiv.innerHTML = '';
+            avatarDiv.appendChild(initialsSpan);
+            avatarDiv.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+        }
+        document.getElementById('fullName').innerHTML = `${escapeHtml(data.firstName||'')} ${escapeHtml(data.lastName||'')}`.trim() || data.email || 'User';
+        document.getElementById('userIdSpan').innerHTML = data.userId || (currentAuth?.uid.slice(0,8).toUpperCase()) || '----';
+        
+        const verifyDiv = document.getElementById('verifyBadge');
+        const isVerified = emailVerified === true || data.emailVerified === true;
+        verifyDiv.innerHTML = isVerified ? '<i class="fas fa-check-circle"></i> Email Verified' : '<i class="fas fa-times-circle"></i> Email Not Verified';
+        verifyDiv.className = isVerified ? 'verify-badge verified' : 'verify-badge not-verified';
+        
+        const fields = [
+            { label: 'First Name', value: data.firstName || 'Not set' },
+            { label: 'Last Name', value: data.lastName || 'Not set' },
+            { label: 'Email', value: data.email || 'Not set' },
+            { label: 'Phone', value: data.mobile || 'Not set' },
+            { label: 'Aadhar', value: data.aadhar ? '•••• '+data.aadhar.slice(-4) : 'Not set' },
+            { label: 'DOB', value: data.dob || 'Not set' },
+            { label: 'Position', value: data.position || 'Not set' },
+            { label: 'Company', value: data.company || 'Not set' },
+            { label: 'Address', value: data.address || 'Not set' },
+            { label: 'Member Since', value: data.registeredAt ? new Date(data.registeredAt).toLocaleDateString() : 'Not set' }
+        ];
+        const grid = document.getElementById('infoGrid');
+        grid.innerHTML = fields.map(f => `
+            <div class="info-row">
+                <div class="info-label">${f.label}.</div>
+                <div class="info-value">${escapeHtml(f.value)}</div>
+            </div>
+        `).join('');
+    }
+    
+    async function loadUser(user) {
+        if(!user) return;
+        currentAuth = user;
+        showLoading(true);
+        try {
+            const userRef = window.ref(window.db, `users/${user.uid}`);
+            const snap = await window.get(userRef);
+            let data = snap.val();
+            if(!data) {
+                data = {
+                    uid: user.uid,
+                    email: user.email,
+                    firstName: '',
+                    lastName: '',
+                    mobile: '',
+                    aadhar: '',
+                    dob: '',
+                    position: '',
+                    company: '',
+                    address: '',
+                    userId: user.uid.slice(0,8).toUpperCase(),
+                    registeredAt: new Date().toISOString(),
+                    emailVerified: user.emailVerified
+                };
+                await window.update(userRef, data);
+            }
+            currentUserData = data;
+            renderProfile(data, user.emailVerified);
+        } catch(e) { showToast('Error loading profile', true); }
+        showLoading(false);
+    }
+    
+    window.refreshProfile = async () => { if(currentAuth) await loadUser(currentAuth); else window.location.href='login.html'; };
+    
+    function openEditModal() {
+        if(!currentUserData) return;
+        document.getElementById('editFname').value = currentUserData.firstName || '';
+        document.getElementById('editLname').value = currentUserData.lastName || '';
+        document.getElementById('editEmail').value = currentUserData.email || '';
+        document.getElementById('editPhone').value = currentUserData.mobile || '';
+        document.getElementById('editAadhar').value = currentUserData.aadhar || '';
+        document.getElementById('editDob').value = currentUserData.dob || '';
+        document.getElementById('editPosition').value = currentUserData.position || '';
+        document.getElementById('editCompany').value = currentUserData.company || '';
+        document.getElementById('editAddress').value = currentUserData.address || '';
+        const preview = document.getElementById('modalPreview');
+        if(currentUserData.profilePicture && currentUserData.profilePicture.startsWith('data:image')) preview.src = currentUserData.profilePicture;
+        else preview.src = 'https://via.placeholder.com/70?text=Avatar';
+        selectedBase64 = currentUserData.profilePicture || null;
+        document.getElementById('editModal').classList.add('show');
+        const statusDiv = document.getElementById('uploadStatus');
+        statusDiv.innerHTML = '';
+        statusDiv.className = 'upload-status';
+    }
+    window.closeEditModal = () => { document.getElementById('editModal').classList.remove('show'); selectedBase64 = null; };
+    
+    function setupImageUpload() {
+        const fileInput = document.getElementById('picUpload');
+        const statusDiv = document.getElementById('uploadStatus');
+        
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            if(!file.type.match('image.*')) { showToast('Please select an image file (JPEG, PNG, WEBP, etc.)', true); return; }
+            
+            // Allow ANY file size - will compress regardless (even 100MB photos)
+            statusDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing high-res image... 0%';
+            statusDiv.className = 'upload-status status-loading';
+            
+            try {
+                // Progress callback
+                const updateProgress = (percent) => {
+                    statusDiv.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${percent < 30 ? 'Decoding image...' : percent < 70 ? 'Compressing to under 5MB...' : 'Finalizing...'} ${percent}%`;
+                };
+                
+                const compressedBase64 = await processProfileImage(file, updateProgress);
+                selectedBase64 = compressedBase64;
+                document.getElementById('modalPreview').src = compressedBase64;
+                
+                const finalSizeKB = Math.round((compressedBase64.length * 3/4) / 1024);
+                statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> Ready! (${finalSizeKB} KB, within 5MB limit)`;
+                statusDiv.className = 'upload-status status-success';
+                setTimeout(() => {
+                    if (statusDiv.innerHTML.includes('Ready')) statusDiv.innerHTML = '';
+                }, 3500);
+                showToast(`Image compressed successfully (${finalSizeKB} KB)`);
+            } catch(err) {
+                console.error(err);
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to process image. Try another photo.';
+                statusDiv.className = 'upload-status status-error';
+                showToast('Image processing failed, please try a different image', true);
+            }
+        };
+        
+        document.getElementById('avatarTrigger').onclick = () => {
+            fileInput.click();
+        };
+    }
+    
+    window.saveProfile = async () => {
+        const updated = {
+            firstName: document.getElementById('editFname').value.trim(),
+            lastName: document.getElementById('editLname').value.trim(),
+            mobile: document.getElementById('editPhone').value.trim(),
+            aadhar: document.getElementById('editAadhar').value.trim(),
+            dob: document.getElementById('editDob').value,
+            position: document.getElementById('editPosition').value.trim(),
+            company: document.getElementById('editCompany').value.trim(),
+            address: document.getElementById('editAddress').value.trim(),
+            email: currentUserData.email,
+            userId: currentUserData.userId,
+            registeredAt: currentUserData.registeredAt,
+            emailVerified: currentAuth?.emailVerified || false,
+            uid: currentAuth?.uid
+        };
+        if(selectedBase64 && selectedBase64.startsWith('data:image')) updated.profilePicture = selectedBase64;
+        else if(selectedBase64 === null && currentUserData.profilePicture) updated.profilePicture = currentUserData.profilePicture;
+        updated.fullName = `${updated.firstName} ${updated.lastName}`.trim() || updated.email;
+        
+        showLoading(true);
+        try {
+            const userRef = window.ref(window.db, `users/${currentAuth.uid}`);
+            await window.update(userRef, updated);
+            if(updated.fullName && currentAuth) await window.updateProfile(currentAuth, { displayName: updated.fullName }).catch(e=>console.warn);
+            currentUserData = {...currentUserData, ...updated};
+            renderProfile(currentUserData, currentAuth.emailVerified);
+            showToast('Profile updated successfully!');
+            closeEditModal();
+        } catch(err) { showToast('Update failed: '+err.message, true); }
+        showLoading(false);
+    };
+    
+    window.logoutUser = async () => {
+        showLoading(true);
+        try {
+            await window.signOut(window.auth);
+            localStorage.clear();
+            window.location.href = 'login.html';
+        } catch(e) { showLoading(false); showToast('Logout failed', true); }
+    };
+    
+    window.onAuthStateChanged(window.auth, async (user) => {
+        if(!user) window.location.href = 'login.html';
+        else await loadUser(user);
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('editBtn').addEventListener('click', openEditModal);
+        setupImageUpload();
+    });
+</script>
+</body>
+</html>
