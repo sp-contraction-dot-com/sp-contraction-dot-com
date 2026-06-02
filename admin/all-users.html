@@ -10,8 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, deleteUser, updateProfile } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
@@ -33,6 +33,12 @@
         window.ref = ref;
         window.get = get;
         window.onValue = onValue;
+        window.set = set;
+        window.remove = remove;
+        window.update = update;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.deleteUser = deleteUser;
+        window.updateProfile = updateProfile;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
@@ -74,6 +80,11 @@
         .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
         .logo-text h1 { font-size: 1.3rem; font-weight: 800; color: #1e293b; letter-spacing: -0.3px; }
         .logo-text p { font-size: 0.55rem; color: #f59e0b; letter-spacing: 1px; font-weight: 600; }
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
         .back-btn {
             background: #f1f5f9;
             border: none;
@@ -90,6 +101,22 @@
             gap: 8px;
         }
         .back-btn:hover { background: #f59e0b; color: white; transform: translateY(-2px); }
+        .add-user-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(34,197,94,0.3);
+        }
+        .add-user-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
         
         /* Stats Cards */
         .stats-grid {
@@ -285,7 +312,7 @@
             border: 1px solid #eef2f6;
             background: white;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
         th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #f0f2f5; font-size: 0.8rem; }
         th { background: #f8fafc; font-weight: 700; color: #475569; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 10; }
         tbody tr:hover { background: #fef9ec; transition: 0.2s; }
@@ -301,12 +328,161 @@
             font-weight: 600;
             color: #1e293b;
         }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .edit-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .edit-btn:hover { background: #2563eb; transform: scale(1.02); }
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .delete-btn:hover { background: #dc2626; transform: scale(1.02); }
+        
         .loading { display: flex; justify-content: center; align-items: center; padding: 50px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .no-data { text-align: center; padding: 50px; color: #94a3b8; }
         .summary-row { background: #fef3c7; font-weight: 700; border-top: 2px solid #f59e0b; }
         .summary-row td { font-weight: 700; color: #1e293b; background: #fffbeb; }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+            border-left: 4px solid #f59e0b;
+            padding-left: 12px;
+        }
+        .modal-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-input-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+        .modal-input-group input, .modal-input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        .modal-input-group input:focus, .modal-input-group select:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .btn-cancel:hover { background: #cbd5e1; }
+        
+        /* Access Denied Message */
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 28px;
+            margin: 20px;
+        }
+        .access-denied i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        .access-denied h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .access-denied p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .access-denied button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
         @media (max-width: 700px) {
             .download-controls { flex-direction: column; align-items: stretch; }
             .download-group { justify-content: center; }
@@ -315,6 +491,7 @@
             .stat-card .value { font-size: 1.2rem; }
             .table-container { max-height: 50vh; }
             .header { padding: 16px; }
+            .modal-form-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -322,10 +499,13 @@
 <div class="container">
     <div class="header">
         <div class="logo-section">
-            <div class="logo-icon"><span>SP</span></div>
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>USER MANAGER</p></div>
         </div>
-        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <div class="header-buttons">
+            <button class="add-user-btn" id="openAddUserBtn"><i class="fas fa-user-plus"></i> Add New User</button>
+            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
     </div>
 
     <!-- Stats Cards -->
@@ -363,34 +543,60 @@
         </div>
     </div>
 
-    <div class="data-card">
+    <div class="data-card" id="mainContentCard">
         <div class="section-title"><i class="fas fa-users"></i><h3>All Registered Users</h3></div>
         
-        <div class="search-wrapper">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Search by name, email, phone, or user ID...">
-            <div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 users</span></div>
+        <div id="usersContent">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, email, phone, or user ID...">
+                <div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 users</span></div>
+            </div>
+            
+            <div class="table-container">
+                <table id="usersTable">
+                    <thead>
+                        <tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th><th style="width:120px;">Actions</th></tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="7" class="loading"><div class="spinner"></div>解决</tbody>
+                    <tfoot id="usersTableFooter"></tfoot>
+                </table>
+            </div>
+            
+            <div class="download-controls">
+                <div class="download-group">
+                    <i class="fas fa-database" style="color:#f59e0b;"></i>
+                    <label>DATA SOURCE</label>
+                    <select id="dataSourceSelect"><option value="all">📋 All users</option><option value="filtered">🔍 Filtered users (search result)</option></select>
+                </div>
+                <div class="download-group">
+                    <div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled><span style="font-size:0.7rem;">records</span></div>
+                    <select id="downloadFormat"><option value="csv">📊 CSV</option><option value="pdf">📑 PDF</option></select>
+                </div>
+                <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
+            </div>
         </div>
         
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead>
-                <tbody id="usersTableBody"><tr><td colspan="6" class="loading"><div class="spinner"></div></td></tr></tbody>
-                <tfoot id="usersTableFooter"></tfoot>
-            </table>
+        <div id="accessDeniedMessage" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal" id="userModal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Add New User</h3>
+        <div class="modal-form-grid">
+            <div class="modal-input-group"><label>First Name</label><input type="text" id="modalFirstName" placeholder="First name"></div>
+            <div class="modal-input-group"><label>Last Name</label><input type="text" id="modalLastName" placeholder="Last name"></div>
+            <div class="modal-input-group"><label>Email Address</label><input type="email" id="modalEmail" placeholder="Email"></div>
+            <div class="modal-input-group"><label>Phone Number</label><input type="text" id="modalPhone" placeholder="Phone number"></div>
+            <div class="modal-input-group"><label>Date of Birth</label><input type="date" id="modalDob"></div>
+            <div class="modal-input-group" id="passwordGroup"><label>Password</label><input type="password" id="modalPassword" placeholder="Password (min 6 chars)"></div>
         </div>
-        
-        <div class="download-controls">
-            <div class="download-group">
-                <i class="fas fa-database" style="color:#f59e0b;"></i>
-                <label>DATA SOURCE</label>
-                <select id="dataSourceSelect"><option value="all">📋 All users</option><option value="filtered">🔍 Filtered users (search result)</option></select>
-            </div>
-            <div class="download-group">
-                <div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled><span style="font-size:0.7rem;">records</span></div>
-                <select id="downloadFormat"><option value="csv">📊 CSV</option><option value="pdf">📑 PDF</option></select>
-            </div>
-            <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
+        <div class="modal-buttons">
+            <button class="btn-save" id="modalSaveBtn"><i class="fas fa-save"></i> Save</button>
+            <button class="btn-cancel" id="modalCancelBtn"><i class="fas fa-times"></i> Cancel</button>
         </div>
     </div>
 </div>
@@ -404,6 +610,10 @@
     let allAttendanceRecords = [];
     let companyLogoBase64 = null;
     let pdfLogoBase64 = null;
+    let editUserId = null;
+    let editUserUid = null;
+    let isAdminUser = false;
+    let adminChecked = false;
     
     // DOM elements
     const tbody = document.getElementById('usersTableBody');
@@ -415,7 +625,23 @@
     const limitCountInput = document.getElementById('limitCount');
     const downloadFormatSelect = document.getElementById('downloadFormat');
     const downloadBtn = document.getElementById('downloadBtn');
-    const logoIconDiv = document.querySelector('.logo-icon');
+    const headerLogo = document.getElementById('headerLogo');
+    const usersContent = document.getElementById('usersContent');
+    const accessDeniedDiv = document.getElementById('accessDeniedMessage');
+    
+    // Modal elements
+    const modal = document.getElementById('userModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalFirstName = document.getElementById('modalFirstName');
+    const modalLastName = document.getElementById('modalLastName');
+    const modalEmail = document.getElementById('modalEmail');
+    const modalPhone = document.getElementById('modalPhone');
+    const modalDob = document.getElementById('modalDob');
+    const modalPassword = document.getElementById('modalPassword');
+    const passwordGroup = document.getElementById('passwordGroup');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const openAddUserBtn = document.getElementById('openAddUserBtn');
     
     // Stats elements
     const statTotalUsers = document.getElementById('statTotalUsers');
@@ -424,6 +650,24 @@
     const statTotalEarnings = document.getElementById('statTotalEarnings');
     const statTotalPaid = document.getElementById('statTotalPaid');
     const statTotalDue = document.getElementById('statTotalDue');
+    
+    function showToast(msg, isErr = false, duration = 3000) {
+        const toast = document.createElement('div');
+        toast.innerText = msg;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '30px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = isErr ? '#dc2626' : '#15803d';
+        toast.style.color = 'white';
+        toast.style.padding = '10px 24px';
+        toast.style.borderRadius = '40px';
+        toast.style.fontSize = '0.8rem';
+        toast.style.zIndex = '9999';
+        toast.style.fontFamily = 'Inter, sans-serif';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), duration);
+    }
     
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     
@@ -452,25 +696,129 @@
     }
     
     function updateHeaderLogo(base64) {
-        if (base64 && base64.startsWith('data:image')) logoIconDiv.innerHTML = `<img src="${base64}" alt="Company Logo">`;
-        else logoIconDiv.innerHTML = `<span>SP</span>`;
+        if (headerLogo) {
+            if (base64 && base64.startsWith('data:image')) headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo">`;
+            else headerLogo.innerHTML = `<span>SP</span>`;
+        }
     }
     
-    async function loadImages(uid) {
-        if (!uid) return;
+    // ========== LOAD COMPANY LOGO FROM CORRECT PATH ==========
+    async function loadCompanyLogo() {
         try {
-            const companyRef = window.ref(db, `users/${uid}/footerLogo`);
-            const pdfRef = window.ref(db, `users/${uid}/pdfLogo`);
-            const [companySnap, pdfSnap] = await Promise.all([window.get(companyRef), window.get(pdfRef)]);
-            if (companySnap.exists() && companySnap.val()?.startsWith('data:image')) {
-                companyLogoBase64 = companySnap.val();
-                updateHeaderLogo(companyLogoBase64);
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                updateHeaderLogo(snapshot.val());
+            } else {
+                updateHeaderLogo(null);
             }
-            if (pdfSnap.exists() && pdfSnap.val()?.startsWith('data:image')) pdfLogoBase64 = pdfSnap.val();
-        } catch(e) { console.warn(e); }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+        }
+    }
+    
+    function listenLogoChanges() {
+        const logoRef = window.ref(db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val && val.startsWith('data:image')) {
+                updateHeaderLogo(val);
+            } else {
+                updateHeaderLogo(null);
+            }
+        });
+    }
+    
+    // ========== LOAD BANNER IMAGE FROM CORRECT PATH ==========
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(db, `companyAssets/banners`);
+            const snapshot = await window.get(bannersRef);
+            const bannerContainer = document.getElementById('bannerContent');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerContainer.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerContainer.style.backgroundSize = 'cover';
+                    bannerContainer.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            bannerContainer.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
+    function listenBannerChanges() {
+        const bannersRef = window.ref(db, `companyAssets/banners`);
+        window.onValue(bannersRef, () => {
+            loadBannerImage();
+        });
+    }
+    
+    // ========== ADMIN VERIFICATION FUNCTION ==========
+    function showAccessDenied() {
+        if (usersContent) usersContent.style.display = 'none';
+        if (accessDeniedDiv) {
+            accessDeniedDiv.style.display = 'block';
+            accessDeniedDiv.innerHTML = `
+                <div class="access-denied">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>⛔ Access Denied</h2>
+                    <p>You don't have administrator privileges to access this page.</p>
+                    <p style="font-size: 0.8rem; color: #ef4444;">Only authorized admins can view and manage users.</p>
+                    <button onclick="window.location.href='dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    async function checkAdminAndLoad(user) {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            
+            // Check if user is admin
+            if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                isAdminUser = false;
+                adminChecked = true;
+                showAccessDenied();
+                return;
+            }
+            
+            // User is admin, load everything
+            isAdminUser = true;
+            adminChecked = true;
+            
+            if (usersContent) usersContent.style.display = 'block';
+            if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+            
+            await loadAllUsers();
+            await loadCompanyLogo();
+            listenLogoChanges();
+            await loadBannerImage();
+            listenBannerChanges();
+            
+        } catch (error) {
+            console.error("Admin verification error:", error);
+            showAccessDenied();
+        }
     }
     
     async function loadAttendanceStats() {
+        if (!isAdminUser) return;
         try {
             const snap = await window.get(window.ref(db, 'attendance'));
             if (snap.exists()) {
@@ -485,18 +833,18 @@
                     totalDue += earn - paid;
                     if (r.workerId) uniqueWorkers.add(r.workerId);
                 });
-                statActiveWorkers.innerText = formatIndianNumber(uniqueWorkers.size);
-                statTotalRecords.innerText = formatIndianNumber(records.length);
-                statTotalEarnings.innerHTML = `₹${formatIndianNumber(totalEarn)}`;
-                statTotalPaid.innerHTML = `₹${formatIndianNumber(totalPaid)}`;
-                statTotalDue.innerHTML = `₹${formatIndianNumber(totalDue)}`;
+                if (statActiveWorkers) statActiveWorkers.innerText = formatIndianNumber(uniqueWorkers.size);
+                if (statTotalRecords) statTotalRecords.innerText = formatIndianNumber(records.length);
+                if (statTotalEarnings) statTotalEarnings.innerHTML = `₹${formatIndianNumber(totalEarn)}`;
+                if (statTotalPaid) statTotalPaid.innerHTML = `₹${formatIndianNumber(totalPaid)}`;
+                if (statTotalDue) statTotalDue.innerHTML = `₹${formatIndianNumber(totalDue)}`;
                 allAttendanceRecords = records;
             } else {
-                statActiveWorkers.innerText = '0';
-                statTotalRecords.innerText = '0';
-                statTotalEarnings.innerHTML = '₹0';
-                statTotalPaid.innerHTML = '₹0';
-                statTotalDue.innerHTML = '₹0';
+                if (statActiveWorkers) statActiveWorkers.innerText = '0';
+                if (statTotalRecords) statTotalRecords.innerText = '0';
+                if (statTotalEarnings) statTotalEarnings.innerHTML = '₹0';
+                if (statTotalPaid) statTotalPaid.innerHTML = '₹0';
+                if (statTotalDue) statTotalDue.innerHTML = '₹0';
             }
         } catch(e) { console.error(e); }
     }
@@ -506,32 +854,37 @@
     }
     
     function renderFooter(records) {
-        if (!records.length) { tfoot.innerHTML = ''; return; }
-        tfoot.innerHTML = `<tr class="summary-row"><td colspan="2"><strong>📊 TOTAL SUMMARY</strong></td><td><strong>${records.length} Users</strong></td><td><strong>${new Set(records.map(u=>u.userId)).size} Workers</strong></td><td colspan="3"></td></tr>`;
+        if (!records.length) { if(tfoot) tfoot.innerHTML = ''; return; }
+        if (tfoot) tfoot.innerHTML = `<tr class="summary-row"><td colspan="2"><strong>📊 TOTAL SUMMARY</strong></td><td colspan="2"><strong>${records.length} Users</strong></td><td colspan="3">解决</tr>`;
     }
     
     function renderTable() {
         if (!currentFilteredUsers.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="no-data"><i class="fas fa-user-slash"></i> No users found</td></tr>';
-            resultCountSpan.innerText = `0 users`;
-            tfoot.innerHTML = '';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="no-data"><i class="fas fa-user-slash"></i> No users found</td></tr>';
+            if (resultCountSpan) resultCountSpan.innerText = `0 users`;
+            if (tfoot) tfoot.innerHTML = '';
             return;
         }
         let html = '';
         for (let u of currentFilteredUsers) {
-            html += `<tr>
-                <td>${getUserAvatarHTML(u)}</td>
-                <td><strong>${escapeHtml(getUserDisplayName(u))}</strong></td>
-                <td>${escapeHtml(u.email || 'N/A')}</td>
-                <td>${escapeHtml(getUserPhone(u))}</td>
-                <td style="color:#f59e0b; font-weight:600;">${escapeHtml(getUserIdValue(u))}</td>
-                <td>${escapeHtml(getRegistrationDate(u))}</td>
-            </tr>`;
+            html += `
+                <tr>
+                    <td>${getUserAvatarHTML(u)}</td>
+                    <td><strong>${escapeHtml(getUserDisplayName(u))}</strong></td>
+                    <td>${escapeHtml(u.email || 'N/A')}</td>
+                    <td>${escapeHtml(getUserPhone(u))}</td>
+                    <td style="color:#f59e0b; font-weight:600;">${escapeHtml(getUserIdValue(u))}</td>
+                    <td>${escapeHtml(getRegistrationDate(u))}</td>
+                    <td class="action-btns">
+                        <button class="edit-btn" onclick="window.editUser('${u.uid}', '${escapeHtml(u.firstName || '')}', '${escapeHtml(u.lastName || '')}', '${escapeHtml(u.email || '')}', '${escapeHtml(getUserPhone(u))}', '${u.dob || ''}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="window.deleteUserAccount('${u.uid}')"><i class="fas fa-trash"></i> Del</button>
+                    </td>
+                </tr>`;
         }
-        tbody.innerHTML = html;
-        resultCountSpan.innerText = `${currentFilteredUsers.length} user${currentFilteredUsers.length !== 1 ? 's' : ''}`;
+        if (tbody) tbody.innerHTML = html;
+        if (resultCountSpan) resultCountSpan.innerText = `${currentFilteredUsers.length} user${currentFilteredUsers.length !== 1 ? 's' : ''}`;
         renderFooter(currentFilteredUsers);
-        statTotalUsers.innerText = formatIndianNumber(allUsers.length);
+        if (statTotalUsers) statTotalUsers.innerText = formatIndianNumber(allUsers.length);
     }
     
     function filterUsers(searchTerm) {
@@ -549,64 +902,191 @@
     }
     
     async function loadAllUsers() {
+        if (!isAdminUser) return;
         try {
             const snapshot = await window.get(window.ref(db, 'users'));
-            if (snapshot.exists()) allUsers = Object.values(snapshot.val());
-            else allUsers = [];
+            if (snapshot.exists()) {
+                allUsers = Object.values(snapshot.val());
+            } else {
+                allUsers = [];
+            }
             allUsers.sort((a,b) => new Date(b.registeredAt||0) - new Date(a.registeredAt||0));
             currentFilteredUsers = [...allUsers];
             renderTable();
-            if (searchInput.value.trim()) filterUsers(searchInput.value);
+            if (searchInput && searchInput.value.trim()) filterUsers(searchInput.value);
             await loadAttendanceStats();
-        } catch(error) { console.error(error); tbody.innerHTML = '<tr><td colspan="6" class="no-data">Error loading data</td></tr>'; }
+        } catch(error) { console.error(error); if(tbody) tbody.innerHTML = '<tr><td colspan="7" class="no-data">Error loading数据</tr>'; }
     }
     
-    // Banner
-    async function loadBannerImage(uid) {
-        if (!uid) return;
+    // Function to generate random User ID
+    function generateUserId() {
+        return Math.floor(10000000 + Math.random() * 90000000).toString();
+    }
+    
+    // Add new user
+    async function addNewUser(firstName, lastName, email, phone, dob, password) {
+        if (!isAdminUser) return { success: false, error: "Admin access required" };
         try {
-            const bannerRef = window.ref(db, `users/${uid}/dashboardBanner`);
-            const snapshot = await window.get(bannerRef);
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        } catch(e) { console.warn(e); }
+            const userCredential = await window.createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            const userId = generateUserId();
+            const fullName = `${firstName} ${lastName}`;
+            
+            await window.updateProfile(user, { displayName: fullName });
+            
+            await window.set(window.ref(db, `users/${user.uid}`), {
+                userId: userId,
+                firstName: firstName,
+                lastName: lastName,
+                fullName: fullName,
+                email: email,
+                mobile: phone,
+                dob: dob,
+                registeredAt: new Date().toISOString(),
+                emailVerified: true,
+                uid: user.uid,
+                profileCompleted: true,
+                role: 'user',
+                isAdmin: false
+            });
+            
+            return { success: true, userId: userId };
+        } catch (error) {
+            console.error("Add user error:", error);
+            return { success: false, error: error.message };
+        }
     }
     
-    function listenBannerChanges(uid) {
-        if (!uid) return;
-        const bannerRef = window.ref(db, `users/${uid}/dashboardBanner`);
-        window.onValue(bannerRef, (snapshot) => {
-            const bannerBase64 = snapshot.val();
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            if (bannerBase64 && bannerBase64.startsWith('data:image')) {
-                bannerContainer.style.backgroundImage = `url(${bannerBase64})`;
-                bannerContainer.style.backgroundSize = 'cover';
-                bannerContainer.style.backgroundPosition = 'center';
-                placeholder.style.display = 'none';
-            } else {
-                bannerContainer.style.backgroundImage = '';
-                placeholder.style.display = 'flex';
-            }
-        });
+    // Update existing user
+    async function updateUser(uid, firstName, lastName, email, phone, dob) {
+        if (!isAdminUser) return { success: false, error: "Admin access required" };
+        try {
+            const userRef = window.ref(db, `users/${uid}`);
+            await window.update(userRef, {
+                firstName: firstName,
+                lastName: lastName,
+                fullName: `${firstName} ${lastName}`,
+                email: email,
+                mobile: phone,
+                dob: dob,
+                updatedAt: new Date().toISOString()
+            });
+            return { success: true };
+        } catch (error) {
+            console.error("Update user error:", error);
+            return { success: false, error: error.message };
+        }
     }
     
-    // Export
+    // Delete user from Database
+    window.deleteUserAccount = async function(uid) {
+        if (!isAdminUser) {
+            showToast('Admin access required', true);
+            return;
+        }
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            try {
+                const userRef = window.ref(db, `users/${uid}`);
+                await window.remove(userRef);
+                showToast('User deleted successfully!');
+                await loadAllUsers();
+            } catch (error) {
+                console.error("Delete error:", error);
+                showToast('Failed to delete user: ' + error.message, true);
+            }
+        }
+    };
+    
+    window.editUser = function(uid, firstName, lastName, email, phone, dob) {
+        if (!isAdminUser) return;
+        editUserUid = uid;
+        editUserId = uid;
+        if (modalTitle) modalTitle.innerText = 'Edit User';
+        if (modalFirstName) modalFirstName.value = firstName;
+        if (modalLastName) modalLastName.value = lastName;
+        if (modalEmail) modalEmail.value = email;
+        if (modalPhone) modalPhone.value = phone;
+        if (modalDob) modalDob.value = dob || '';
+        if (passwordGroup) passwordGroup.style.display = 'none';
+        if (modal) modal.classList.add('show');
+    };
+    
+    function openAddModal() {
+        if (!isAdminUser) return;
+        editUserUid = null;
+        editUserId = null;
+        if (modalTitle) modalTitle.innerText = 'Add New User';
+        if (modalFirstName) modalFirstName.value = '';
+        if (modalLastName) modalLastName.value = '';
+        if (modalEmail) modalEmail.value = '';
+        if (modalPhone) modalPhone.value = '';
+        if (modalDob) modalDob.value = '';
+        if (modalPassword) modalPassword.value = '';
+        if (passwordGroup) passwordGroup.style.display = 'block';
+        if (modal) modal.classList.add('show');
+    }
+    
+    function closeModal() {
+        if (modal) modal.classList.remove('show');
+        editUserUid = null;
+        editUserId = null;
+    }
+    
+    async function saveUser() {
+        if (!isAdminUser) return;
+        const firstName = modalFirstName ? modalFirstName.value.trim() : '';
+        const lastName = modalLastName ? modalLastName.value.trim() : '';
+        const email = modalEmail ? modalEmail.value.trim() : '';
+        const phone = modalPhone ? modalPhone.value.trim() : '';
+        const dob = modalDob ? modalDob.value : '';
+        
+        if (!firstName || !lastName) {
+            showToast('Please enter first name and last name', true);
+            return;
+        }
+        if (!email) {
+            showToast('Please enter email address', true);
+            return;
+        }
+        if (!phone) {
+            showToast('Please enter phone number', true);
+            return;
+        }
+        
+        if (editUserUid) {
+            // Update existing user
+            const result = await updateUser(editUserUid, firstName, lastName, email, phone, dob);
+            if (result.success) {
+                showToast('User updated successfully!');
+                closeModal();
+                await loadAllUsers();
+            } else {
+                showToast('Failed to update user: ' + result.error, true);
+            }
+        } else {
+            // Add new user
+            const password = modalPassword ? modalPassword.value : '';
+            if (!password || password.length < 6) {
+                showToast('Password must be at least 6 characters', true);
+                return;
+            }
+            const result = await addNewUser(firstName, lastName, email, phone, dob, password);
+            if (result.success) {
+                showToast(`User added successfully! User ID: ${result.userId}`);
+                closeModal();
+                await loadAllUsers();
+            } else {
+                showToast('Failed to add user: ' + result.error, true);
+            }
+        }
+    }
+    
+    // Export functions
     function getRecordsToExport() {
-        const source = dataSourceSelect.value;
+        const source = dataSourceSelect ? dataSourceSelect.value : 'all';
         let baseRecords = (source === 'all') ? [...allUsers] : [...currentFilteredUsers];
-        if (limitCheckbox.checked) {
-            let limit = parseInt(limitCountInput.value, 10);
+        if (limitCheckbox && limitCheckbox.checked) {
+            let limit = parseInt(limitCountInput ? limitCountInput.value : 10, 10);
             if (isNaN(limit) || limit < 1) limit = 10;
             if (limit < baseRecords.length) baseRecords = baseRecords.slice(0, limit);
         }
@@ -652,9 +1132,6 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         let startY = 15;
-        if (pdfLogoBase64) {
-            try { doc.addImage(pdfLogoBase64, 'JPEG', 14, 8, 25, 25); startY = 32; } catch(e) {}
-        }
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
         doc.setTextColor(245,158,11);
@@ -691,44 +1168,55 @@
     }
     
     function handleDownload() {
+        if (!isAdminUser) return;
         const records = getRecordsToExport();
         if (!records.length) { alert("No records available."); return; }
-        const format = downloadFormatSelect.value;
+        const format = downloadFormatSelect ? downloadFormatSelect.value : 'csv';
         const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-        const sourceLabel = dataSourceSelect.value === 'all' ? 'all' : 'filtered';
-        const limitLabel = limitCheckbox.checked ? `_latest${limitCountInput.value}` : '';
+        const sourceLabel = (dataSourceSelect ? dataSourceSelect.value : 'all') === 'all' ? 'all' : 'filtered';
+        const limitLabel = (limitCheckbox && limitCheckbox.checked) ? `_latest${limitCountInput ? limitCountInput.value : 10}` : '';
         const fileName = `users_${sourceLabel}${limitLabel}_${timestamp}.${format === 'csv' ? 'csv' : 'pdf'}`;
         if (format === 'csv') downloadCSV(records, fileName);
         else downloadPDF(records, fileName);
     }
     
     function toggleLimitInput() {
-        limitCountInput.disabled = !limitCheckbox.checked;
-        if (limitCheckbox.checked && (!limitCountInput.value || parseInt(limitCountInput.value)<1)) limitCountInput.value = "10";
+        if (limitCountInput) limitCountInput.disabled = !(limitCheckbox && limitCheckbox.checked);
+        if (limitCheckbox && limitCheckbox.checked && limitCountInput && (!limitCountInput.value || parseInt(limitCountInput.value)<1)) limitCountInput.value = "10";
     }
     
     let debounceTimer;
     function onSearchInput() {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => filterUsers(searchInput.value), 300);
+        debounceTimer = setTimeout(() => filterUsers(searchInput ? searchInput.value : ''), 300);
     }
     
     function bindEvents() {
-        searchInput.addEventListener('input', onSearchInput);
-        limitCheckbox.addEventListener('change', toggleLimitInput);
-        downloadBtn.addEventListener('click', handleDownload);
+        if (searchInput) searchInput.addEventListener('input', onSearchInput);
+        if (limitCheckbox) limitCheckbox.addEventListener('change', toggleLimitInput);
+        if (downloadBtn) downloadBtn.addEventListener('click', handleDownload);
         toggleLimitInput();
+        if (openAddUserBtn) openAddUserBtn.addEventListener('click', openAddModal);
+        if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+        if (modalSaveBtn) modalSaveBtn.addEventListener('click', saveUser);
     }
     
+    // Main auth check
     window.onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = 'login.html'; return; }
-        bindEvents();
-        await loadAllUsers();
-        await loadImages(user.uid);
-        await loadBannerImage(user.uid);
-        listenBannerChanges(user.uid);
-        // Real-time listener for attendance to update stats
-        window.onValue(window.ref(db, 'attendance'), () => loadAttendanceStats());
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        await checkAdminAndLoad(user);
+        if (isAdminUser) {
+            bindEvents();
+            window.onValue(window.ref(db, 'attendance'), () => {
+                if (isAdminUser) loadAttendanceStats();
+            });
+            window.onValue(window.ref(db, 'users'), () => {
+                if (isAdminUser) loadAllUsers();
+            });
+        }
     });
 </script>
 </body>
