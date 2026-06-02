@@ -694,6 +694,7 @@
         <a href="attendance.html" class="action-btn"><i class="fas fa-plus-circle"></i> Add Attendance</a>
         <a href="financial-report.html" class="action-btn action-btn-secondary"><i class="fas fa-file-invoice-dollar"></i> Payment Report</a>
         <a href="profile.html" class="action-btn"><i class="fas fa-user-edit"></i> View Profile</a>
+        <a href="admin-manage.html" class="action-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"><i class="fas fa-user-shield"></i> Manage Admins</a>
     </div>
     
     <!-- FOOTER -->
@@ -1044,9 +1045,32 @@
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
     }
     
-    window.onAuthStateChanged(window.auth, (user) => {
-        if (!user) window.location.href = 'login.html';
-        else { loadDashboardData(); listenRealTime(); }
+    // ========== ADMIN VERIFICATION CODE (CHANGED) ==========
+    window.onAuthStateChanged(window.auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        // Check if user is admin
+        try {
+            const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            
+            if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                alert("❌ Access Denied! You don't have admin privileges.");
+                window.location.href = 'index-user.html';
+                return;
+            }
+            
+            document.getElementById('welcomeName').innerHTML = userData.fullName?.split(' ')[0] || 'Admin';
+            await loadDashboardData();
+            listenRealTime();
+            
+        } catch (error) {
+            console.error("Admin verification error:", error);
+            window.location.href = 'login.html';
+        }
     });
 </script>
 </body>
