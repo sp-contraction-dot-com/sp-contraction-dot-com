@@ -140,6 +140,31 @@
             opacity: 0.7;
         }
         
+        /* Section Divider Styles */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 30px 0 18px 0;
+        }
+        .section-divider i {
+            font-size: 1.2rem;
+            background: #fef3c7;
+            padding: 8px 10px;
+            border-radius: 14px;
+            color: #f59e0b;
+        }
+        .section-divider h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .section-divider span {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #e2e8f0, transparent);
+        }
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -168,14 +193,19 @@
         .stat-card .sub-text { font-size: 0.55rem; opacity: 0.8; margin-top: 4px; }
         .stat-icon { width: 46px; height: 46px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         
-        .card-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-        .card-2 { background: linear-gradient(135deg, #f97316, #ea580c); }
-        .card-3 { background: linear-gradient(135deg, #10b981, #059669); }
-        .card-4 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-        .card-5 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .card-6 { background: linear-gradient(135deg, #ec489a, #db2777); }
-        .card-7 { background: linear-gradient(135deg, #f43f5e, #e11d48); }
-        .card-8 { background: linear-gradient(135deg, #14b8a6, #0f766e); }
+        /* Company Section Card Colors */
+        .card-company-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .card-company-2 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .card-company-3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .card-company-4 { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .card-company-5 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        /* Workers Section Card Colors */
+        .card-worker-1 { background: linear-gradient(135deg, #10b981, #059669); }
+        .card-worker-2 { background: linear-gradient(135deg, #ec489a, #db2777); }
+        .card-worker-3 { background: linear-gradient(135deg, #14b8a6, #0f766e); }
+        .card-worker-4 { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+        .card-worker-5 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         
         @media (max-width: 550px) {
             .stat-card { padding: 12px 10px; }
@@ -488,7 +518,7 @@
         </div>
     </div>
     
-    <!-- BANNER SECTION - লোড হবে companyAssets/banners থেকে -->
+    <!-- BANNER SECTION -->
     <div class="banner-section" id="bannerSection" style="background-size: cover; background-position: center;">
         <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
@@ -498,19 +528,105 @@
         </div>
     </div>
     
-    <!-- STATS GRID: 8 Cards (added 8th card for Total Due to Workers) -->
+    <!-- ========== SECTION 1: COMPANY FINANCIAL INSIGHTS ========== -->
+    <div class="section-divider">
+        <i class="fas fa-building"></i>
+        <h2>COMPANY FINANCIAL INSIGHTS</h2>
+        <span></span>
+    </div>
     <div class="stats-grid">
-        <div class="stat-card card-1"><div class="stat-info"><h4><i class="fas fa-users"></i> Registered Users</h4><div class="value" id="totalRegisteredUsers">0</div><div class="sub-text">Total Accounts</div></div><div class="stat-icon"><i class="fas fa-user-plus"></i></div></div>
-        <div class="stat-card card-2"><div class="stat-info"><h4><i class="fas fa-hard-hat"></i> Active Workers</h4><div class="value" id="totalWorkers">0</div><div class="sub-text">Currently Working</div></div><div class="stat-icon"><i class="fas fa-briefcase"></i></div></div>
-        <div class="stat-card card-3"><div class="stat-info"><h4><i class="fas fa-check-circle"></i> Present Today</h4><div class="value" id="presentToday">0</div><div class="sub-text">Today's Attendance</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
-        <div class="stat-card card-4"><div class="stat-info"><h4><i class="fas fa-coins"></i> Total Earnings</h4><div class="value" id="totalEarnings">₹0</div><div class="sub-text">All Time Revenue</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
-        <div class="stat-card card-5"><div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Paid to Workers</h4><div class="value" id="totalPaidToUser">₹0</div><div class="sub-text">Amount Disbursed</div></div><div class="stat-icon"><i class="fas fa-wallet"></i></div></div>
-        <div class="stat-card card-6"><div class="stat-info"><h4><i class="fas fa-building"></i> Company Paid</h4><div class="value" id="totalCompanyPaid">₹0</div><div class="sub-text">Received from Companies</div></div><div class="stat-icon"><i class="fas fa-church"></i></div></div>
-        <div class="stat-card card-7"><div class="stat-info"><h4><i class="fas fa-clock"></i> Company Due</h4><div class="value" id="totalCompanyDue">₹0</div><div class="sub-text">Outstanding Balance</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
-        <!-- NEW CARD: Total Due to Workers (Remaining payable to workers after deductions) -->
-        <div class="stat-card card-8"><div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4><div class="value" id="totalDueToWorkers">₹0</div><div class="sub-text">Pending salary</div></div><div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div></div>
+        <div class="stat-card card-company-1">
+            <div class="stat-info">
+                <h4><i class="fas fa-coins"></i> Total Earnings</h4>
+                <div class="value" id="totalEarnings">₹0</div>
+                <div class="sub-text">All Time Revenue</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        </div>
+        <div class="stat-card card-company-2">
+            <div class="stat-info">
+                <h4><i class="fas fa-building"></i> Company Paid</h4>
+                <div class="value" id="totalCompanyPaid">₹0</div>
+                <div class="sub-text">Received from Companies</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        </div>
+        <div class="stat-card card-company-3">
+            <div class="stat-info">
+                <h4><i class="fas fa-clock"></i> Company Due</h4>
+                <div class="value" id="totalCompanyDue">₹0</div>
+                <div class="sub-text">Outstanding Balance</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+        <div class="stat-card card-company-4">
+            <div class="stat-info">
+                <h4><i class="fas fa-calendar-day"></i> Today's Receivable</h4>
+                <div class="value" id="todaysReceivable">₹0</div>
+                <div class="sub-text">Earned today from companies</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-sun"></i></div>
+        </div>
+        <div class="stat-card card-company-5">
+            <div class="stat-info">
+                <h4><i class="fas fa-chart-line"></i> Total Company Due</h4>
+                <div class="value" id="totalCompanyDueCumulative">₹0</div>
+                <div class="sub-text">Previous Due + Today's Receivable</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
+        </div>
     </div>
     
+    <!-- ========== SECTION 2: WORKERS & ATTENDANCE ========== -->
+    <div class="section-divider">
+        <i class="fas fa-hard-hat"></i>
+        <h2>WORKERS & ATTENDANCE</h2>
+        <span></span>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card card-worker-1">
+            <div class="stat-info">
+                <h4><i class="fas fa-users"></i> Registered Users</h4>
+                <div class="value" id="totalRegisteredUsers">0</div>
+                <div class="sub-text">Total Accounts</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+        </div>
+        <div class="stat-card card-worker-2">
+            <div class="stat-info">
+                <h4><i class="fas fa-hard-hat"></i> Active Workers</h4>
+                <div class="value" id="totalWorkers">0</div>
+                <div class="sub-text">Currently Working</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+        </div>
+        <div class="stat-card card-worker-3">
+            <div class="stat-info">
+                <h4><i class="fas fa-check-circle"></i> Present Today</h4>
+                <div class="value" id="presentToday">0</div>
+                <div class="sub-text">Today's Attendance</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-sun"></i></div>
+        </div>
+        <div class="stat-card card-worker-4">
+            <div class="stat-info">
+                <h4><i class="fas fa-wallet"></i> Paid to Workers</h4>
+                <div class="value" id="totalPaidToUser">₹0</div>
+                <div class="sub-text">Amount Disbursed</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        </div>
+        <div class="stat-card card-worker-5">
+            <div class="stat-info">
+                <h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4>
+                <div class="value" id="totalDueToWorkers">₹0</div>
+                <div class="sub-text">Pending salary</div>
+            </div>
+            <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        </div>
+    </div>
+    
+    <!-- CHARTS SECTION -->
     <div class="charts-row">
         <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Weekly Attendance Rate (%)</h3><div class="canvas-wrapper"><canvas id="attendanceRateChart"></canvas></div></div>
         <div class="chart-card"><h3><i class="fas fa-chart-bar"></i> Weekly Payment Trend (₹)</h3><div class="canvas-wrapper"><canvas id="weeklyPaymentChart"></canvas></div></div>
@@ -528,8 +644,12 @@
         </div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead>
-                <tbody id="usersTableBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
+                <thead>
+                    <tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -542,8 +662,12 @@
         </div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead>
-                <tbody id="companyPaymentTableBody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
+                <thead>
+                    <tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr>
+                </thead>
+                <tbody id="companyPaymentTableBody">
+                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -556,8 +680,12 @@
         </div>
         <div class="table-container">
             <table>
-                <thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead>
-                <tbody id="attendanceTableBody"><tr><td colspan="7" style="text-align:center;">Loading...</td></tr></tbody>
+                <thead>
+                    <tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -568,7 +696,7 @@
         <a href="profile.html" class="action-btn"><i class="fas fa-user-edit"></i> View Profile</a>
     </div>
     
-    <!-- FOOTER - White Background with Company Logo from companyAssets -->
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
@@ -597,7 +725,7 @@
             <div class="footer-contact">
                 <h4>Contact Info</h4>
                 <ul>
-                    <li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra </li>
+                    <li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra</li>
                     <li><i class="fas fa-phone-alt"></i> +91 98674 78423</li>
                     <li><i class="fas fa-envelope"></i> spbuild.official@gmail.com</li>
                     <li><i class="fas fa-clock"></i> Mon - Sat: 9:00 AM - 6:00 PM</li>
@@ -618,10 +746,8 @@
     let attendanceRateChart = null, weeklyPaymentChart = null, paymentPieChart = null, dailyEarningChart = null;
     let currentAuthUser = null;
     
-    // ==================== GLOBAL COMPANY ASSETS FUNCTIONS (সকল ইউজারের জন্য) ====================
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
-    // কোম্পানির লোগো লোড করুন (হেডার ও ফুটার উভয় জায়গায়)
     async function loadCompanyLogo() {
         try {
             const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
@@ -642,7 +768,6 @@
         }
     }
     
-    // ব্যানার ইমেজ লোড করুন (সব ব্যানারের মধ্যে প্রথমটি দেখাবে)
     async function loadBannerImage() {
         try {
             const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
@@ -660,7 +785,6 @@
                     return;
                 }
             }
-            // কোন ব্যানার না থাকলে
             bannerSection.style.backgroundImage = '';
             if (placeholder) placeholder.style.display = 'flex';
         } catch(e) {
@@ -714,7 +838,6 @@
                 }
             }
             
-            // কোম্পানির লোগো এবং ব্যানার লোড করুন (সকল ইউজারের জন্য)
             await loadCompanyLogo();
             await loadBannerImage();
             
@@ -732,22 +855,30 @@
         document.getElementById('totalWorkers').textContent = uniqueWorkers;
         
         let today = new Date().toISOString().split('T')[0];
-        document.getElementById('presentToday').textContent = allAttendanceRecords.filter(r=>r.date===today && r.status==='present').length;
+        let presentCount = allAttendanceRecords.filter(r=>r.date===today && r.status==='present').length;
+        document.getElementById('presentToday').textContent = presentCount;
         
         let totalEarn = allAttendanceRecords.reduce((s,r)=>s+(r.earnings||0),0);
         let totalPaidToWorker = allAttendanceRecords.reduce((s,r)=>s+(r.paid||0),0);
         let companyPaid = allPaymentRecords.reduce((s,p)=>s+(p.companyPaid||0),0);
-        let companyDue = allPaymentRecords.reduce((s,p)=>s+((p.totalEarning||0)-(p.companyPaid||0)),0);
+        let previousCompanyDue = allPaymentRecords.reduce((s,p)=>s+((p.totalEarning||0)-(p.companyPaid||0)),0);
         
-        // Calculate Total Due to Workers: Total Earnings - Total Paid To Workers
+        let todaysEarnings = allAttendanceRecords.filter(r=>r.date===today).reduce((s,r)=>s+(r.earnings||0),0);
+        let todaysCompanyPaid = allPaymentRecords.filter(p=>p.date===today).reduce((s,p)=>s+(p.companyPaid||0),0);
+        let todaysReceivable = todaysEarnings - todaysCompanyPaid;
+        if (todaysReceivable < 0) todaysReceivable = 0;
+        
+        let totalCompanyDueCumulative = previousCompanyDue + todaysReceivable;
         let totalDueToWorkers = totalEarn - totalPaidToWorker;
         if (totalDueToWorkers < 0) totalDueToWorkers = 0;
         
         document.getElementById('totalEarnings').innerHTML = '₹' + formatNumber(totalEarn);
         document.getElementById('totalPaidToUser').innerHTML = '₹' + formatNumber(totalPaidToWorker);
         document.getElementById('totalCompanyPaid').innerHTML = '₹' + formatNumber(companyPaid);
-        document.getElementById('totalCompanyDue').innerHTML = '₹' + formatNumber(companyDue);
+        document.getElementById('totalCompanyDue').innerHTML = '₹' + formatNumber(previousCompanyDue);
         document.getElementById('totalDueToWorkers').innerHTML = '₹' + formatNumber(totalDueToWorkers);
+        document.getElementById('todaysReceivable').innerHTML = '₹' + formatNumber(todaysReceivable);
+        document.getElementById('totalCompanyDueCumulative').innerHTML = '₹' + formatNumber(totalCompanyDueCumulative);
     }
     
     function getUserAvatarHTML(user) {
@@ -779,7 +910,7 @@
                 <td>${escapeHtml(u.mobile || u.phone || 'N/A')}</td>
                 <td style="color:#f59e0b;">${escapeHtml(u.userId || u.uid?.slice(0,8) || 'N/A')}</td>
                 <td>${escapeHtml(regDate)}</td>
-                </tr>`;
+            </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -803,7 +934,7 @@
                 <td>${r.hours || 0}</td>
                 <td>₹${formatNumber(r.earnings || 0)}</td>
                 <td>${escapeHtml(r.workDesc || '-')}</td>
-                </tr>`;
+            </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -826,7 +957,7 @@
                 <td class="amount-positive">₹${formatNumber(p.totalEarning || 0)}</td>
                 <td class="amount-positive">₹${formatNumber(p.companyPaid || 0)}</td>
                 <td style="color:${dueColor};">₹${formatNumber(due)}</td>
-                </tr>`;
+            </tr>`;
         }
         tbody.innerHTML = html;
     }
@@ -909,7 +1040,6 @@
         window.onValue(window.ref(window.db, 'attendance'), () => loadDashboardData());
         window.onValue(window.ref(window.db, 'companyDailyPayments'), () => loadDashboardData());
         window.onValue(window.ref(window.db, 'users'), () => loadDashboardData());
-        // রিয়েল-টাইমে লোগো ও ব্যানার পরিবর্তন শুনুন
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`), () => loadCompanyLogo());
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
     }
