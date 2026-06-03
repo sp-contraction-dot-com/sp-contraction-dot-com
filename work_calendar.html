@@ -500,7 +500,10 @@
                 <i class="fas fa-user-circle"></i>
                 <span id="userNameDisplay">Loading...</span>
             </div>
-            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+            <!-- FIXED: Back button now uses parent navigation instead of reloading index.html inside iframe -->
+            <button class="back-btn" onclick="goBackToDashboard()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
         </div>
     </div>
     
@@ -631,6 +634,23 @@
     function showLoading(show) {
         document.getElementById('loading').classList.toggle('show', show);
     }
+    
+    // Go back function - checks if in iframe and navigates parent
+    window.goBackToDashboard = function() {
+        // Check if we are inside an iframe
+        if (window.self !== window.top) {
+            // We are in an iframe - communicate with parent to load dashboard
+            if (window.parent && window.parent.loadPageInIframe) {
+                window.parent.loadPageInIframe('dashboard.html');
+            } else {
+                // Fallback: redirect top window
+                window.top.location.href = 'index.html';
+            }
+        } else {
+            // Not in iframe, just go to index
+            window.location.href = 'index.html';
+        }
+    };
     
     // Load Company Logo
     async function loadCompanyLogo() {
