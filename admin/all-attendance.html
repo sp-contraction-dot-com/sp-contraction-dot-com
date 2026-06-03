@@ -49,7 +49,6 @@
         }
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* Header section */
         .header {
             background: #ffffff;
             border-radius: 28px;
@@ -140,7 +139,6 @@
         }
         .add-new-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
         
-        /* Colorful Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -198,7 +196,6 @@
         .card-7 { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .card-8 { background: linear-gradient(135deg, #ef4444, #dc2626); }
         
-        /* Banner Section */
         .banner-section {
             position: relative;
             margin-bottom: 28px;
@@ -229,7 +226,6 @@
         .banner-placeholder i { font-size: 2.5rem; opacity: 0.5; }
         .banner-placeholder p { font-size: 0.8rem; opacity: 0.7; }
         
-        /* Data Card (main content) */
         .data-card {
             background: #ffffff;
             border-radius: 28px;
@@ -258,7 +254,6 @@
             color: #1e293b;
         }
         
-        /* Search Bar */
         .search-wrapper {
             margin-bottom: 28px;
             position: relative;
@@ -310,7 +305,6 @@
             color: #d97706;
         }
         
-        /* Download Controls */
         .download-controls {
             background: #fefaf5;
             border-radius: 28px;
@@ -393,7 +387,6 @@
             box-shadow: 0 8px 20px rgba(34,197,94,0.4);
         }
         
-        /* Table Container */
         .table-container {
             overflow-x: auto;
             overflow-y: auto;
@@ -485,7 +478,6 @@
             background: #fffbeb;
         }
         
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -596,7 +588,6 @@
         .suggestion-name { font-weight: 600; color: #1e293b; }
         .suggestion-id { font-size: 0.7rem; color: #f59e0b; }
         
-        /* Access Denied Message */
         .access-denied {
             display: flex;
             flex-direction: column;
@@ -658,7 +649,6 @@
         </div>
     </div>
 
-    <!-- Colorful Stats Cards -->
     <div class="stats-grid">
         <div class="stat-card card-1">
             <div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Records</h4><div class="value" id="statTotalRecords">0</div><div class="sub-text">Attendance entries</div></div>
@@ -730,7 +720,11 @@
                         </tr>
                     </thead>
                     <tbody id="attendanceTableBody">
-                        <tr><td colspan="11" class="loading"><div class="spinner"></div></td></tr>
+                        <tr>
+                            <td colspan="11" class="loading">
+                                <div class="spinner"></div>
+                            </td>
+                        </tr>
                     </tbody>
                     <tfoot id="attendanceTableFooter"></tfoot>
                 </table>
@@ -765,7 +759,6 @@
     </div>
 </div>
 
-<!-- Add/Edit Record Modal -->
 <div class="modal" id="attendanceModal">
     <div class="modal-content">
         <h3 id="modalTitle">Add New Attendance Record</h3>
@@ -808,8 +801,15 @@
     let editRecordId = null;
     let isAdminUser = false;
     let adminChecked = false;
+    let currentAdminInfo = {
+        name: '',
+        userId: '',
+        email: '',
+        mobile: '',
+        address: ''
+    };
+    let pdfLogoBase64 = null;  // PDF Report Logo from logoupload.html
     
-    // DOM elements
     const tbody = document.getElementById('attendanceTableBody');
     const tfoot = document.getElementById('attendanceTableFooter');
     const searchInput = document.getElementById('searchInput');
@@ -823,7 +823,6 @@
     const attendanceContent = document.getElementById('attendanceContent');
     const accessDeniedDiv = document.getElementById('accessDeniedMessage');
     
-    // Modal elements
     const modal = document.getElementById('attendanceModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalDate = document.getElementById('modalDate');
@@ -841,7 +840,6 @@
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const openAddModalBtn = document.getElementById('openAddModalBtn');
     
-    // Stat elements
     const statTotalRecords = document.getElementById('statTotalRecords');
     const statTotalWorkers = document.getElementById('statTotalWorkers');
     const statTotalHours = document.getElementById('statTotalHours');
@@ -851,7 +849,6 @@
     const statPresentToday = document.getElementById('statPresentToday');
     const statTodayEarnings = document.getElementById('statTodayEarnings');
     
-    // Helper functions
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
@@ -892,41 +889,59 @@
     function updateHeaderLogo(base64) {
         if (headerLogo) {
             if (base64 && base64.startsWith('data:image')) {
-                headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo">`;
+                headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
             } else {
                 headerLogo.innerHTML = `<span>SP</span>`;
             }
         }
     }
     
-    // ========== LOAD COMPANY LOGO FROM CORRECT PATH ==========
-    async function loadCompanyLogo() {
+    // ========== LOAD PDF REPORT LOGO (PRIORITY) ==========
+    async function loadPdfLogo() {
         try {
-            const logoRef = window.ref(db, `companyAssets/footerLogo`);
-            const snapshot = await window.get(logoRef);
+            const pdfLogoRef = window.ref(db, `companyAssets/pdfLogo`);
+            const snapshot = await window.get(pdfLogoRef);
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                updateHeaderLogo(snapshot.val());
-            } else {
-                updateHeaderLogo(null);
+                pdfLogoBase64 = snapshot.val();
+                console.log("✅ PDF Report Logo loaded");
+                return;
             }
+            
+            const headerLogoRef = window.ref(db, `companyAssets/headerLogo`);
+            const headerSnap = await window.get(headerLogoRef);
+            if (headerSnap.exists() && headerSnap.val() && headerSnap.val().startsWith('data:image')) {
+                pdfLogoBase64 = headerSnap.val();
+                console.log("✅ Header Logo loaded as fallback");
+                return;
+            }
+            
+            const footerRef = window.ref(db, `companyAssets/footerLogo`);
+            const footerSnap = await window.get(footerRef);
+            if (footerSnap.exists() && footerSnap.val() && footerSnap.val().startsWith('data:image')) {
+                pdfLogoBase64 = footerSnap.val();
+                console.log("✅ Footer Logo loaded as fallback");
+                return;
+            }
+            
+            pdfLogoBase64 = null;
+            console.log("No PDF logo found, will use default SP icon");
         } catch(err) {
-            console.warn("Error loading company logo:", err);
+            console.warn("Error loading PDF logo:", err);
+            pdfLogoBase64 = null;
         }
     }
     
-    function listenLogoChanges() {
-        const logoRef = window.ref(db, `companyAssets/footerLogo`);
-        window.onValue(logoRef, (snapshot) => {
+    function listenPdfLogoChanges() {
+        const pdfLogoRef = window.ref(db, `companyAssets/pdfLogo`);
+        window.onValue(pdfLogoRef, (snapshot) => {
             const val = snapshot.val();
             if (val && val.startsWith('data:image')) {
-                updateHeaderLogo(val);
-            } else {
-                updateHeaderLogo(null);
+                pdfLogoBase64 = val;
+                console.log("PDF Logo updated in real-time");
             }
         });
     }
     
-    // ========== LOAD BANNER IMAGE FROM CORRECT PATH ==========
     async function loadBannerImage() {
         try {
             const bannersRef = window.ref(db, `companyAssets/banners`);
@@ -958,7 +973,90 @@
         });
     }
     
-    // ========== ADMIN VERIFICATION FUNCTION ==========
+    async function loadCurrentAdminInfo(user) {
+        if (!user) return;
+        try {
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            if (userData) {
+                currentAdminInfo.name = userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || user.email?.split('@')[0] || 'Admin';
+                currentAdminInfo.userId = userData.userId || user.uid?.slice(0, 8) || 'ADMIN001';
+                currentAdminInfo.email = userData.email || user.email || 'N/A';
+                currentAdminInfo.mobile = userData.mobile || userData.phone || 'N/A';
+                currentAdminInfo.address = userData.address || 'N/A';
+            } else {
+                currentAdminInfo.name = user.email?.split('@')[0] || 'Admin';
+                currentAdminInfo.userId = user.uid?.slice(0, 8) || 'ADMIN001';
+                currentAdminInfo.email = user.email || 'N/A';
+                currentAdminInfo.mobile = 'N/A';
+                currentAdminInfo.address = 'N/A';
+            }
+        } catch (err) {
+            console.warn("Error loading admin info:", err);
+        }
+    }
+    
+    // ========== DRAW PDF LOGO (SHIFTED 8px UP) ==========
+    function drawPDFLogo(doc, x, y, size = 20) {
+        if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+            try {
+                doc.addImage(pdfLogoBase64, 'JPEG', x, y - 8, size, size);
+                return true;
+            } catch(e) {
+                console.warn("Could not add PDF logo to PDF:", e);
+            }
+        }
+        
+        const radius = size / 2;
+        const centerX = x + radius;
+        const centerY = (y - 8) + radius;
+        
+        doc.setFillColor(245, 158, 11);
+        doc.circle(centerX, centerY, radius, 'F');
+        doc.setFontSize(13);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.text("SP", centerX, centerY + 4, { align: "center" });
+        return true;
+    }
+    
+    // ========== DRAW WATERMARK LOGO (VERY LIGHT, 5% OPACITY) ==========
+    function drawWatermarkLogo(doc, pageWidth, pageHeight) {
+        if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+            try {
+                const maxSize = Math.min(pageWidth, pageHeight) * 0.7;
+                const x = (pageWidth - maxSize) / 2;
+                const y = (pageHeight - maxSize) / 2;
+                
+                doc.setGState(new doc.GState({ opacity: 0.05 }));
+                doc.addImage(pdfLogoBase64, 'JPEG', x, y, maxSize, maxSize);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+                return true;
+            } catch(e) {
+                console.warn("Could not add watermark logo:", e);
+            }
+        }
+        
+        try {
+            const maxSize = Math.min(pageWidth, pageHeight) * 0.7;
+            const radius = maxSize / 2;
+            const centerX = pageWidth / 2;
+            const centerY = pageHeight / 2;
+            
+            doc.setGState(new doc.GState({ opacity: 0.05 }));
+            doc.setFillColor(245, 158, 11);
+            doc.circle(centerX, centerY, radius, 'F');
+            doc.setFontSize(maxSize * 0.6);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("SP", centerX, centerY + (maxSize * 0.2), { align: "center" });
+            doc.setGState(new doc.GState({ opacity: 1 }));
+        } catch(e) {
+            console.warn("Could not add SP watermark:", e);
+        }
+        return true;
+    }
+    
     function showAccessDenied() {
         if (attendanceContent) attendanceContent.style.display = 'none';
         if (accessDeniedDiv) {
@@ -987,7 +1085,6 @@
             const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
             const userData = userSnap.val();
             
-            // Check if user is admin
             if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
                 isAdminUser = false;
                 adminChecked = true;
@@ -995,17 +1092,17 @@
                 return;
             }
             
-            // User is admin, load everything
             isAdminUser = true;
             adminChecked = true;
             
             if (attendanceContent) attendanceContent.style.display = 'block';
             if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
             
+            await loadCurrentAdminInfo(user);
             await loadUsers();
             await loadAllAttendance();
-            await loadCompanyLogo();
-            listenLogoChanges();
+            await loadPdfLogo();
+            listenPdfLogoChanges();
             await loadBannerImage();
             listenBannerChanges();
             
@@ -1029,7 +1126,6 @@
         }
     }
     
-    // Totals and rendering
     function computeTotals(records) {
         let totalHours = 0, totalEarnings = 0, totalPaid = 0, totalDue = 0;
         const uniqueWorkers = new Set();
@@ -1096,7 +1192,7 @@
     
     function renderTable() {
         if (!currentFilteredRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data"><i class="fas fa-calendar-times"></i> No attendance records found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="no-data"><i class="fas fa-calendar-times"></i> No attendance records found<\/td></tr>';
             resultCountSpan.innerText = `0 records`;
             tfoot.innerHTML = '';
             updateStatsCards([]);
@@ -1166,12 +1262,11 @@
             }
         } catch (error) {
             console.error(error);
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data">Error loading data</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="no-data">Error loading data<\/td></tr>';
             tfoot.innerHTML = '';
         }
     }
     
-    // CRUD Operations
     async function addAttendanceRecord(recordData) {
         if (!isAdminUser) return;
         try {
@@ -1213,7 +1308,6 @@
         }
     };
     
-    // Modal autocomplete for worker search
     function setupModalAutoSuggest() {
         modalWorkerSearch.addEventListener('input', function() {
             const query = this.value.toLowerCase().trim();
@@ -1369,7 +1463,168 @@
         setTimeout(() => toast.remove(), duration);
     }
     
-    // Export helpers
+    // ========== IMPROVED PDF EXPORT FUNCTION WITH LIGHT WATERMARK ==========
+    async function downloadPDF(records, fileName) {
+        if (!records.length) { 
+            alert("No records to generate PDF."); 
+            return; 
+        }
+        
+        showToast('📄 Generating PDF...');
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const centerX = pageWidth / 2;
+            let currentY = 12;
+            
+            // ========== ADD WATERMARK LOGO (VERY LIGHT, 5% OPACITY) ==========
+            drawWatermarkLogo(doc, pageWidth, pageHeight);
+            
+            // ========== HEADER WITH PDF LOGO (SHIFTED 8px UP) ==========
+            drawPDFLogo(doc, 12, currentY, 20);
+            
+            // Title
+            doc.setFontSize(18);
+            doc.setTextColor(245, 158, 11);
+            doc.setFont("helvetica", "bold");
+            doc.text("SP CONSTRUCTION - ATTENDANCE REPORT", centerX, currentY + 10, { align: "center" });
+            
+            // Horizontal Line
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(0.8);
+            doc.line(15, currentY + 16, pageWidth - 15, currentY + 16);
+            
+            // ========== TWO COLUMN INFO SECTION ==========
+            currentY += 26;
+            doc.setFontSize(8);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont("helvetica", "normal");
+            
+            let leftX = 15;
+            let rightX = pageWidth - 15;
+            
+            doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, leftX, currentY);
+            doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, leftX, currentY + 6);
+            doc.text(`Email: ${escapeHtml(currentAdminInfo.email)}`, leftX, currentY + 12);
+            doc.text(`Mobile: ${escapeHtml(currentAdminInfo.mobile)}`, leftX, currentY + 18);
+            doc.text(`Address: ${escapeHtml(currentAdminInfo.address)}`, leftX, currentY + 24);
+            
+            doc.text(`Generated: ${new Date().toLocaleString()}`, rightX, currentY, { align: "right" });
+            doc.text(`Total Records: ${records.length}`, rightX, currentY + 10, { align: "right" });
+            
+            // ========== TABLE ==========
+            const data = prepareExportData(records);
+            const tableData = data.map(row => [
+                row.date,
+                row.workerName,
+                row.workerId,
+                row.status,
+                row.hours.toString(),
+                'Rs. ' + formatIndianNumber(row.rate),
+                'Rs. ' + formatIndianNumber(row.earnings),
+                'Rs. ' + formatIndianNumber(row.paid),
+                'Rs. ' + formatIndianNumber(row.due),
+                row.workDesc
+            ]);
+            
+            doc.autoTable({
+                startY: currentY + 34,
+                head: [[
+                    "Date", "Worker Name", "Worker ID", "Status", "Hours", 
+                    "Rate (Rs.)", "Earnings (Rs.)", "Paid (Rs.)", "Due (Rs.)", "Work Description"
+                ]],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [245, 158, 11], 
+                    textColor: 255, 
+                    fontStyle: 'bold',
+                    halign: 'center',
+                    fontSize: 8
+                },
+                bodyStyles: { fontSize: 7.5, cellPadding: 2, textColor: [50, 50, 50] },
+                columnStyles: {
+                    0: { cellWidth: 20, halign: 'center' },
+                    1: { cellWidth: 35, halign: 'left' },
+                    2: { cellWidth: 22, halign: 'center' },
+                    3: { cellWidth: 16, halign: 'center' },
+                    4: { cellWidth: 10, halign: 'center' },
+                    5: { cellWidth: 20, halign: 'right' },
+                    6: { cellWidth: 22, halign: 'right' },
+                    7: { cellWidth: 20, halign: 'right' },
+                    8: { cellWidth: 20, halign: 'right' },
+                    9: { cellWidth: 42, halign: 'left' }
+                },
+                margin: { left: 12, right: 12 },
+                didDrawPage: (data) => {
+                    const pageCount = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        drawWatermarkLogo(doc, pageWidth, pageHeight);
+                        doc.setFontSize(7);
+                        doc.setTextColor(148, 163, 184);
+                        doc.text(`Page ${i} of ${pageCount}`, centerX, 195, { align: "center" });
+                    }
+                }
+            });
+            
+            // ========== SUMMARY SECTION ==========
+            const totals = computeTotals(records);
+            const finalY = doc.lastAutoTable.finalY + 10;
+            
+            doc.setDrawColor(245, 158, 11);
+            doc.setFillColor(255, 248, 225);
+            doc.rect(20, finalY, pageWidth - 40, 48, 'FD');
+            
+            doc.setFontSize(11);
+            doc.setTextColor(245, 158, 11);
+            doc.setFont("helvetica", "bold");
+            doc.text("SUMMARY", centerX, finalY + 7, { align: "center" });
+            
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(0.4);
+            doc.line(35, finalY + 11, pageWidth - 35, finalY + 11);
+            
+            doc.setFontSize(8);
+            doc.setTextColor(51, 51, 51);
+            doc.setFont("helvetica", "normal");
+            
+            const col1X = 40;
+            const col2X = 130;
+            const col3X = 220;
+            let sumY = finalY + 22;
+            
+            doc.text(`Total Workers: ${totals.uniqueWorkers}`, col1X, sumY);
+            doc.text(`Total Records: ${totals.recordCount}`, col2X, sumY);
+            doc.text(`Total Hours: ${formatIndianNumber(totals.totalHours)} hrs`, col3X, sumY);
+            
+            sumY += 8;
+            doc.text(`Total Earnings: Rs. ${formatIndianNumber(totals.totalEarnings)}`, col1X, sumY);
+            doc.text(`Total Paid: Rs. ${formatIndianNumber(totals.totalPaid)}`, col2X, sumY);
+            
+            const dueColor = totals.totalDue < 0 ? [220, 38, 38] : [34, 197, 94];
+            doc.setTextColor(dueColor[0], dueColor[1], dueColor[2]);
+            doc.text(`Total Due: Rs. ${formatIndianNumber(Math.abs(totals.totalDue))}`, col3X, sumY);
+            
+            doc.setTextColor(51, 51, 51);
+            
+            const footerY = finalY + 52;
+            doc.setFontSize(6);
+            doc.setTextColor(148, 163, 184);
+            doc.text("This is a system generated attendance report from SP Construction Management System.", centerX, footerY, { align: "center" });
+            
+            doc.save(fileName);
+            showToast('✅ PDF downloaded successfully!');
+            
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            showToast('❌ Failed to generate PDF: ' + error.message, true);
+        }
+    }
+    
     function getRecordsToExport() {
         const source = dataSourceSelect.value;
         let baseRecords = (source === 'all') ? [...allAttendanceRecords] : [...currentFilteredRecords];
@@ -1423,12 +1678,6 @@
         URL.revokeObjectURL(url);
     }
     
-    function downloadPDF(records, fileName) {
-        if (!records.length) { alert("No records to generate PDF."); return; }
-        alert("PDF download coming soon!");
-        downloadCSV(records, fileName.replace('.pdf', '.csv'));
-    }
-    
     function handleDownload() {
         if (!isAdminUser) return;
         const records = getRecordsToExport();
@@ -1438,8 +1687,11 @@
         const sourceLabel = dataSourceSelect.value === 'all' ? 'all' : 'filtered';
         const limitLabel = limitCheckbox.checked ? `_latest${limitCountInput.value}` : '';
         const fileName = `attendance_${sourceLabel}${limitLabel}_${timestamp}.${format === 'csv' ? 'csv' : 'pdf'}`;
-        if (format === 'csv') downloadCSV(records, fileName);
-        else downloadPDF(records, fileName);
+        if (format === 'csv') {
+            downloadCSV(records, fileName);
+        } else {
+            downloadPDF(records, fileName);
+        }
     }
     
     function toggleLimitInput() {
@@ -1464,7 +1716,6 @@
         setupModalAutoSuggest();
     }
     
-    // Main auth check
     window.onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'login.html';
