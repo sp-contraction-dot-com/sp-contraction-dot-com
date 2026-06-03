@@ -62,12 +62,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             border: 1px solid rgba(245,158,11,0.2);
         }
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
             width: 48px;
             height: 48px;
@@ -79,28 +74,10 @@
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(245,158,11,0.3);
         }
-        .logo-icon span {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: white;
-        }
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .logo-text h1 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-        .logo-text p {
-            font-size: 0.55rem;
-            color: #f59e0b;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
+        .logo-icon span { font-size: 1.5rem; font-weight: 800; color: white; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-text h1 { font-size: 1.3rem; font-weight: 800; color: #1e293b; letter-spacing: -0.3px; }
+        .logo-text p { font-size: 0.55rem; color: #f59e0b; letter-spacing: 1px; font-weight: 600; }
         .header-buttons {
             display: flex;
             gap: 12px;
@@ -158,35 +135,10 @@
             cursor: default;
         }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
-        .stat-info h4 {
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            opacity: 0.9;
-            letter-spacing: 0.5px;
-        }
-        .stat-card .value {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
-        .stat-card .sub-text {
-            font-size: 0.55rem;
-            opacity: 0.8;
-            margin-top: 4px;
-        }
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-        }
+        .stat-info h4 { font-size: 0.7rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; opacity: 0.9; letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+        .stat-card .sub-text { font-size: 0.55rem; opacity: 0.8; margin-top: 4px; }
+        .stat-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
         .card-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
         .card-2 { background: linear-gradient(135deg, #f97316, #ea580c); }
         .card-3 { background: linear-gradient(135deg, #10b981, #059669); }
@@ -241,17 +193,43 @@
             padding-bottom: 12px;
             border-bottom: 2px solid #fef3c7;
         }
-        .section-title i {
-            font-size: 1.3rem;
-            color: #f59e0b;
-            background: #fef3c7;
-            padding: 10px;
-            border-radius: 14px;
+        .section-title i { font-size: 1.3rem; color: #f59e0b; background: #fef3c7; padding: 10px; border-radius: 14px; }
+        .section-title h3 { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+        
+        .admin-info-section {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            position: relative;
         }
-        .section-title h3 {
-            font-size: 1.1rem;
+        .admin-info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .admin-info-left, .admin-info-right {
+            font-size: 0.75rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .admin-info-left span, .admin-info-right span {
             font-weight: 700;
             color: #1e293b;
+        }
+        .separator-line {
+            background: linear-gradient(90deg, #f59e0b, #fef3c7, #f59e0b);
+            height: 2px;
+            width: 100%;
+            margin: 16px 0 0 0;
+            border-radius: 2px;
+        }
+        .separator-line-light {
+            background: linear-gradient(90deg, #e2e8f0, #f59e0b, #e2e8f0);
+            height: 1px;
+            width: 100%;
+            margin: 12px 0 8px 0;
         }
         
         .search-wrapper {
@@ -283,9 +261,7 @@
             outline: none;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        #searchInput:focus {
-            box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
-        }
+        #searchInput:focus { box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
         .result-badge {
             margin-top: 12px;
             font-size: 0.75rem;
@@ -297,13 +273,7 @@
             gap: 8px;
             padding: 0 8px;
         }
-        .result-count {
-            background: #fef3c7;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-weight: 600;
-            color: #d97706;
-        }
+        .result-count { background: #fef3c7; padding: 4px 12px; border-radius: 40px; font-weight: 600; color: #d97706; }
         
         .download-controls {
             background: #fefaf5;
@@ -327,12 +297,7 @@
             border-radius: 60px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-        .download-group label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #475569;
-            letter-spacing: 0.3px;
-        }
+        .download-group label { font-size: 0.75rem; font-weight: 700; color: #475569; letter-spacing: 0.3px; }
         select, .download-group input {
             border: 1px solid #e2e8f0;
             padding: 8px 14px;
@@ -343,10 +308,7 @@
             outline: none;
             transition: 0.15s;
         }
-        select:focus, .download-group input:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
-        }
+        select:focus, .download-group input:focus { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
         .limit-control {
             display: flex;
             align-items: center;
@@ -355,16 +317,8 @@
             padding: 0 16px;
             border-radius: 40px;
         }
-        .limit-control input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin: 0;
-            accent-color: #f59e0b;
-        }
-        .limit-control input[type="number"] {
-            width: 80px;
-            padding: 6px 8px;
-        }
+        .limit-control input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: #f59e0b; }
+        .limit-control input[type="number"] { width: 80px; padding: 6px 8px; }
         .download-btn {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             border: none;
@@ -382,10 +336,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(34,197,94,0.4);
-        }
+        .download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.4); }
         
         .table-container {
             overflow-x: auto;
@@ -396,38 +347,17 @@
             border: 1px solid #eef2f6;
             background: white;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1200px;
-        }
-        th, td {
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 1px solid #f0f2f5;
-            font-size: 0.8rem;
-        }
-        th {
-            background: #f8fafc;
-            font-weight: 700;
-            color: #475569;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        tbody tr:hover {
-            background: #fef9ec;
-            transition: 0.2s;
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th, td { padding: 14px 12px; text-align: center !important; border-bottom: 1px solid #f0f2f5; font-size: 0.8rem; }
+        th { background: #f8fafc; font-weight: 700; color: #475569; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 10; }
+        tbody tr:hover { background: #fef9ec; transition: 0.2s; }
         .badge-present { background: #dcfce7; color: #15803d; padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-absent { background: #fee2e2; color: #b91c1c; padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-halfday { background: #fff3e3; color: #d97706; padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .action-btns {
             display: flex;
             gap: 8px;
+            justify-content: center;
         }
         .edit-btn {
             background: #3b82f6;
@@ -454,29 +384,12 @@
         }
         .delete-btn:hover { background: #dc2626; transform: scale(1.02); }
         
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px;
-        }
+        .loading { display: flex; justify-content: center; align-items: center; padding: 50px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .no-data {
-            text-align: center;
-            padding: 50px;
-            color: #94a3b8;
-        }
-        .summary-row {
-            background: #fef3c7;
-            font-weight: 700;
-            border-top: 2px solid #f59e0b;
-        }
-        .summary-row td {
-            font-weight: 700;
-            color: #1e293b;
-            background: #fffbeb;
-        }
+        .no-data { text-align: center; padding: 50px; color: #94a3b8; }
+        .summary-row { background: #fef3c7; font-weight: 800; border-top: 2px solid #f59e0b; }
+        .summary-row td { font-weight: 800; color: #1e293b; background: #fffbeb; }
         
         .modal {
             display: none;
@@ -633,6 +546,7 @@
             .table-container { max-height: 50vh; }
             .header { padding: 16px; }
             .modal-form-grid { grid-template-columns: 1fr; }
+            .admin-info-grid { flex-direction: column; gap: 8px; }
         }
     </style>
 </head>
@@ -663,15 +577,15 @@
             <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
         </div>
         <div class="stat-card card-4">
-            <div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Total Earnings</h4><div class="value" id="statTotalEarnings">₹0</div><div class="sub-text">Gross revenue</div></div>
+            <div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Total Earnings</h4><div class="value" id="statTotalEarnings">Rs.0</div><div class="sub-text">Gross revenue</div></div>
             <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
         </div>
         <div class="stat-card card-5">
-            <div class="stat-info"><h4><i class="fas fa-money-bill-wave"></i> Total Paid</h4><div class="value" id="statTotalPaid">₹0</div><div class="sub-text">Disbursed amount</div></div>
+            <div class="stat-info"><h4><i class="fas fa-money-bill-wave"></i> Total Paid</h4><div class="value" id="statTotalPaid">Rs.0</div><div class="sub-text">Disbursed amount</div></div>
             <div class="stat-icon"><i class="fas fa-wallet"></i></div>
         </div>
         <div class="stat-card card-6">
-            <div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Total Due</h4><div class="value" id="statTotalDue">₹0</div><div class="sub-text">Outstanding</div></div>
+            <div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Total Due</h4><div class="value" id="statTotalDue">Rs.0</div><div class="sub-text">Outstanding</div></div>
             <div class="stat-icon"><i class="fas fa-hourglass-start"></i></div>
         </div>
         <div class="stat-card card-7">
@@ -679,7 +593,7 @@
             <div class="stat-icon"><i class="fas fa-sun"></i></div>
         </div>
         <div class="stat-card card-8">
-            <div class="stat-info"><h4><i class="fas fa-trend-up"></i> Today's Earnings</h4><div class="value" id="statTodayEarnings">₹0</div><div class="sub-text">Today's revenue</div></div>
+            <div class="stat-info"><h4><i class="fas fa-trend-up"></i> Today's Earnings</h4><div class="value" id="statTodayEarnings">Rs.0</div><div class="sub-text">Today's revenue</div></div>
             <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
         </div>
     </div>
@@ -689,19 +603,35 @@
             <div class="banner-placeholder" id="bannerPlaceholder"><i class="fas fa-image"></i><p>Dashboard banner image will appear here</p></div>
         </div>
     </div>
-    
+
     <div class="data-card" id="mainContentCard">
         <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>All Worker Attendance Records</h3></div>
         
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="Search by date (YYYY-MM-DD), worker name, or worker ID...">
-            <div class="result-badge">
-                <span><i class="fas fa-filter"></i> Live filter</span>
-                <span class="result-count" id="resultCountSpan">0 records</span>
+        <div class="admin-info-section" id="adminInfoSection">
+            <div class="admin-info-grid">
+                <div class="admin-info-left">
+                    <span>Generated By:</span> <span id="adminName">Loading...</span><br>
+                    <span>Admin ID:</span> <span id="adminId">Loading...</span><br>
+                    <span>Email:</span> <span id="adminEmail">Loading...</span>
+                </div>
+                <div class="admin-info-right">
+                    <span>Mobile:</span> <span id="adminMobile">Loading...</span><br>
+                    <span>Address:</span> <span id="adminAddress">Loading...</span><br>
+                    <span>Report Date:</span> <span id="reportDate">Loading...</span>
+                </div>
             </div>
+            <div class="separator-line"></div>
         </div>
         
         <div id="attendanceContent">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by date (YYYY-MM-DD), worker name, or worker ID...">
+                <div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 records</span></div>
+            </div>
+            
+            <div class="separator-line-light"></div>
+            
             <div class="table-container">
                 <table id="attendanceTable">
                     <thead>
@@ -711,10 +641,10 @@
                             <th>Worker ID</th>
                             <th>Status</th>
                             <th>Hours</th>
-                            <th>Rate (₹)</th>
-                            <th>Earnings (₹)</th>
-                            <th>Paid (₹)</th>
-                            <th>Due (₹)</th>
+                            <th>Rate (Rs.)</th>
+                            <th>Earnings (Rs.)</th>
+                            <th>Paid (Rs.)</th>
+                            <th>Due (Rs.)</th>
                             <th>Work Description</th>
                             <th style="width:120px;">Actions</th>
                         </tr>
@@ -735,8 +665,8 @@
                     <i class="fas fa-database" style="color:#f59e0b;"></i>
                     <label>DATA SOURCE</label>
                     <select id="dataSourceSelect">
-                        <option value="all">📋 All records</option>
-                        <option value="filtered">🔍 Filtered records (search result)</option>
+                        <option value="all">All records</option>
+                        <option value="filtered">Filtered records (search result)</option>
                     </select>
                 </div>
                 <div class="download-group">
@@ -747,8 +677,8 @@
                         <span style="font-size:0.7rem;">records</span>
                     </div>
                     <select id="downloadFormat">
-                        <option value="csv">📊 CSV</option>
-                        <option value="pdf">📑 PDF</option>
+                        <option value="csv">CSV</option>
+                        <option value="pdf">PDF</option>
                     </select>
                 </div>
                 <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
@@ -775,9 +705,9 @@
                 <select id="modalStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select>
             </div>
             <div class="modal-input-group"><label>Work Hours</label><input type="number" id="modalHours" step="0.5" placeholder="Hours worked"></div>
-            <div class="modal-input-group"><label>Daily Rate (₹)</label><input type="number" id="modalRate" placeholder="Rate per day"></div>
+            <div class="modal-input-group"><label>Daily Rate (Rs.)</label><input type="number" id="modalRate" placeholder="Rate per day"></div>
             <div class="modal-input-group"><label>Work Description</label><input type="text" id="modalWorkDesc" placeholder="What work done"></div>
-            <div class="modal-input-group"><label>Payment Given (₹)</label><input type="number" id="modalPaid" placeholder="Amount paid"></div>
+            <div class="modal-input-group"><label>Payment Given (Rs.)</label><input type="number" id="modalPaid" placeholder="Amount paid"></div>
         </div>
         <div id="modalSelectedWorkerInfo" style="background:#fef3c7; padding:8px 12px; border-radius:12px; margin-top:5px; display:none;">
             <span><i class="fas fa-check-circle" style="color:#22c55e;"></i> Selected: <strong id="modalSelectedWorkerName">-</strong> <span id="modalSelectedWorkerId" style="color:#f59e0b;"></span></span>
@@ -808,7 +738,8 @@
         mobile: '',
         address: ''
     };
-    let pdfLogoBase64 = null;  // PDF Report Logo from logoupload.html
+    let pdfLogoBase64 = null;
+    let companyLogoBase64 = null;
     
     const tbody = document.getElementById('attendanceTableBody');
     const tfoot = document.getElementById('attendanceTableFooter');
@@ -822,6 +753,13 @@
     const headerLogo = document.getElementById('headerLogo');
     const attendanceContent = document.getElementById('attendanceContent');
     const accessDeniedDiv = document.getElementById('accessDeniedMessage');
+    
+    const adminNameSpan = document.getElementById('adminName');
+    const adminIdSpan = document.getElementById('adminId');
+    const adminEmailSpan = document.getElementById('adminEmail');
+    const adminMobileSpan = document.getElementById('adminMobile');
+    const adminAddressSpan = document.getElementById('adminAddress');
+    const reportDateSpan = document.getElementById('reportDate');
     
     const modal = document.getElementById('attendanceModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -862,8 +800,7 @@
         let lastThree = str.slice(-3);
         let other = str.slice(0, -3);
         if (other !== '') lastThree = ',' + lastThree;
-        let result = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-        return result;
+        return other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
     }
     
     function formatNumber(value) {
@@ -886,60 +823,76 @@
         return rate;
     }
     
-    function updateHeaderLogo(base64) {
-        if (headerLogo) {
-            if (base64 && base64.startsWith('data:image')) {
-                headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
-            } else {
-                headerLogo.innerHTML = `<span>SP</span>`;
+    // ========== COMPANY LOGO LOAD FUNCTION ==========
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            
+            if (headerLogo) {
+                if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    const logoUrl = snapshot.val();
+                    companyLogoBase64 = logoUrl;
+                    headerLogo.innerHTML = `<img src="${logoUrl}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    console.log("Company logo loaded successfully");
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                    console.log("No logo found, showing default SP");
+                }
             }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+            if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
         }
     }
     
-    // ========== LOAD PDF REPORT LOGO (PRIORITY) ==========
+    function listenLogoChanges() {
+        const logoRef = window.ref(db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            const val = snapshot.val();
+            if (headerLogo) {
+                if (val && val.startsWith('data:image')) {
+                    companyLogoBase64 = val;
+                    headerLogo.innerHTML = `<img src="${val}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                }
+            }
+        });
+    }
+    
+    function updateAdminInfoDisplay() {
+        if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
+        if (adminIdSpan) adminIdSpan.innerText = currentAdminInfo.userId || 'ADMIN001';
+        if (adminEmailSpan) adminEmailSpan.innerText = currentAdminInfo.email || 'N/A';
+        if (adminMobileSpan) adminMobileSpan.innerText = currentAdminInfo.mobile || 'N/A';
+        if (adminAddressSpan) adminAddressSpan.innerText = currentAdminInfo.address || 'N/A';
+        if (reportDateSpan) {
+            const now = new Date();
+            reportDateSpan.innerText = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' | ' + now.toLocaleTimeString();
+        }
+    }
+    
     async function loadPdfLogo() {
         try {
             const pdfLogoRef = window.ref(db, `companyAssets/pdfLogo`);
             const snapshot = await window.get(pdfLogoRef);
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 pdfLogoBase64 = snapshot.val();
-                console.log("✅ PDF Report Logo loaded");
+                console.log("PDF Logo loaded");
                 return;
             }
-            
-            const headerLogoRef = window.ref(db, `companyAssets/headerLogo`);
-            const headerSnap = await window.get(headerLogoRef);
-            if (headerSnap.exists() && headerSnap.val() && headerSnap.val().startsWith('data:image')) {
-                pdfLogoBase64 = headerSnap.val();
-                console.log("✅ Header Logo loaded as fallback");
-                return;
-            }
-            
             const footerRef = window.ref(db, `companyAssets/footerLogo`);
             const footerSnap = await window.get(footerRef);
             if (footerSnap.exists() && footerSnap.val() && footerSnap.val().startsWith('data:image')) {
                 pdfLogoBase64 = footerSnap.val();
-                console.log("✅ Footer Logo loaded as fallback");
+                console.log("Footer Logo loaded as fallback for PDF");
                 return;
             }
-            
             pdfLogoBase64 = null;
-            console.log("No PDF logo found, will use default SP icon");
         } catch(err) {
-            console.warn("Error loading PDF logo:", err);
             pdfLogoBase64 = null;
         }
-    }
-    
-    function listenPdfLogoChanges() {
-        const pdfLogoRef = window.ref(db, `companyAssets/pdfLogo`);
-        window.onValue(pdfLogoRef, (snapshot) => {
-            const val = snapshot.val();
-            if (val && val.startsWith('data:image')) {
-                pdfLogoBase64 = val;
-                console.log("PDF Logo updated in real-time");
-            }
-        });
     }
     
     async function loadBannerImage() {
@@ -961,16 +914,7 @@
             }
             bannerContainer.style.backgroundImage = '';
             if (placeholder) placeholder.style.display = 'flex';
-        } catch(e) {
-            console.warn("Error loading banner:", e);
-        }
-    }
-    
-    function listenBannerChanges() {
-        const bannersRef = window.ref(db, `companyAssets/banners`);
-        window.onValue(bannersRef, () => {
-            loadBannerImage();
-        });
+        } catch(e) {}
     }
     
     async function loadCurrentAdminInfo(user) {
@@ -979,11 +923,11 @@
             const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
             const userData = userSnap.val();
             if (userData) {
-                currentAdminInfo.name = userData.fullName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || user.email?.split('@')[0] || 'Admin';
+                currentAdminInfo.name = userData.fullName || userData.firstName || user.email?.split('@')[0] || 'Admin';
                 currentAdminInfo.userId = userData.userId || user.uid?.slice(0, 8) || 'ADMIN001';
                 currentAdminInfo.email = userData.email || user.email || 'N/A';
                 currentAdminInfo.mobile = userData.mobile || userData.phone || 'N/A';
-                currentAdminInfo.address = userData.address || 'N/A';
+                currentAdminInfo.address = userData.address || userData.city || 'N/A';
             } else {
                 currentAdminInfo.name = user.email?.split('@')[0] || 'Admin';
                 currentAdminInfo.userId = user.uid?.slice(0, 8) || 'ADMIN001';
@@ -991,68 +935,40 @@
                 currentAdminInfo.mobile = 'N/A';
                 currentAdminInfo.address = 'N/A';
             }
-        } catch (err) {
-            console.warn("Error loading admin info:", err);
-        }
+            updateAdminInfoDisplay();
+        } catch (err) {}
     }
     
-    // ========== DRAW PDF LOGO (SHIFTED 8px UP) ==========
-    function drawPDFLogo(doc, x, y, size = 20) {
+    function drawPDFLogo(doc, x, y, size = 18) {
         if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
             try {
-                doc.addImage(pdfLogoBase64, 'JPEG', x, y - 8, size, size);
+                doc.addImage(pdfLogoBase64, 'JPEG', x, y - 5, size, size);
                 return true;
-            } catch(e) {
-                console.warn("Could not add PDF logo to PDF:", e);
-            }
+            } catch(e) {}
         }
-        
         const radius = size / 2;
         const centerX = x + radius;
-        const centerY = (y - 8) + radius;
-        
+        const centerY = (y - 5) + radius;
         doc.setFillColor(245, 158, 11);
         doc.circle(centerX, centerY, radius, 'F');
-        doc.setFontSize(13);
+        doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.text("SP", centerX, centerY + 4, { align: "center" });
         return true;
     }
     
-    // ========== DRAW WATERMARK LOGO (VERY LIGHT, 5% OPACITY) ==========
     function drawWatermarkLogo(doc, pageWidth, pageHeight) {
         if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
             try {
-                const maxSize = Math.min(pageWidth, pageHeight) * 0.7;
+                const maxSize = Math.min(pageWidth, pageHeight) * 0.5;
                 const x = (pageWidth - maxSize) / 2;
                 const y = (pageHeight - maxSize) / 2;
-                
-                doc.setGState(new doc.GState({ opacity: 0.05 }));
+                doc.setGState(new doc.GState({ opacity: 0.04 }));
                 doc.addImage(pdfLogoBase64, 'JPEG', x, y, maxSize, maxSize);
                 doc.setGState(new doc.GState({ opacity: 1 }));
                 return true;
-            } catch(e) {
-                console.warn("Could not add watermark logo:", e);
-            }
-        }
-        
-        try {
-            const maxSize = Math.min(pageWidth, pageHeight) * 0.7;
-            const radius = maxSize / 2;
-            const centerX = pageWidth / 2;
-            const centerY = pageHeight / 2;
-            
-            doc.setGState(new doc.GState({ opacity: 0.05 }));
-            doc.setFillColor(245, 158, 11);
-            doc.circle(centerX, centerY, radius, 'F');
-            doc.setFontSize(maxSize * 0.6);
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("helvetica", "bold");
-            doc.text("SP", centerX, centerY + (maxSize * 0.2), { align: "center" });
-            doc.setGState(new doc.GState({ opacity: 1 }));
-        } catch(e) {
-            console.warn("Could not add SP watermark:", e);
+            } catch(e) {}
         }
         return true;
     }
@@ -1064,12 +980,9 @@
             accessDeniedDiv.innerHTML = `
                 <div class="access-denied">
                     <i class="fas fa-shield-alt"></i>
-                    <h2>⛔ Access Denied</h2>
+                    <h2>Access Denied</h2>
                     <p>You don't have administrator privileges to access this page.</p>
-                    <p style="font-size: 0.8rem; color: #ef4444;">Only authorized admins can view attendance records.</p>
-                    <button onclick="window.location.href='dashboard.html'">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
-                    </button>
+                    <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
                 </div>
             `;
         }
@@ -1080,34 +993,24 @@
             window.location.href = 'login.html';
             return;
         }
-        
         try {
             const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
             const userData = userSnap.val();
-            
             if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
-                isAdminUser = false;
-                adminChecked = true;
                 showAccessDenied();
                 return;
             }
-            
             isAdminUser = true;
-            adminChecked = true;
-            
             if (attendanceContent) attendanceContent.style.display = 'block';
             if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
-            
             await loadCurrentAdminInfo(user);
             await loadUsers();
             await loadAllAttendance();
             await loadPdfLogo();
-            listenPdfLogoChanges();
+            await loadCompanyLogo();
+            listenLogoChanges();
             await loadBannerImage();
-            listenBannerChanges();
-            
         } catch (error) {
-            console.error("Admin verification error:", error);
             showAccessDenied();
         }
     }
@@ -1153,9 +1056,9 @@
         statTotalRecords.innerText = formatIndianNumber(totals.recordCount);
         statTotalWorkers.innerText = formatIndianNumber(totals.uniqueWorkers);
         statTotalHours.innerText = formatIndianNumber(totals.totalHours);
-        statTotalEarnings.innerHTML = `₹${formatIndianNumber(totals.totalEarnings)}`;
-        statTotalPaid.innerHTML = `₹${formatIndianNumber(totals.totalPaid)}`;
-        statTotalDue.innerHTML = `₹${formatIndianNumber(totals.totalDue)}`;
+        statTotalEarnings.innerHTML = `Rs.${formatIndianNumber(totals.totalEarnings)}`;
+        statTotalPaid.innerHTML = `Rs.${formatIndianNumber(totals.totalPaid)}`;
+        statTotalDue.innerHTML = `Rs.${formatIndianNumber(totals.totalDue)}`;
         
         const today = new Date().toISOString().split('T')[0];
         let presentTodayCount = 0;
@@ -1167,7 +1070,7 @@
             }
         }
         statPresentToday.innerText = formatIndianNumber(presentTodayCount);
-        statTodayEarnings.innerHTML = `₹${formatIndianNumber(todayTotalEarnings)}`;
+        statTodayEarnings.innerHTML = `Rs.${formatIndianNumber(todayTotalEarnings)}`;
     }
     
     function renderFooter(records) {
@@ -1176,23 +1079,23 @@
         const dueColor = totals.totalDue < 0 ? '#dc2626' : '#15803d';
         tfoot.innerHTML = `
             <tr class="summary-row">
-                <td colspan="2"><strong>📊 TOTAL SUMMARY</strong></td>
+                <td colspan="2"><strong>TOTAL SUMMARY</strong></td>
                 <td><strong>${totals.uniqueWorkers} Workers</strong></td>
                 <td><strong>${totals.recordCount} Records</strong></td>
                 <td><strong>${formatIndianNumber(totals.totalHours)} hrs</strong></td>
-                <td>—</td>
-                <td><strong>₹ ${formatIndianNumber(totals.totalEarnings)}</strong></td>
-                <td><strong>₹ ${formatIndianNumber(totals.totalPaid)}</strong></td>
-                <td style="color: ${dueColor};"><strong>₹ ${formatIndianNumber(totals.totalDue)}</strong></td>
-                <td>—</td>
-                <td>—</td>
-             </tr>
+                <td>—</strong></td>
+                <td><strong>Rs.${formatIndianNumber(totals.totalEarnings)}</strong></td>
+                <td><strong>Rs.${formatIndianNumber(totals.totalPaid)}</strong></td>
+                <td style="color: ${dueColor};"><strong>Rs.${formatIndianNumber(totals.totalDue)}</strong></td>
+                <td>—</strong></td>
+                <td>—</strong></td>
+            </tr>
         `;
     }
     
     function renderTable() {
         if (!currentFilteredRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data"><i class="fas fa-calendar-times"></i> No attendance records found<\/td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="no-data">No attendance records found<\/td></tr>';
             resultCountSpan.innerText = `0 records`;
             tfoot.innerHTML = '';
             updateStatsCards([]);
@@ -1209,10 +1112,10 @@
                     <td style="color:#f59e0b; font-weight:600;">${escapeHtml(r.workerId || 'N/A')}</td>
                     <td>${getStatusBadge(r.status)}</td>
                     <td>${r.hours || 0}</td>
-                    <td>₹${formatNumber(r.rate || 0)}</td>
-                    <td>₹${formatNumber(r.earnings || 0)}</td>
-                    <td>₹${formatNumber(r.paid || 0)}</td>
-                    <td style="color: ${dueColor}; font-weight:600;">₹${formatNumber(due)}</td>
+                    <td class="amount-positive">Rs.${formatNumber(r.rate || 0)}</td>
+                    <td class="amount-positive">Rs.${formatNumber(r.earnings || 0)}</td>
+                    <td class="amount-positive">Rs.${formatNumber(r.paid || 0)}</td>
+                    <td style="color: ${dueColor}; font-weight:600;">Rs.${formatNumber(due)}</td>
                     <td>${escapeHtml(r.workDesc || '-')}</td>
                     <td class="action-btns">
                         <button class="edit-btn" onclick="openEditModal('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
@@ -1463,179 +1366,6 @@
         setTimeout(() => toast.remove(), duration);
     }
     
-    // ========== IMPROVED PDF EXPORT FUNCTION WITH LIGHT WATERMARK ==========
-    async function downloadPDF(records, fileName) {
-        if (!records.length) { 
-            alert("No records to generate PDF."); 
-            return; 
-        }
-        
-        showToast('📄 Generating PDF...');
-        
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const centerX = pageWidth / 2;
-            let currentY = 12;
-            
-            // ========== ADD WATERMARK LOGO (VERY LIGHT, 5% OPACITY) ==========
-            drawWatermarkLogo(doc, pageWidth, pageHeight);
-            
-            // ========== HEADER WITH PDF LOGO (SHIFTED 8px UP) ==========
-            drawPDFLogo(doc, 12, currentY, 20);
-            
-            // Title
-            doc.setFontSize(18);
-            doc.setTextColor(245, 158, 11);
-            doc.setFont("helvetica", "bold");
-            doc.text("SP CONSTRUCTION - ATTENDANCE REPORT", centerX, currentY + 10, { align: "center" });
-            
-            // Horizontal Line
-            doc.setDrawColor(245, 158, 11);
-            doc.setLineWidth(0.8);
-            doc.line(15, currentY + 16, pageWidth - 15, currentY + 16);
-            
-            // ========== TWO COLUMN INFO SECTION ==========
-            currentY += 26;
-            doc.setFontSize(8);
-            doc.setTextColor(80, 80, 80);
-            doc.setFont("helvetica", "normal");
-            
-            let leftX = 15;
-            let rightX = pageWidth - 15;
-            
-            doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, leftX, currentY);
-            doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, leftX, currentY + 6);
-            doc.text(`Email: ${escapeHtml(currentAdminInfo.email)}`, leftX, currentY + 12);
-            doc.text(`Mobile: ${escapeHtml(currentAdminInfo.mobile)}`, leftX, currentY + 18);
-            doc.text(`Address: ${escapeHtml(currentAdminInfo.address)}`, leftX, currentY + 24);
-            
-            doc.text(`Generated: ${new Date().toLocaleString()}`, rightX, currentY, { align: "right" });
-            doc.text(`Total Records: ${records.length}`, rightX, currentY + 10, { align: "right" });
-            
-            // ========== TABLE ==========
-            const data = prepareExportData(records);
-            const tableData = data.map(row => [
-                row.date,
-                row.workerName,
-                row.workerId,
-                row.status,
-                row.hours.toString(),
-                'Rs. ' + formatIndianNumber(row.rate),
-                'Rs. ' + formatIndianNumber(row.earnings),
-                'Rs. ' + formatIndianNumber(row.paid),
-                'Rs. ' + formatIndianNumber(row.due),
-                row.workDesc
-            ]);
-            
-            doc.autoTable({
-                startY: currentY + 34,
-                head: [[
-                    "Date", "Worker Name", "Worker ID", "Status", "Hours", 
-                    "Rate (Rs.)", "Earnings (Rs.)", "Paid (Rs.)", "Due (Rs.)", "Work Description"
-                ]],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { 
-                    fillColor: [245, 158, 11], 
-                    textColor: 255, 
-                    fontStyle: 'bold',
-                    halign: 'center',
-                    fontSize: 8
-                },
-                bodyStyles: { fontSize: 7.5, cellPadding: 2, textColor: [50, 50, 50] },
-                columnStyles: {
-                    0: { cellWidth: 20, halign: 'center' },
-                    1: { cellWidth: 35, halign: 'left' },
-                    2: { cellWidth: 22, halign: 'center' },
-                    3: { cellWidth: 16, halign: 'center' },
-                    4: { cellWidth: 10, halign: 'center' },
-                    5: { cellWidth: 20, halign: 'right' },
-                    6: { cellWidth: 22, halign: 'right' },
-                    7: { cellWidth: 20, halign: 'right' },
-                    8: { cellWidth: 20, halign: 'right' },
-                    9: { cellWidth: 42, halign: 'left' }
-                },
-                margin: { left: 12, right: 12 },
-                didDrawPage: (data) => {
-                    const pageCount = doc.internal.getNumberOfPages();
-                    for (let i = 1; i <= pageCount; i++) {
-                        doc.setPage(i);
-                        drawWatermarkLogo(doc, pageWidth, pageHeight);
-                        doc.setFontSize(7);
-                        doc.setTextColor(148, 163, 184);
-                        doc.text(`Page ${i} of ${pageCount}`, centerX, 195, { align: "center" });
-                    }
-                }
-            });
-            
-            // ========== SUMMARY SECTION ==========
-            const totals = computeTotals(records);
-            const finalY = doc.lastAutoTable.finalY + 10;
-            
-            doc.setDrawColor(245, 158, 11);
-            doc.setFillColor(255, 248, 225);
-            doc.rect(20, finalY, pageWidth - 40, 48, 'FD');
-            
-            doc.setFontSize(11);
-            doc.setTextColor(245, 158, 11);
-            doc.setFont("helvetica", "bold");
-            doc.text("SUMMARY", centerX, finalY + 7, { align: "center" });
-            
-            doc.setDrawColor(245, 158, 11);
-            doc.setLineWidth(0.4);
-            doc.line(35, finalY + 11, pageWidth - 35, finalY + 11);
-            
-            doc.setFontSize(8);
-            doc.setTextColor(51, 51, 51);
-            doc.setFont("helvetica", "normal");
-            
-            const col1X = 40;
-            const col2X = 130;
-            const col3X = 220;
-            let sumY = finalY + 22;
-            
-            doc.text(`Total Workers: ${totals.uniqueWorkers}`, col1X, sumY);
-            doc.text(`Total Records: ${totals.recordCount}`, col2X, sumY);
-            doc.text(`Total Hours: ${formatIndianNumber(totals.totalHours)} hrs`, col3X, sumY);
-            
-            sumY += 8;
-            doc.text(`Total Earnings: Rs. ${formatIndianNumber(totals.totalEarnings)}`, col1X, sumY);
-            doc.text(`Total Paid: Rs. ${formatIndianNumber(totals.totalPaid)}`, col2X, sumY);
-            
-            const dueColor = totals.totalDue < 0 ? [220, 38, 38] : [34, 197, 94];
-            doc.setTextColor(dueColor[0], dueColor[1], dueColor[2]);
-            doc.text(`Total Due: Rs. ${formatIndianNumber(Math.abs(totals.totalDue))}`, col3X, sumY);
-            
-            doc.setTextColor(51, 51, 51);
-            
-            const footerY = finalY + 52;
-            doc.setFontSize(6);
-            doc.setTextColor(148, 163, 184);
-            doc.text("This is a system generated attendance report from SP Construction Management System.", centerX, footerY, { align: "center" });
-            
-            doc.save(fileName);
-            showToast('✅ PDF downloaded successfully!');
-            
-        } catch (error) {
-            console.error("PDF generation error:", error);
-            showToast('❌ Failed to generate PDF: ' + error.message, true);
-        }
-    }
-    
-    function getRecordsToExport() {
-        const source = dataSourceSelect.value;
-        let baseRecords = (source === 'all') ? [...allAttendanceRecords] : [...currentFilteredRecords];
-        if (limitCheckbox.checked) {
-            let limit = parseInt(limitCountInput.value, 10);
-            if (isNaN(limit) || limit < 1) limit = 10;
-            if (limit < baseRecords.length) baseRecords = baseRecords.slice(0, limit);
-        }
-        return baseRecords;
-    }
-    
     function prepareExportData(records) {
         return records.map(rec => ({
             date: rec.date || 'N/A',
@@ -1654,7 +1384,7 @@
     function downloadCSV(records, fileName) {
         if (!records.length) { alert("No records to export."); return; }
         const data = prepareExportData(records);
-        const headers = ["Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate (₹)", "Earnings (₹)", "Paid (₹)", "Due (₹)", "Work Description"];
+        const headers = ["Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate (Rs.)", "Earnings (Rs.)", "Paid (Rs.)", "Due (Rs.)", "Work Description"];
         const csvRows = [headers.join(",")];
         for (const row of data) {
             const values = headers.map(header => {
@@ -1676,6 +1406,176 @@
         link.href = url; link.download = fileName;
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
         URL.revokeObjectURL(url);
+    }
+    
+    async function downloadPDF(records, fileName) {
+        if (!records.length) { alert("No records to generate PDF."); return; }
+        
+        showToast('Generating PDF...');
+        
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const centerX = pageWidth / 2;
+            let currentY = 10;
+            
+            drawWatermarkLogo(doc, pageWidth, pageHeight);
+            drawPDFLogo(doc, 14, currentY, 16);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.setTextColor(245, 158, 11);
+            doc.text("SP CONSTRUCTION - ATTENDANCE REPORT", centerX, currentY + 9, { align: "center" });
+            
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(0.6);
+            doc.line(12, currentY + 14, pageWidth - 12, currentY + 14);
+            
+            currentY += 22;
+            doc.setFontSize(8);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont("helvetica", "normal");
+            
+            doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, 12, currentY);
+            doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, 12, currentY + 5);
+            doc.text(`Email: ${escapeHtml(currentAdminInfo.email)}`, 12, currentY + 10);
+            doc.text(`Mobile: ${escapeHtml(currentAdminInfo.mobile)}`, 12, currentY + 15);
+            doc.text(`Address: ${escapeHtml(currentAdminInfo.address)}`, 12, currentY + 20);
+            
+            doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth - 12, currentY, { align: "right" });
+            doc.text(`Total Records: ${records.length}`, pageWidth - 12, currentY + 6, { align: "right" });
+            doc.text(`Unique Workers: ${new Set(records.map(r=>r.workerId)).size}`, pageWidth - 12, currentY + 12, { align: "right" });
+            
+            currentY += 26;
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(0.4);
+            doc.line(12, currentY - 2, pageWidth - 12, currentY - 2);
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(12, currentY, pageWidth - 12, currentY);
+            
+            const tableData = records.map(rec => [
+                rec.date || 'N/A',
+                rec.workerName || 'N/A',
+                rec.workerId || 'N/A',
+                rec.status === 'present' ? 'Present' : (rec.status === 'absent' ? 'Absent' : 'Half'),
+                (rec.hours || 0).toString(),
+                `Rs.${formatIndianNumber(rec.rate || 0)}`,
+                `Rs.${formatIndianNumber(rec.earnings || 0)}`,
+                `Rs.${formatIndianNumber(rec.paid || 0)}`,
+                `Rs.${formatIndianNumber((rec.earnings||0) - (rec.paid||0))}`,
+                (rec.workDesc || '-').substring(0, 25)
+            ]);
+            
+            doc.autoTable({
+                startY: currentY + 4,
+                head: [["Date", "Worker Name", "ID", "Status", "Hrs", "Rate", "Earnings", "Paid", "Due", "Work Desc"]],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [245, 158, 11], textColor: 255, fontStyle: 'bold', halign: 'center', fontSize: 7 },
+                bodyStyles: { fontSize: 6.5, cellPadding: 1.2, textColor: [50, 50, 50], halign: 'center' },
+                columnStyles: {
+                    0: { cellWidth: 16, halign: 'center' },
+                    1: { cellWidth: 35, halign: 'left' },
+                    2: { cellWidth: 18, halign: 'center' },
+                    3: { cellWidth: 14, halign: 'center' },
+                    4: { cellWidth: 10, halign: 'center' },
+                    5: { cellWidth: 18, halign: 'right' },
+                    6: { cellWidth: 22, halign: 'right' },
+                    7: { cellWidth: 18, halign: 'right' },
+                    8: { cellWidth: 18, halign: 'right' },
+                    9: { cellWidth: 42, halign: 'left' }
+                },
+                margin: { left: 10, right: 10 },
+                didDrawPage: (data) => {
+                    const pageCount = doc.internal.getNumberOfPages();
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        drawWatermarkLogo(doc, pageWidth, pageHeight);
+                        doc.setFontSize(7);
+                        doc.setTextColor(148, 163, 184);
+                        doc.text(`Page ${i} of ${pageCount}`, centerX, pageHeight - 8, { align: "center" });
+                    }
+                }
+            });
+            
+            const totals = computeTotals(records);
+            let finalY = doc.lastAutoTable.finalY + 8;
+            const summaryHeight = 50;
+            
+            if (finalY + summaryHeight > pageHeight - 10) {
+                doc.addPage();
+                drawWatermarkLogo(doc, pageWidth, pageHeight);
+                finalY = 15;
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setFontSize(7);
+                doc.setTextColor(148, 163, 184);
+                doc.text(`Page ${pageCount} of ${pageCount}`, centerX, pageHeight - 8, { align: "center" });
+            }
+            
+            const boxWidth = 185;
+            const boxX = (pageWidth - boxWidth) / 2;
+            
+            doc.setDrawColor(245, 158, 11);
+            doc.setFillColor(255, 248, 225);
+            doc.rect(boxX, finalY, boxWidth, 46, 'FD');
+            
+            doc.setFontSize(11);
+            doc.setTextColor(245, 158, 11);
+            doc.setFont("helvetica", "bold");
+            doc.text("COMPLETE SUMMARY", centerX, finalY + 7, { align: "center" });
+            
+            doc.setDrawColor(245, 158, 11);
+            doc.setLineWidth(0.3);
+            doc.line(centerX - 40, finalY + 10, centerX + 40, finalY + 10);
+            
+            doc.setFontSize(8);
+            doc.setTextColor(51, 51, 51);
+            doc.setFont("helvetica", "normal");
+            
+            const col1 = boxX + 10;
+            const col2 = boxX + 75;
+            const col3 = boxX + 140;
+            
+            doc.text(`Workers: ${totals.uniqueWorkers}`, col1, finalY + 19);
+            doc.text(`Records: ${totals.recordCount}`, col2, finalY + 19);
+            doc.text(`Hours: ${formatIndianNumber(totals.totalHours)}`, col3, finalY + 19);
+            
+            doc.text(`Earnings: Rs.${formatIndianNumber(totals.totalEarnings)}`, col1, finalY + 28);
+            doc.text(`Paid: Rs.${formatIndianNumber(totals.totalPaid)}`, col2, finalY + 28);
+            
+            const dueColor = totals.totalDue < 0 ? [220, 38, 38] : [34, 197, 94];
+            doc.setTextColor(dueColor[0], dueColor[1], dueColor[2]);
+            doc.text(`Due: Rs.${formatIndianNumber(Math.abs(totals.totalDue))}`, col3, finalY + 28);
+            
+            const lastPage = doc.internal.getNumberOfPages();
+            doc.setPage(lastPage);
+            doc.setFontSize(6);
+            doc.setTextColor(148, 163, 184);
+            doc.setFont("helvetica", "normal");
+            doc.text("This is a system generated attendance report from SP Construction Management System.", centerX, pageHeight - 5, { align: "center" });
+            
+            doc.save(fileName);
+            showToast('PDF downloaded successfully!');
+            
+        } catch (error) {
+            console.error("PDF error:", error);
+            showToast('Failed to generate PDF', true);
+        }
+    }
+    
+    function getRecordsToExport() {
+        const source = dataSourceSelect.value;
+        let baseRecords = (source === 'all') ? [...allAttendanceRecords] : [...currentFilteredRecords];
+        if (limitCheckbox.checked) {
+            let limit = parseInt(limitCountInput.value, 10);
+            if (isNaN(limit) || limit < 1) limit = 10;
+            if (limit < baseRecords.length) baseRecords = baseRecords.slice(0, limit);
+        }
+        return baseRecords;
     }
     
     function handleDownload() {
@@ -1725,6 +1625,12 @@
         await checkAdminAndLoad(user);
         if (isAdminUser) {
             bindEvents();
+            window.onValue(window.ref(db, 'attendance'), () => {
+                if (isAdminUser) loadAllAttendance();
+            });
+            window.onValue(window.ref(db, 'users'), () => {
+                if (isAdminUser) loadUsers();
+            });
         }
     });
 </script>
