@@ -560,6 +560,9 @@
         <i class="fas fa-user"></i> <span>My Profile</span>
     </div>
     <div class="menu-item" onclick="loadPageInIframe('user-attendant-card.html'); closeLeftMenu();">
+        <i class="fas fa-calendar-check"></i> <span>My Attendance Card</span>
+    </div>
+        <div class="menu-item" onclick="loadPageInIframe('employee-id-card.html'); closeLeftMenu();">
         <i class="fas fa-id-card"></i> <span>My ID Card</span>
     </div>
     <div class="menu-item" onclick="loadPageInIframe('work_calendar.html'); closeLeftMenu();">
@@ -949,6 +952,32 @@
     window.renderSupport = renderSupport;
     window.showNotifications = showNotifications;
     window.loadPageInIframe = loadPageInIframe;
+    
+    // Listen for postMessage from child iframes (for navigation)
+window.addEventListener('message', function(event) {
+    // Accept messages from same origin
+    if (event.data && event.data.type === 'NAVIGATE' && event.data.page) {
+        console.log("Parent received navigation request:", event.data.page);
+        if (typeof window.loadPageInIframe === 'function') {
+            window.loadPageInIframe(event.data.page);
+        }
+    }
+});
+
+// Make sure loadPageInIframe is globally available
+window.loadPageInIframe = function(pageUrl) {
+    const iframe = document.getElementById('dashboardFrame');
+    const iframeContainer = document.getElementById('iframeContainer');
+    const dynamicView = document.getElementById('dynamicView');
+    
+    if (iframe) {
+        iframe.src = pageUrl;
+        iframeContainer.style.display = 'flex';
+        if (dynamicView) dynamicView.style.display = 'none';
+        if (dynamicView) dynamicView.innerHTML = '';
+        console.log("Loaded page in iframe:", pageUrl);
+    }
+};
 </script>
 </body>
 </html>
