@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium ID Card | SP BUILD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0a0f1d 0%, #141a2e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card-container {
+            width: 95mm;
+            height: 60mm;
+            max-width: 100%;
+            aspect-ratio: 95 / 60;
+            perspective: 1200px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        @media screen and (max-width: 600px) {
+            .card-container {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 95 / 60;
+            }
+        }
+
+        .flip-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+            border-radius: 14px;
+        }
+
+        .card-container.flipped .flip-wrapper {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,215,0,0.2) inset;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .card-front {
+            transform: rotateY(0deg);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .front-content, .back-content {
+            position: relative;
+            z-index: 1;
+            padding: 8px 12px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+        }
+
+        /* ========== Front Page Styles ========== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text h1 {
+            font-size: 15px;
+            background: linear-gradient(120deg, #2563eb, #1e40af);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 5.5px;
+            color: #475569;
+        }
+
+        .badge {
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            padding: 3px 8px;
+            border-radius: 30px;
+            font-size: 6px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .main-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .photo-col {
+            width: 52px;
+            flex-shrink: 0;
+        }
+        .photo-box {
+            width: 52px;
+            height: 60px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            border: 2px solid #fbbf24;
+            overflow: hidden;
+        }
+        .photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-col {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 6px 10px;
+            border-radius: 12px;
+        }
+        .name {
+            font-size: 9.5px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .designation {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 6px;
+            display: inline-block;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+        .info-list {
+            margin-top: 5px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 3px;
+            font-size: 6.5px;
+        }
+        .info-label {
+            width: 40px;
+            font-weight: 700;
+            color: #475569;
+        }
+        .info-value {
+            flex: 1;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .qrcode-col {
+            width: 75px;
+            flex-shrink: 0;
+            text-align: center;
+            margin-left: 15px;
+        }
+        .qrcode-box {
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #qrcode canvas, #qrcode img {
+            width: 55px !important;
+            height: 55px !important;
+        }
+        .qr-text {
+            font-size: 5px;
+            margin-top: 4px;
+            color: #1e293b;
+            font-weight: 600;
+            background: rgba(255,255,255,0.7);
+            padding: 2px 4px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .address-row {
+            margin-top: 4px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+        }
+        .address-label {
+            font-size: 5.5px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 2px;
+        }
+        .address-value {
+            font-size: 6px;
+            font-weight: 500;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .footer-stamp {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+        }
+
+        .sign-area {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 8px;
+            color: #334155;
+        }
+
+        .hologram {
+            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-size: 5px;
+            font-weight: bold;
+        }
+
+        /* ========== Back Page Styles ========== */
+        .back-top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+        }
+        
+        .back-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .back-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .back-logo-icon span {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        
+        .back-company h5 {
+            font-size: 10px;
+            font-weight: 800;
+            color: white;
+        }
+        
+        .back-company p {
+            font-size: 5px;
+            color: #fbbf24;
+        }
+        
+        .back-help {
+            text-align: right;
+        }
+        
+        .back-help span {
+            font-size: 7px;
+            font-weight: 700;
+            color: white;
+            display: block;
+        }
+        
+        .back-help small {
+            font-size: 5px;
+            color: #fbbf24;
+        }
+        
+        .back-middle-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+        }
+        
+        .barcode-area {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .barcode {
+            height: 30px;
+            background: repeating-linear-gradient(90deg, 
+                #fff 0px, #fff 2px, 
+                #000 2px, #000 6px);
+            width: 100%;
+            border-radius: 5px;
+        }
+        
+        .back-qrcode-area {
+            text-align: center;
+        }
+        
+        .back-qrcode-box {
+            background: white;
+            padding: 3px;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        #backQrcode canvas, #backQrcode img {
+            width: 40px !important;
+            height: 40px !important;
+        }
+        
+        .back-qr-text {
+            font-size: 4px;
+            color: #fbbf24;
+            margin-top: 2px;
+        }
+        
+        .back-details {
+            margin-bottom: 6px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+        }
+        
+        .back-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            font-size: 6px;
+            border-bottom: 0.5px dashed rgba(255,255,255,0.2);
+        }
+        
+        .back-row:last-child {
+            border-bottom: none;
+        }
+        
+        .back-label {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+        
+        .back-value {
+            color: white;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        
+        .back-address-section {
+            margin-bottom: 6px;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .back-address-section .company-name {
+            font-size: 7px;
+            font-weight: 800;
+            color: #fbbf24;
+        }
+        
+        .back-address-section .company-address {
+            font-size: 5px;
+            color: white;
+            margin-top: 2px;
+        }
+        
+        .back-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            margin-top: auto;
+        }
+        
+        .back-auth-signature {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 8px;
+            color: #fbbf24;
+        }
+        
+        .back-website {
+            font-size: 5px;
+            color: white;
+        }
+        
+        .back-valid-date {
+            font-size: 5px;
+            color: #fbbf24;
+        }
+
+        /* Flip Button - positioned below card */
+        .flip-button {
+            position: absolute;
+            bottom: -35px;
+            right: 0;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 9px;
+            cursor: pointer;
+            z-index: 20;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .flip-button:hover { background: #d97706; transform: translateY(-2px); }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: white; font-size: 12px; }
+        
+        /* Action Buttons - moved 10px lower */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 60px;
+        }
+        .action-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .action-btn:hover { background: #d97706; transform: translateY(-2px); }
+        .action-btn.secondary { background: #3b82f6; }
+        .action-btn.secondary:hover { background: #2563eb; }
+        
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .no-print, .flip-button, .action-buttons, .loading-overlay { display: none !important; }
+            .card-container { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay" class="loading-overlay" style="display: flex;">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading your ID card...</div>
+</div>
+
+<!-- Main View Card -->
+<div class="card-container" id="cardContainer" style="display: none;">
+    <div class="flip-wrapper">
+        <div class="card-front" id="cardFront">
+            <div class="front-content">
+                <div class="header">
+                    <div class="logo">
+                        <div class="logo-icon" id="companyLogo"><span>🏗️</span></div>
+                        <div class="logo-text">
+                            <h1>SP BUILD</h1>
+                            <p>CONSTRUCTION & ENGINEERING</p>
+                        </div>
+                    </div>
+                    <div class="badge" id="memberBadge">⭐ PLATINUM</div>
+                </div>
+
+                <div class="main-row">
+                    <div class="photo-col">
+                        <div class="photo-box">
+                            <img id="profilePhoto" src="" alt="Photo">
+                        </div>
+                    </div>
+                    <div class="info-col">
+                        <div class="name" id="empName">Loading...</div>
+                        <div class="designation" id="empDesignation">---</div>
+                        <div class="info-list">
+                            <div class="info-row"><span class="info-label">ID:</span><span class="info-value" id="empId">---</span></div>
+                            <div class="info-row"><span class="info-label">Dept:</span><span class="info-value" id="empDept">---</span></div>
+                            <div class="info-row"><span class="info-label">Blood:</span><span class="info-value" id="empBlood">---</span></div>
+                            <div class="info-row"><span class="info-label">Phone:</span><span class="info-value" id="empPhone">---</span></div>
+                        </div>
+                    </div>
+                    <div class="qrcode-col">
+                        <div class="qrcode-box"><div id="qrcode"></div></div>
+                        <div class="qr-text">SCAN TO VERIFY</div>
+                    </div>
+                </div>
+
+                <div class="address-row">
+                    <div class="address-label"><i class="fas fa-map-marker-alt"></i> Address</div>
+                    <div class="address-value" id="empAddress">Loading...</div>
+                </div>
+
+                <div class="footer-stamp">
+                    <div class="sign-area" id="authSignCard">Authorized</div>
+                    <div class="hologram">🔒 SECURE HOLOGRAM</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-back" id="cardBack">
+            <div class="back-content">
+                <div class="back-top-section">
+                    <div class="back-logo-area">
+                        <div class="back-logo-icon" id="backCompanyLogo"><span>🏗️</span></div>
+                        <div class="back-company">
+                            <h5>SP BUILD</h5>
+                            <p>CONSTRUCTION & ENGINEERING</p>
+                        </div>
+                    </div>
+                    <div class="back-help">
+                        <span><i class="fas fa-phone-alt"></i> 1800-202-4321</span>
+                        <small>24/7 Helpline</small>
+                    </div>
+                </div>
+                
+                <div class="back-middle-section">
+                    <div class="barcode-area">
+                        <div class="barcode"></div>
+                        <div style="font-size: 4px; color: #fbbf24; margin-top: 3px;">SCAN TO VERIFY</div>
+                    </div>
+                    <div class="back-qrcode-area">
+                        <div class="back-qrcode-box">
+                            <div id="backQrcode"></div>
+                        </div>
+                        <div class="back-qr-text">QR Code</div>
+                    </div>
+                </div>
+                
+                <div class="back-details">
+                    <div class="back-row"><span class="back-label"><i class="fas fa-id-card"></i> CARD NO :</span><span class="back-value" id="backCardNo">---</span></div>
+                    <div class="back-row"><span class="back-label"><i class="fas fa-envelope"></i> EMAIL :</span><span class="back-value" id="backEmail">---</span></div>
+                    <div class="back-row"><span class="back-label"><i class="fas fa-calendar"></i> JOINING :</span><span class="back-value" id="backJoining">---</span></div>
+                </div>
+                
+                <div class="back-address-section">
+                    <div class="company-name">SP BUILD CONSTRUCTION PVT. LTD.</div>
+                    <div class="company-address">123, Grand Trunk Road, Howrah, Kolkata - 711101, West Bengal, India</div>
+                </div>
+                
+                <div class="back-footer">
+                    <div class="back-auth-signature" id="authSign">---</div>
+                    <div class="back-website">www.spbuild.com</div>
+                    <div class="back-valid-date" id="validDate">Valid Till: ---</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="flip-button no-print" id="flipBtn">🔄 Flip Card</button>
+</div>
+
+<div class="action-buttons no-print">
+    <button class="action-btn" id="downloadBtn">
+        <i class="fas fa-download"></i> Download as Image
+    </button>
+    <button class="action-btn" id="printBtn">
+        <i class="fas fa-print"></i> Print ID Card
+    </button>
+    <button class="action-btn secondary" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Back to Profile
+    </button>
+</div>
+
+<script type="module">
+    let currentUserData = null;
+    let currentAuthUser = null;
+    let frontBgImage = '';
+    let backBgImage = '';
+    let companyLogoImage = '';
+    let cardData = {};
+    const COMPANY_ASSETS_PATH = 'companyAssets';
+    
+    function formatDate(dateStr) {
+        if(!dateStr) return 'Not set';
+        if(typeof dateStr === 'number') return new Date(dateStr).toLocaleDateString('en-US');
+        if(dateStr.includes('-')) {
+            let parts = dateStr.split('-');
+            if(parts.length === 3) return `${parts[1]}/${parts[2]}/${parts[0]}`;
+        }
+        return dateStr;
+    }
+    
+    function generateQRCode(userId) {
+        const verifyUrl = `https://sp-build-official.web.app/verify.html?id=${userId}`;
+        const qrcodeDiv = document.getElementById("qrcode");
+        qrcodeDiv.innerHTML = "";
+        try {
+            new QRCode(qrcodeDiv, { text: verifyUrl, width: 55, height: 55, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+        } catch(e) {
+            qrcodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=55x55&data=${encodeURIComponent(verifyUrl)}" width="55" height="55">`;
+        }
+        return verifyUrl;
+    }
+    
+    function generateBackQRCode(userId) {
+        const verifyUrl = `https://sp-build-official.web.app/verify.html?id=${userId}`;
+        const backQrcodeDiv = document.getElementById("backQrcode");
+        backQrcodeDiv.innerHTML = "";
+        try {
+            new QRCode(backQrcodeDiv, { text: verifyUrl, width: 40, height: 40, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+        } catch(e) {
+            backQrcodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=40x40&data=${encodeURIComponent(verifyUrl)}" width="40" height="40">`;
+        }
+        return verifyUrl;
+    }
+    
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            const logoIcon = document.getElementById('companyLogo');
+            const backLogoIcon = document.getElementById('backCompanyLogo');
+            
+            if(snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                companyLogoImage = snapshot.val();
+                const logoHtml = `<img src="${companyLogoImage}" style="width:100%; height:100%; object-fit:cover;">`;
+                logoIcon.innerHTML = logoHtml;
+                backLogoIcon.innerHTML = logoHtml;
+            } else {
+                companyLogoImage = '';
+                logoIcon.innerHTML = `<span>🏗️</span>`;
+                backLogoIcon.innerHTML = `<span>🏗️</span>`;
+            }
+        } catch(error) { console.error("Logo error:", error); }
+    }
+    
+    async function loadCardBackgrounds() {
+        try {
+            const frontBgRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/cardFrontBg`);
+            const frontBgSnap = await window.get(frontBgRef);
+            const cardFront = document.getElementById('cardFront');
+            if (frontBgSnap.exists() && frontBgSnap.val() && frontBgSnap.val().startsWith('data:image')) {
+                frontBgImage = frontBgSnap.val();
+                cardFront.style.backgroundImage = `url(${frontBgImage})`;
+                cardFront.style.backgroundSize = 'cover';
+                cardFront.style.backgroundPosition = 'center';
+            } else {
+                frontBgImage = '';
+                cardFront.style.backgroundImage = 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)';
+            }
+            
+            const backBgRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/cardBackBg`);
+            const backBgSnap = await window.get(backBgRef);
+            const cardBack = document.getElementById('cardBack');
+            if (backBgSnap.exists() && backBgSnap.val() && backBgSnap.val().startsWith('data:image')) {
+                backBgImage = backBgSnap.val();
+                cardBack.style.backgroundImage = `url(${backBgImage})`;
+                cardBack.style.backgroundSize = 'cover';
+                cardBack.style.backgroundPosition = 'center';
+            } else {
+                backBgImage = '';
+                cardBack.style.backgroundImage = 'linear-gradient(145deg, #1a1f30 0%, #0f172a 100%)';
+            }
+        } catch(error) { console.error("Background error:", error); }
+    }
+    
+    async function loadAndDisplayCard(user) {
+        if(!user) return;
+        currentAuthUser = user;
+        
+        try {
+            await loadCompanyLogo();
+            await loadCardBackgrounds();
+            
+            const userRef = window.ref(window.db, `users/${user.uid}`);
+            const snapshot = await window.get(userRef);
+            
+            if(snapshot.exists()) {
+                currentUserData = snapshot.val();
+            } else {
+                currentUserData = {
+                    uid: user.uid, email: user.email,
+                    firstName: user.displayName?.split(' ')[0] || '',
+                    lastName: user.displayName?.split(' ')[1] || '',
+                    position: "Team Member", department: "Construction",
+                    mobile: user.phoneNumber || "", bloodGroup: "N/A",
+                    address: "Not provided", registeredAt: new Date().toISOString(),
+                    userId: user.uid.slice(0,8).toUpperCase()
+                };
+            }
+            
+            let fullName = `${currentUserData.firstName || ''} ${currentUserData.lastName || ''}`.trim() || currentUserData.fullName || user.displayName || user.email?.split('@')[0] || "SP Employee";
+            let designation = currentUserData.position || currentUserData.designation || currentUserData.role || "Team Member";
+            let userId = currentUserData.userId || currentUserData.idno || currentUserData.employeeId || user.uid.slice(0,8).toUpperCase();
+            let dept = currentUserData.department || currentUserData.dept || "Construction";
+            let blood = currentUserData.bloodGroup || currentUserData.blood || "N/A";
+            let phone = currentUserData.mobile || currentUserData.phone || "Not set";
+            let fullAddress = currentUserData.address || currentUserData.location || "Not provided";
+            let email = currentUserData.email || user.email || "Not set";
+            let joining = currentUserData.joiningDate || currentUserData.joining || currentUserData.registeredAt;
+            let badge = "⭐ PLATINUM";
+            if(designation.includes("Manager") || designation.includes("Director")) badge = "👑 EXECUTIVE";
+            if(blood === "O+") badge = "⭐ GOLD ELITE";
+            
+            let firstInitial = fullName.charAt(0) || "S";
+            let lastPart = fullName.split(' ')[1] ? fullName.split(' ')[1].charAt(0) : '';
+            let signature = lastPart ? `${firstInitial}. ${lastPart}.` : `${firstInitial}.`;
+            let issueYear = currentUserData.registeredAt ? new Date(currentUserData.registeredAt).getFullYear() : 2024;
+            
+            cardData = {
+                fullName, designation, userId, dept, blood, phone, fullAddress, email, 
+                joining: joining ? formatDate(joining) : "Not set", 
+                badge, signature, issueYear,
+                profilePic: currentUserData.profilePicture || ''
+            };
+            
+            document.getElementById("empName").innerText = fullName;
+            document.getElementById("empDesignation").innerText = designation;
+            document.getElementById("empId").innerText = userId;
+            document.getElementById("backCardNo").innerText = userId;
+            document.getElementById("empDept").innerText = dept;
+            document.getElementById("empBlood").innerText = blood;
+            document.getElementById("empPhone").innerText = phone;
+            document.getElementById("empAddress").innerHTML = `<i class="fas fa-location-dot"></i> ${fullAddress}`;
+            document.getElementById("backEmail").innerText = email;
+            document.getElementById("backJoining").innerText = cardData.joining;
+            document.getElementById("memberBadge").innerHTML = badge;
+            document.getElementById("authSign").innerHTML = signature;
+            document.getElementById("authSignCard").innerHTML = signature;
+            document.getElementById("validDate").innerHTML = `Dec ${issueYear + 5}`;
+            
+            generateQRCode(userId);
+            generateBackQRCode(userId);
+            
+            let profileImg = document.getElementById("profilePhoto");
+            if(cardData.profilePic && cardData.profilePic.startsWith('data:image')) {
+                profileImg.src = cardData.profilePic;
+            } else {
+                let initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+                profileImg.src = `https://ui-avatars.com/api/?background=1e40af&color=ffffff&bold=true&size=80&name=${initials || 'SP'}&length=2`;
+            }
+        } catch(error) {
+            console.error("Error:", error);
+        }
+    }
+    
+    async function downloadCard() {
+        const cardContainer = document.getElementById("cardContainer");
+        const wasFlipped = cardContainer.classList.contains("flipped");
+        
+        if (wasFlipped) cardContainer.classList.remove("flipped");
+        await new Promise(r => setTimeout(r, 100));
+        
+        try {
+            const frontCanvas = await html2canvas(document.querySelector('.card-front'), {
+                scale: 3,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false
+            });
+            
+            const frontLink = document.createElement('a');
+            frontLink.download = 'spbuild-id-card-front.png';
+            frontLink.href = frontCanvas.toDataURL('image/png');
+            frontLink.click();
+            
+            cardContainer.classList.add("flipped");
+            await new Promise(r => setTimeout(r, 200));
+            
+            const backCanvas = await html2canvas(document.querySelector('.card-back'), {
+                scale: 3,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false
+            });
+            
+            const backLink = document.createElement('a');
+            backLink.download = 'spbuild-id-card-back.png';
+            backLink.href = backCanvas.toDataURL('image/png');
+            backLink.click();
+            
+            if (!wasFlipped) cardContainer.classList.remove("flipped");
+            
+        } catch(error) {
+            console.error('Download error:', error);
+            alert('Download failed. Please try again.');
+        }
+    }
+    
+    function printCard() {
+        const printWindow = window.open('', '_blank');
+        
+        const profilePicSrc = cardData.profilePic && cardData.profilePic.startsWith('data:image') ? 
+            cardData.profilePic : `https://ui-avatars.com/api/?background=1e40af&color=ffffff&bold=true&size=80&name=${(cardData.fullName || 'SP').substring(0,2)}&length=2`;
+        
+        const frontBgStyle = frontBgImage ? `background-image: url('${frontBgImage}'); background-size: cover; background-position: center;` : 'background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);';
+        const backBgStyle = backBgImage ? `background-image: url('${backBgImage}'); background-size: cover; background-position: center;` : 'background: linear-gradient(145deg, #1a1f30 0%, #0f172a 100%);';
+        
+        const companyLogoHtml = companyLogoImage ? `<img src="${companyLogoImage}" style="width:100%; height:100%; object-fit:cover;">` : '<span>🏗️</span>';
+        const verifyUrl = `https://sp-build-official.web.app/verify.html?id=${cardData.userId}`;
+        
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>SP BUILD ID Card</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+                    body { background: white; padding: 0; margin: 0; }
+                    .card-front-print, .card-back-print {
+                        width: 95mm;
+                        height: 60mm;
+                        position: relative;
+                        margin: 0;
+                        padding: 8px 12px;
+                        page-break-after: always;
+                        break-after: page;
+                        border-radius: 14px;
+                        overflow: hidden;
+                    }
+                    .front-content, .back-content {
+                        position: relative;
+                        z-index: 1;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: rgba(255,255,255,0.85); border-radius: 12px; }
+                    .logo { display: flex; align-items: center; gap: 8px; }
+                    .logo-icon { width: 36px; height: 36px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+                    .logo-text h1 { font-size: 15px; background: linear-gradient(120deg, #2563eb, #1e40af); -webkit-background-clip: text; background-clip: text; color: transparent; }
+                    .logo-text p { font-size: 5.5px; color: #475569; }
+                    .badge { background: linear-gradient(145deg, #fbbf24, #f59e0b); padding: 3px 8px; border-radius: 30px; font-size: 6px; font-weight: bold; color: #1e293b; }
+                    .main-row { display: flex; gap: 10px; margin-bottom: 8px; flex: 1; align-items: center; }
+                    .photo-col { width: 52px; }
+                    .photo-box { width: 52px; height: 60px; background: #e2e8f0; border-radius: 8px; border: 2px solid #fbbf24; overflow: hidden; }
+                    .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+                    .info-col { flex: 1; background: rgba(255,255,255,0.85); padding: 6px 10px; border-radius: 12px; }
+                    .name { font-size: 9.5px; font-weight: 800; color: #0f172a; }
+                    .designation { background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 8px; font-size: 6px; display: inline-block; font-weight: 600; margin-top: 3px; }
+                    .info-list { margin-top: 5px; }
+                    .info-row { display: flex; margin-bottom: 3px; font-size: 6.5px; }
+                    .info-label { width: 40px; font-weight: 700; color: #475569; }
+                    .info-value { flex: 1; font-weight: 600; color: #0f172a; }
+                    .qrcode-col { width: 75px; text-align: center; margin-left: 15px; }
+                    .qrcode-box { background: white; padding: 5px; border-radius: 8px; display: inline-block; }
+                    .qrcode-box canvas, .qrcode-box img { width: 55px !important; height: 55px !important; }
+                    .qr-text { font-size: 5px; margin-top: 4px; background: rgba(255,255,255,0.7); padding: 2px 4px; border-radius: 8px; display: inline-block; }
+                    .address-row { margin-top: 4px; padding: 6px 10px; background: rgba(255,255,255,0.85); border-radius: 12px; }
+                    .address-label { font-size: 5.5px; font-weight: 700; color: #475569; margin-bottom: 2px; }
+                    .address-value { font-size: 6px; font-weight: 500; color: #0f172a; }
+                    .footer-stamp { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding: 6px 10px; background: rgba(255,255,255,0.85); border-radius: 12px; }
+                    .sign-area { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #334155; }
+                    .hologram { background: linear-gradient(145deg, #f1f5f9, #e2e8f0); padding: 2px 6px; border-radius: 20px; font-size: 5px; font-weight: bold; }
+                    
+                    .back-top-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; }
+                    .back-logo-area { display: flex; align-items: center; gap: 8px; }
+                    .back-logo-icon { width: 32px; height: 32px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+                    .back-company h5 { font-size: 10px; font-weight: 800; color: white; }
+                    .back-company p { font-size: 5px; color: #fbbf24; }
+                    .back-help { text-align: right; }
+                    .back-help span { font-size: 7px; font-weight: 700; color: white; display: block; }
+                    .back-help small { font-size: 5px; color: #fbbf24; }
+                    .back-middle-section { display: flex; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; }
+                    .barcode-area { flex: 1; text-align: center; }
+                    .barcode { height: 30px; background: repeating-linear-gradient(90deg, #fff 0px, #fff 2px, #000 2px, #000 6px); width: 100%; border-radius: 5px; }
+                    .back-qrcode-area { text-align: center; }
+                    .back-qrcode-box { background: white; padding: 3px; border-radius: 8px; display: inline-block; }
+                    .back-qr-text { font-size: 4px; color: #fbbf24; margin-top: 2px; }
+                    .back-details { margin-bottom: 6px; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; }
+                    .back-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 6px; border-bottom: 0.5px dashed rgba(255,255,255,0.2); }
+                    .back-label { color: #fbbf24; font-weight: 700; }
+                    .back-value { color: white; font-weight: 600; font-family: monospace; }
+                    .back-address-section { margin-bottom: 6px; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; text-align: center; }
+                    .back-address-section .company-name { font-size: 7px; font-weight: 800; color: #fbbf24; }
+                    .back-address-section .company-address { font-size: 5px; color: white; margin-top: 2px; }
+                    .back-footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; margin-top: auto; }
+                    .back-auth-signature { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #fbbf24; }
+                    .back-website { font-size: 5px; color: white; }
+                    .back-valid-date { font-size: 5px; color: #fbbf24; }
+                    
+                    @media print {
+                        body { margin: 0; padding: 0; }
+                        .card-front-print, .card-back-print { page-break-after: always; break-after: page; }
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="card-front-print" style="${frontBgStyle}">
+                    <div class="front-content">
+                        <div class="header">
+                            <div class="logo">
+                                <div class="logo-icon">${companyLogoHtml}</div>
+                                <div class="logo-text"><h1>SP BUILD</h1><p>CONSTRUCTION & ENGINEERING</p></div>
+                            </div>
+                            <div class="badge">${cardData.badge || '⭐ PLATINUM'}</div>
+                        </div>
+                        <div class="main-row">
+                            <div class="photo-col"><div class="photo-box"><img src="${profilePicSrc}" alt="Photo"></div></div>
+                            <div class="info-col">
+                                <div class="name">${cardData.fullName || 'Employee'}</div>
+                                <div class="designation">${cardData.designation || 'Team Member'}</div>
+                                <div class="info-list">
+                                    <div class="info-row"><span class="info-label">ID:</span><span class="info-value">${cardData.userId || '---'}</span></div>
+                                    <div class="info-row"><span class="info-label">Dept:</span><span class="info-value">${cardData.dept || 'Construction'}</span></div>
+                                    <div class="info-row"><span class="info-label">Blood:</span><span class="info-value">${cardData.blood || 'N/A'}</span></div>
+                                    <div class="info-row"><span class="info-label">Phone:</span><span class="info-value">${cardData.phone || 'Not set'}</span></div>
+                                </div>
+                            </div>
+                            <div class="qrcode-col">
+                                <div class="qrcode-box" id="printFrontQrcode"></div>
+                                <div class="qr-text">SCAN TO VERIFY</div>
+                            </div>
+                        </div>
+                        <div class="address-row">
+                            <div class="address-label"><i class="fas fa-map-marker-alt"></i> Address</div>
+                            <div class="address-value">${cardData.fullAddress || 'Not provided'}</div>
+                        </div>
+                        <div class="footer-stamp">
+                            <div class="sign-area">${cardData.signature || 'Authorized'}</div>
+                            <div class="hologram">🔒 SECURE HOLOGRAM</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back-print" style="${backBgStyle}">
+                    <div class="back-content">
+                        <div class="back-top-section">
+                            <div class="back-logo-area">
+                                <div class="back-logo-icon">${companyLogoHtml}</div>
+                                <div class="back-company"><h5>SP BUILD</h5><p>CONSTRUCTION & ENGINEERING</p></div>
+                            </div>
+                            <div class="back-help"><span><i class="fas fa-phone-alt"></i> 1800-202-4321</span><small>24/7 Helpline</small></div>
+                        </div>
+                        <div class="back-middle-section">
+                            <div class="barcode-area"><div class="barcode"></div><div style="font-size:4px; color:#fbbf24; margin-top:3px;">SCAN TO VERIFY</div></div>
+                            <div class="back-qrcode-area"><div class="back-qrcode-box" id="printBackQrcode"></div><div class="back-qr-text">QR Code</div></div>
+                        </div>
+                        <div class="back-details">
+                            <div class="back-row"><span class="back-label">CARD NO :</span><span class="back-value">${cardData.userId || '---'}</span></div>
+                            <div class="back-row"><span class="back-label">EMAIL :</span><span class="back-value">${cardData.email || 'Not set'}</span></div>
+                            <div class="back-row"><span class="back-label">JOINING :</span><span class="back-value">${cardData.joining || 'Not set'}</span></div>
+                        </div>
+                        <div class="back-address-section">
+                            <div class="company-name">SP BUILD CONSTRUCTION PVT. LTD.</div>
+                            <div class="company-address">123, Grand Trunk Road, Howrah, Kolkata - 711101, West Bengal, India</div>
+                        </div>
+                        <div class="back-footer">
+                            <div class="back-auth-signature">${cardData.signature || 'Authorized'}</div>
+                            <div class="back-website">www.spbuild.com</div>
+                            <div class="back-valid-date">Valid Till: Dec ${(cardData.issueYear || 2024) + 5}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    const verifyUrl = '${verifyUrl}';
+                    new QRCode(document.getElementById('printFrontQrcode'), { text: verifyUrl, width: 55, height: 55, colorDark: "#000000", colorLight: "#ffffff" });
+                    new QRCode(document.getElementById('printBackQrcode'), { text: verifyUrl, width: 40, height: 40, colorDark: "#000000", colorLight: "#ffffff" });
+                    setTimeout(() => { window.print(); }, 500);
+                <\/script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+    }
+    
+    function setupFlip() {
+        const cardContainer = document.getElementById("cardContainer");
+        const flipBtn = document.getElementById("flipBtn");
+        flipBtn.addEventListener("click", (e) => { e.stopPropagation(); cardContainer.classList.toggle("flipped"); flipBtn.innerHTML = cardContainer.classList.contains("flipped") ? "🔄 Show Front" : "🔄 Flip Card"; });
+        cardContainer.addEventListener("click", (e) => { if(e.target !== flipBtn && !flipBtn.contains(e.target)) { cardContainer.classList.toggle("flipped"); flipBtn.innerHTML = cardContainer.classList.contains("flipped") ? "🔄 Show Front" : "🔄 Flip Card"; } });
+    }
+    
+    window.goBack = () => { window.location.href = 'profile.html'; };
+    
+    document.getElementById('downloadBtn').addEventListener('click', downloadCard);
+    document.getElementById('printBtn').addEventListener('click', printCard);
+    
+    window.onAuthStateChanged(window.auth, async (user) => {
+        const loadingOverlay = document.getElementById("loadingOverlay");
+        const cardContainer = document.getElementById("cardContainer");
+        if(!user) {
+            loadingOverlay.innerHTML = '<div class="spinner"></div><div class="loading-text">Please login...</div>';
+            setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+            return;
+        }
+        await loadAndDisplayCard(user);
+        loadingOverlay.style.display = "none";
+        cardContainer.style.display = "block";
+        setupFlip();
+    });
+</script>
+</body>
+</html>
