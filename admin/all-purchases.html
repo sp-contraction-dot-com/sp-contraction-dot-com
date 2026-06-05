@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Purchase / Shopping List | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        
+        window.auth = auth;
+        window.db = database;
+        window.ref = ref;
+        window.get = get;
+        window.onValue = onValue;
+        window.set = set;
+        window.push = push;
+        window.remove = remove;
+        window.update = update;
+        window.onAuthStateChanged = onAuthStateChanged;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 16px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+        }
+        .logo-icon span { font-size: 1.5rem; font-weight: 800; color: white; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-text h1 { font-size: 1.3rem; font-weight: 800; color: #1e293b; letter-spacing: -0.3px; }
+        .logo-text p { font-size: 0.55rem; color: #f59e0b; letter-spacing: 1px; font-weight: 600; }
+        .header-buttons { display: flex; gap: 12px; align-items: center; }
+        .back-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #475569;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover { background: #f59e0b; color: white; transform: translateY(-2px); }
+        .add-new-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
+        }
+        .add-new-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            border-radius: 24px;
+            padding: 18px 16px;
+            transition: all 0.3s;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: default;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-info h4 { font-size: 0.7rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; opacity: 0.9; }
+        .stat-card .value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+        .stat-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .card-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .card-2 { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .card-3 { background: linear-gradient(135deg, #10b981, #059669); }
+        .card-4 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .card-5 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .card-6 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        
+        /* Banner section - exactly like dashboard */
+        .banner-section {
+            position: relative;
+            margin-bottom: 28px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            background: #e2e8f0;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            transition: 0.3s;
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+        .banner-placeholder {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .banner-placeholder i {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+        .banner-placeholder p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .data-card {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(245,158,11,0.15);
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #fef3c7;
+        }
+        .section-title i { font-size: 1.3rem; color: #f59e0b; background: #fef3c7; padding: 10px; border-radius: 14px; }
+        .section-title h3 { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+        
+        .admin-info-section {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+        .admin-info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .admin-info-left, .admin-info-right {
+            font-size: 0.75rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .admin-info-left span, .admin-info-right span { font-weight: 700; color: #1e293b; }
+        .separator-line {
+            background: linear-gradient(90deg, #f59e0b, #fef3c7, #f59e0b);
+            height: 2px;
+            width: 100%;
+            margin: 16px 0 0 0;
+            border-radius: 2px;
+        }
+        .separator-line-light {
+            background: linear-gradient(90deg, #e2e8f0, #f59e0b, #e2e8f0);
+            height: 1px;
+            width: 100%;
+            margin: 12px 0 8px 0;
+        }
+        
+        .search-wrapper {
+            margin-bottom: 28px;
+            position: relative;
+            background: #f8fafc;
+            border-radius: 60px;
+            padding: 3px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            z-index: 2;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            border: none;
+            border-radius: 60px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            background: white;
+            outline: none;
+        }
+        #searchInput:focus { box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+        .result-badge {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+        }
+        .result-count { background: #fef3c7; padding: 4px 12px; border-radius: 40px; font-weight: 600; color: #d97706; }
+        
+        .download-controls {
+            background: #fefaf5;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            border: 1px solid #fee7c0;
+        }
+        .download-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 60px;
+        }
+        select, .download-group input {
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            background: white;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+        .limit-control input[type="checkbox"] { width: 18px; height: 18px; accent-color: #f59e0b; }
+        .limit-control input[type="number"] { width: 80px; padding: 6px 8px; }
+        .download-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            padding: 10px 32px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.4); }
+        
+        .table-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 60vh;
+            margin-top: 20px;
+            border-radius: 20px;
+            border: 1px solid #eef2f6;
+            background: white;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid #f0f2f5; font-size: 0.75rem; font-weight: 500; }
+        th { background: #f8fafc; font-weight: 800; color: #475569; font-size: 0.7rem; text-transform: uppercase; position: sticky; top: 0; }
+        tbody tr:hover { background: #fef9ec; }
+        .action-btns { display: flex; gap: 6px; justify-content: center; }
+        .edit-btn { background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 20px; cursor: pointer; font-size: 0.65rem; font-weight: 600; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 20px; cursor: pointer; font-size: 0.65rem; font-weight: 600; }
+        .summary-row { background: #fef3c7; font-weight: 800; border-top: 2px solid #f59e0b; }
+        .summary-row td { font-weight: 800; color: #1e293b; background: #fffbeb; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #1e293b;
+            border-left: 4px solid #f59e0b;
+            padding-left: 12px;
+        }
+        .modal-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-input-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+        .modal-input-group input, .modal-input-group select, .modal-input-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+        }
+        .modal-input-group input:focus, .modal-input-group select:focus { outline: none; border-color: #f59e0b; }
+        .company-select-group { display: flex; gap: 8px; align-items: center; }
+        .company-select-group select { flex: 1; }
+        .payment-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .payment-row .modal-input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .icon-btn {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn.add { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .icon-btn.delete { background: #ef4444; color: white; }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-save { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .btn-cancel { background: #e2e8f0; color: #475569; }
+        
+        .access-denied { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; text-align: center; background: white; border-radius: 28px; margin: 20px; padding: 40px; }
+        .access-denied i { font-size: 4rem; color: #ef4444; margin-bottom: 20px; }
+        
+        @media (max-width: 700px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal-form-grid { grid-template-columns: 1fr; }
+            .payment-row { flex-direction: column; }
+            .banner-section { min-height: 120px; }
+            .banner-placeholder { padding: 25px 15px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>PURCHASE & EXPENSE</p></div>
+        </div>
+        <div class="header-buttons">
+            <button class="add-new-btn" id="openAddModalBtn"><i class="fas fa-shopping-cart"></i> Add New Purchase</button>
+            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card card-1"><div class="stat-info"><h4>Total Records</h4><div class="value" id="statTotalRecords">0</div></div><div class="stat-icon"><i class="fas fa-database"></i></div></div>
+        <div class="stat-card card-2"><div class="stat-info"><h4>Total Quantity</h4><div class="value" id="statTotalQty">0</div></div><div class="stat-icon"><i class="fas fa-boxes"></i></div></div>
+        <div class="stat-card card-3"><div class="stat-info"><h4>Total Spent</h4><div class="value" id="statTotalSpent">₹0</div></div><div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div></div>
+        <div class="stat-card card-4"><div class="stat-info"><h4>Total Companies</h4><div class="value" id="statTotalCompanies">0</div></div><div class="stat-icon"><i class="fas fa-building"></i></div></div>
+        <div class="stat-card card-5"><div class="stat-info"><h4>Total Paid</h4><div class="value" id="statTotalPaid">₹0</div></div><div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div></div>
+        <div class="stat-card card-6"><div class="stat-info"><h4>Total Due</h4><div class="value" id="statTotalDue">₹0</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
+    </div>
+
+    <!-- BANNER SECTION - IMPROVED LIKE DASHBOARD -->
+    <div class="banner-section" id="bannerSection">
+        <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
+            <div class="banner-placeholder" id="bannerPlaceholder">
+                <i class="fas fa-image"></i>
+                <p>Dashboard banner image will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-card" id="mainContentCard">
+        <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Tools & Materials Purchase Records</h3></div>
+        
+        <div class="admin-info-section" id="adminInfoSection">
+            <div class="admin-info-grid">
+                <div class="admin-info-left">
+                    <span>Generated By:</span> <span id="adminName">Loading...</span><br>
+                    <span>Admin ID:</span> <span id="adminId">Loading...</span><br>
+                    <span>Email:</span> <span id="adminEmail">Loading...</span>
+                </div>
+                <div class="admin-info-right">
+                    <span>Mobile:</span> <span id="adminMobile">Loading...</span><br>
+                    <span>Address:</span> <span id="adminAddress">Loading...</span><br>
+                    <span>Report Date:</span> <span id="reportDate">Loading...</span>
+                </div>
+            </div>
+            <div class="separator-line"></div>
+        </div>
+        
+        <div id="purchaseContent">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by date, product, or company name...">
+                <div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 records</span></div>
+            </div>
+            
+            <div class="separator-line-light"></div>
+            
+            <div class="table-container">
+                <table id="purchaseTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Company Name</th>
+                            <th>Product Name</th>
+                            <th>Qty</th>
+                            <th>Unit Price (₹)</th>
+                            <th>Total (₹)</th>
+                            <th>Paid (₹)</th>
+                            <th>Due (₹)</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseTableBody"><tr><td colspan="10" class="loading"><div class="spinner"></div>解决了</tbody>
+                    <tfoot id="purchaseTableFooter"></tfoot>
+                </table>
+            </div>
+            
+            <div class="download-controls">
+                <div class="download-group"><i class="fas fa-database"></i><label>DATA SOURCE</label><select id="dataSourceSelect"><option value="all">All records</option><option value="filtered">Filtered records</option></select></div>
+                <div class="download-group"><div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled></div><select id="downloadFormat"><option value="csv">CSV</option><option value="pdf">PDF</option></select></div>
+                <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="addCompanyModal">
+    <div class="modal-content">
+        <h3><i class="fas fa-building"></i> Add New Company</h3>
+        <div class="modal-input-group"><label>Company Name</label><input type="text" id="newCompanyName" placeholder="Enter company name"></div>
+        <div class="modal-buttons"><button class="btn-save" onclick="saveNewCompany()">Add Company</button><button class="btn-cancel" onclick="closeAddCompanyModal()">Cancel</button></div>
+    </div>
+</div>
+
+<div class="modal" id="purchaseModal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Add New Purchase</h3>
+        <div class="modal-form-grid">
+            <div class="modal-input-group"><label>Date</label><input type="date" id="modalDate" value=""></div>
+            <div class="modal-input-group">
+                <label>Company Name</label>
+                <div class="company-select-group">
+                    <select id="modalCompanySelect"><option value="">-- Select Company --</option></select>
+                    <button class="icon-btn add" onclick="openAddCompanyModal()" title="Add New Company"><i class="fas fa-plus"></i></button>
+                    <button class="icon-btn delete" onclick="deleteSelectedCompany()" title="Delete Company"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <div class="modal-input-group"><label>Product Name</label><input type="text" id="modalProduct" placeholder="e.g., Hammer, Tape, Drill"></div>
+            <div class="modal-input-group"><label>Quantity (Pieces)</label><input type="number" id="modalQty" placeholder="Number" step="1"></div>
+            <div class="modal-input-group"><label>Unit Price (₹)</label><input type="number" id="modalPrice" placeholder="Price per piece" step="0.01"></div>
+            <div class="modal-input-group"><label>Total Price (₹)</label><input type="text" id="modalTotal" readonly placeholder="Auto Calculated"></div>
+        </div>
+        <div class="payment-row">
+            <div class="modal-input-group"><label>Company Paid (₹)</label><input type="number" id="modalCompanyPaid" placeholder="Amount company gave" step="0.01" value="0"></div>
+            <div class="modal-input-group"><label>Due (₹)</label><input type="text" id="modalDue" readonly placeholder="Auto calculated"></div>
+        </div>
+        <div class="modal-input-group"><label>Notes / Description</label><textarea id="modalNotes" rows="2" placeholder="Optional: Store name, purpose..."></textarea></div>
+        <div class="modal-buttons"><button class="btn-save" id="modalSaveBtn"><i class="fas fa-save"></i> Save</button><button class="btn-cancel" id="modalCancelBtn"><i class="fas fa-times"></i> Cancel</button></div>
+    </div>
+</div>
+
+<script type="module">
+    const db = window.db;
+    const auth = window.auth;
+    
+    let allPurchases = [];
+    let currentFilteredPurchases = [];
+    let allCompanies = [];
+    let pdfLogoBase64 = null;
+    let companyLogoBase64 = null;
+    let editRecordId = null;
+    let isAdminUser = false;
+    let currentAdminInfo = {
+        name: '',
+        userId: '',
+        email: '',
+        mobile: '',
+        address: ''
+    };
+    
+    // DOM Elements
+    const tbody = document.getElementById('purchaseTableBody');
+    const tfoot = document.getElementById('purchaseTableFooter');
+    const searchInput = document.getElementById('searchInput');
+    const resultCountSpan = document.getElementById('resultCountSpan');
+    const dataSourceSelect = document.getElementById('dataSourceSelect');
+    const limitCheckbox = document.getElementById('limitCheckbox');
+    const limitCountInput = document.getElementById('limitCount');
+    const downloadFormatSelect = document.getElementById('downloadFormat');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const headerLogo = document.getElementById('headerLogo');
+    const statTotalRecords = document.getElementById('statTotalRecords');
+    const statTotalQty = document.getElementById('statTotalQty');
+    const statTotalSpent = document.getElementById('statTotalSpent');
+    const statTotalCompanies = document.getElementById('statTotalCompanies');
+    const statTotalPaid = document.getElementById('statTotalPaid');
+    const statTotalDue = document.getElementById('statTotalDue');
+    
+    const adminNameSpan = document.getElementById('adminName');
+    const adminIdSpan = document.getElementById('adminId');
+    const adminEmailSpan = document.getElementById('adminEmail');
+    const adminMobileSpan = document.getElementById('adminMobile');
+    const adminAddressSpan = document.getElementById('adminAddress');
+    const reportDateSpan = document.getElementById('reportDate');
+    
+    const modal = document.getElementById('purchaseModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDate = document.getElementById('modalDate');
+    const modalCompanySelect = document.getElementById('modalCompanySelect');
+    const modalProduct = document.getElementById('modalProduct');
+    const modalQty = document.getElementById('modalQty');
+    const modalPrice = document.getElementById('modalPrice');
+    const modalTotal = document.getElementById('modalTotal');
+    const modalCompanyPaid = document.getElementById('modalCompanyPaid');
+    const modalDue = document.getElementById('modalDue');
+    const modalNotes = document.getElementById('modalNotes');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const openAddModalBtn = document.getElementById('openAddModalBtn');
+    
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function formatIndianNumber(num) { if (num === null || isNaN(num)) return '0'; let n = Math.round(parseFloat(num)); return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+    function formatNumber(value) { return formatIndianNumber(parseFloat(value) || 0); }
+    
+    function updateAdminInfoDisplay() {
+        if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
+        if (adminIdSpan) adminIdSpan.innerText = currentAdminInfo.userId || 'ADMIN001';
+        if (adminEmailSpan) adminEmailSpan.innerText = currentAdminInfo.email || 'N/A';
+        if (adminMobileSpan) adminMobileSpan.innerText = currentAdminInfo.mobile || 'N/A';
+        if (adminAddressSpan) adminAddressSpan.innerText = currentAdminInfo.address || 'N/A';
+        if (reportDateSpan) {
+            const now = new Date();
+            reportDateSpan.innerText = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' | ' + now.toLocaleTimeString();
+        }
+    }
+    
+    async function loadCurrentAdminInfo(user) {
+        if (!user) return;
+        try {
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+            const userData = userSnap.val();
+            if (userData) {
+                currentAdminInfo.name = userData.fullName || userData.firstName || user.email?.split('@')[0] || 'Admin';
+                currentAdminInfo.userId = userData.userId || user.uid?.slice(0, 8) || 'ADMIN001';
+                currentAdminInfo.email = userData.email || user.email || 'N/A';
+                currentAdminInfo.mobile = userData.mobile || userData.phone || 'N/A';
+                currentAdminInfo.address = userData.address || userData.city || 'N/A';
+            } else {
+                currentAdminInfo.name = user.email?.split('@')[0] || 'Admin';
+                currentAdminInfo.userId = user.uid?.slice(0, 8) || 'ADMIN001';
+                currentAdminInfo.email = user.email || 'N/A';
+                currentAdminInfo.mobile = 'N/A';
+                currentAdminInfo.address = 'N/A';
+            }
+            updateAdminInfoDisplay();
+        } catch (err) {}
+    }
+    
+    function updateDue() {
+        const total = parseFloat(modalTotal.value) || 0;
+        const paid = parseFloat(modalCompanyPaid.value) || 0;
+        modalDue.value = formatIndianNumber(total - paid);
+    }
+    modalTotal.addEventListener('input', updateDue);
+    modalCompanyPaid.addEventListener('input', updateDue);
+    
+    function calculateTotal() {
+        const qty = parseFloat(modalQty.value) || 0;
+        const price = parseFloat(modalPrice.value) || 0;
+        modalTotal.value = (qty * price).toFixed(2);
+        updateDue();
+    }
+    modalQty.addEventListener('input', calculateTotal);
+    modalPrice.addEventListener('input', calculateTotal);
+    
+    async function loadCompanies() {
+        if (!isAdminUser) return;
+        try {
+            const snapshot = await window.get(window.ref(db, 'companies'));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                allCompanies = Object.entries(data).map(([id, name]) => ({ id, name: name }));
+            } else { allCompanies = []; }
+            updateCompanySelect();
+            if (statTotalCompanies) statTotalCompanies.innerText = formatIndianNumber(allCompanies.length);
+        } catch(e) { console.error(e); }
+    }
+    
+    function updateCompanySelect() {
+        if (!modalCompanySelect) return;
+        let options = '<option value="">-- Select Company --</option>';
+        for (let c of allCompanies) options += `<option value="${c.id}">${escapeHtml(c.name)}</option>`;
+        modalCompanySelect.innerHTML = options;
+    }
+    
+    window.saveNewCompany = async function() {
+        if (!isAdminUser) return;
+        const companyName = document.getElementById('newCompanyName').value.trim();
+        if (!companyName) { showToast('Enter company name', true); return; }
+        try {
+            const newRef = window.push(window.ref(db, 'companies'));
+            await window.set(newRef, companyName);
+            showToast('Company added!');
+            closeAddCompanyModal();
+            document.getElementById('newCompanyName').value = '';
+            await loadCompanies();
+        } catch(e) { showToast('Failed', true); }
+    };
+    
+    window.deleteSelectedCompany = async function() {
+        if (!isAdminUser) return;
+        const selectedId = modalCompanySelect.value;
+        if (!selectedId) { showToast('Select a company first', true); return; }
+        const selectedCompany = allCompanies.find(c => c.id === selectedId);
+        if (selectedCompany && confirm(`Delete "${selectedCompany.name}"?`)) {
+            try {
+                await window.remove(window.ref(db, `companies/${selectedId}`));
+                showToast('Company deleted');
+                await loadCompanies();
+                modalCompanySelect.value = '';
+            } catch(e) { showToast('Delete failed', true); }
+        }
+    };
+    
+    window.openAddCompanyModal = function() { document.getElementById('addCompanyModal').classList.add('show'); };
+    window.closeAddCompanyModal = function() { document.getElementById('addCompanyModal').classList.remove('show'); };
+    
+    function computeTotals(records) {
+        let totalQty = 0, totalSpent = 0, totalPaid = 0, totalDue = 0;
+        const uniqueCompanies = new Set();
+        for (const r of records) {
+            totalQty += r.quantity || 0;
+            totalSpent += r.totalPrice || 0;
+            totalPaid += r.companyPaid || 0;
+            totalDue += (r.totalPrice || 0) - (r.companyPaid || 0);
+            if (r.companyName) uniqueCompanies.add(r.companyName);
+        }
+        return { recordCount: records.length, totalQty, totalSpent, totalPaid, totalDue, uniqueCompanies: uniqueCompanies.size };
+    }
+    
+    function updateStatsCards(records) {
+        const totals = computeTotals(records);
+        statTotalRecords.innerText = formatIndianNumber(totals.recordCount);
+        statTotalQty.innerText = formatIndianNumber(totals.totalQty);
+        statTotalSpent.innerHTML = `₹${formatIndianNumber(totals.totalSpent)}`;
+        statTotalPaid.innerHTML = `₹${formatIndianNumber(totals.totalPaid)}`;
+        statTotalDue.innerHTML = `₹${formatIndianNumber(totals.totalDue)}`;
+        if(statTotalCompanies) statTotalCompanies.innerText = formatIndianNumber(totals.uniqueCompanies);
+    }
+    
+    function renderFooter(records) {
+        if (!records.length) { tfoot.innerHTML = ''; return; }
+        const totals = computeTotals(records);
+        tfoot.innerHTML = `
+            <tr class="summary-row">
+                <td colspan="3"><strong>TOTAL SUMMARY</strong></td>
+                <td><strong>${formatIndianNumber(totals.recordCount)} Records</strong></td>
+                <td><strong>${formatIndianNumber(totals.totalQty)} Pcs</strong></td>
+                <td><strong>₹${formatIndianNumber(totals.totalSpent)}</strong></td>
+                <td><strong>₹${formatIndianNumber(totals.totalPaid)}</strong></td>
+                <td style="color: ${totals.totalDue > 0 ? '#dc2626' : '#15803d'};"><strong>₹${formatIndianNumber(totals.totalDue)}</strong></td>
+                <td>—</strong></td>
+                <td>—</strong></td>
+            </tr>
+        `;
+    }
+    
+    function renderTable() {
+        if (!currentFilteredPurchases.length) {
+            tbody.innerHTML = '<tr><td colspan="10" class="no-data">No purchase records found</td></tr>';
+            resultCountSpan.innerText = `0 records`;
+            tfoot.innerHTML = '';
+            updateStatsCards([]);
+            return;
+        }
+        let html = '';
+        for (let r of currentFilteredPurchases) {
+            const due = (r.totalPrice || 0) - (r.companyPaid || 0);
+            const dueColor = due < 0 ? '#dc2626' : '#15803d';
+            html += `<tr>
+                        <td>${escapeHtml(r.date || 'N/A')}</td>
+                        <td><strong>${escapeHtml(r.companyName || 'N/A')}</strong></td>
+                        <td>${escapeHtml(r.productName || 'N/A')}</td>
+                        <td>${r.quantity || 0}</td>
+                        <td>₹${formatNumber(r.unitPrice || 0)}</td>
+                        <td class="amount-positive">₹${formatNumber(r.totalPrice || 0)}</td>
+                        <td class="amount-positive">₹${formatNumber(r.companyPaid || 0)}</td>
+                        <td style="color: ${dueColor};">₹${formatNumber(due)}</td>
+                        <td>${escapeHtml(r.notes || '-')}</td>
+                        <td class="action-btns">
+                            <button class="edit-btn" onclick="window.editPurchase('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="delete-btn" onclick="window.deletePurchase('${r.id}')"><i class="fas fa-trash"></i> Del</button>
+                        </td>
+                    </tr>`;
+        }
+        tbody.innerHTML = html;
+        resultCountSpan.innerText = `${currentFilteredPurchases.length} record${currentFilteredPurchases.length !== 1 ? 's' : ''}`;
+        renderFooter(currentFilteredPurchases);
+        updateStatsCards(currentFilteredPurchases);
+    }
+    
+    function filterRecords(searchTerm) {
+        const term = searchTerm.trim().toLowerCase();
+        if (!term) { currentFilteredPurchases = [...allPurchases]; renderTable(); return; }
+        currentFilteredPurchases = allPurchases.filter(rec => (rec.date && rec.date.includes(term)) || (rec.productName && rec.productName.toLowerCase().includes(term)) || (rec.companyName && rec.companyName.toLowerCase().includes(term)));
+        renderTable();
+    }
+    
+    async function loadAllPurchases() {
+        if (!isAdminUser) return;
+        try {
+            const snapshot = await window.get(window.ref(db, 'purchases'));
+            let records = [];
+            if (snapshot.exists()) records = Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }));
+            records.sort((a,b) => new Date(b.date) - new Date(a.date));
+            allPurchases = records;
+            currentFilteredPurchases = [...allPurchases];
+            renderTable();
+            if (searchInput.value.trim()) filterRecords(searchInput.value);
+        } catch (error) { tbody.innerHTML = '<tr><td colspan="10" class="no-data">Error loading data</td></tr>'; }
+    }
+    
+    async function addPurchaseRecord(recordData) {
+        if (!isAdminUser) return;
+        try {
+            const newRef = window.push(window.ref(db, 'purchases'));
+            await window.set(newRef, recordData);
+            await loadAllPurchases();
+            showToast('Purchase added!');
+        } catch (error) { showToast('Failed to add', true); }
+    }
+    
+    async function updatePurchaseRecord(id, recordData) {
+        if (!isAdminUser) return;
+        try {
+            await window.update(window.ref(db, `purchases/${id}`), recordData);
+            await loadAllPurchases();
+            showToast('Purchase updated!');
+        } catch (error) { showToast('Update failed', true); }
+    }
+    
+    window.deletePurchase = async function(id) {
+        if (!isAdminUser) return;
+        if (confirm('Delete this purchase record?')) {
+            try {
+                await window.remove(window.ref(db, `purchases/${id}`));
+                await loadAllPurchases();
+                showToast('Deleted!');
+            } catch (error) { showToast('Delete failed', true); }
+        }
+    };
+    
+    function openAddModal() {
+        editRecordId = null;
+        modalTitle.innerText = 'Add New Purchase';
+        modalDate.value = new Date().toISOString().split('T')[0];
+        modalCompanySelect.value = '';
+        modalProduct.value = '';
+        modalQty.value = '';
+        modalPrice.value = '';
+        modalTotal.value = '';
+        modalCompanyPaid.value = '0';
+        modalNotes.value = '';
+        updateDue();
+        modal.classList.add('show');
+    }
+    
+    window.editPurchase = function(id) {
+        const record = allPurchases.find(r => r.id === id);
+        if (!record) return;
+        editRecordId = id;
+        modalTitle.innerText = 'Edit Purchase';
+        modalDate.value = record.date || '';
+        const company = allCompanies.find(c => c.name === record.companyName);
+        modalCompanySelect.value = company ? company.id : '';
+        modalProduct.value = record.productName || '';
+        modalQty.value = record.quantity || '';
+        modalPrice.value = record.unitPrice || '';
+        modalCompanyPaid.value = record.companyPaid || 0;
+        modalNotes.value = record.notes || '';
+        calculateTotal();
+        modal.classList.add('show');
+    };
+    
+    function closeModal() { modal.classList.remove('show'); editRecordId = null; }
+    
+    async function saveModalRecord() {
+        const date = modalDate.value;
+        const companyId = modalCompanySelect.value;
+        const selectedCompany = allCompanies.find(c => c.id === companyId);
+        const companyName = selectedCompany ? selectedCompany.name : '';
+        const productName = modalProduct.value.trim();
+        const quantity = parseFloat(modalQty.value) || 0;
+        const unitPrice = parseFloat(modalPrice.value) || 0;
+        const totalPrice = quantity * unitPrice;
+        const companyPaid = parseFloat(modalCompanyPaid.value) || 0;
+        const notes = modalNotes.value.trim() || '';
+        
+        if (!date) { showToast('Select date', true); return; }
+        if (!companyId) { showToast('Select company', true); return; }
+        if (!productName) { showToast('Enter product name', true); return; }
+        if (quantity <= 0) { showToast('Enter valid quantity', true); return; }
+        
+        const recordData = { date, companyId, companyName, productName, quantity, unitPrice, totalPrice, companyPaid, notes, createdAt: new Date().toISOString() };
+        
+        if (editRecordId) { recordData.updatedAt = new Date().toISOString(); await updatePurchaseRecord(editRecordId, recordData); }
+        else { await addPurchaseRecord(recordData); }
+        closeModal();
+    }
+    
+    // --- Assets & Banner (Fixed like Dashboard) ---
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const logoSnap = await window.get(logoRef);
+            if (logoSnap.exists() && logoSnap.val().startsWith('data:image')) {
+                companyLogoBase64 = logoSnap.val();
+                if(headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Logo">`;
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(db, `companyAssets/banners`);
+            const snapshot = await window.get(bannersRef);
+            const bannerSection = document.getElementById('bannerSection');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerSection.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerSection.style.backgroundSize = 'cover';
+                    bannerSection.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            bannerSection.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) {
+            console.warn("Error loading banner:", e);
+        }
+    }
+    
+    async function loadPdfLogo() {
+        try {
+            const pdfRef = window.ref(db, `companyAssets/pdfLogo`);
+            const pdfSnap = await window.get(pdfRef);
+            if (pdfSnap.exists() && pdfSnap.val().startsWith('data:image')) {
+                pdfLogoBase64 = pdfSnap.val();
+            }
+        } catch(e) {}
+    }
+    
+    function drawPDFLogo(doc, x, y, size=16) {
+        if (pdfLogoBase64) try { doc.addImage(pdfLogoBase64, 'JPEG', x, y-4, size, size); return true; } catch(e){}
+        doc.setFillColor(245,158,11); doc.circle(x+size/2, y-4+size/2, size/2, 'F');
+        doc.setFontSize(11); doc.setTextColor(255,255,255); doc.text("SP", x+size/2, y+size/2-1, { align: "center" }); return true;
+    }
+    function drawWatermark(doc, w, h) { if(pdfLogoBase64) try{ doc.setGState(new doc.GState({opacity:0.04})); doc.addImage(pdfLogoBase64, 'JPEG', w*0.25, h*0.25, w*0.5, h*0.5); doc.setGState(new doc.GState({opacity:1})); }catch(e){} }
+    
+    function showToast(msg, isErr = false) { const toast = document.createElement('div'); toast.innerText = msg; toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:'+(isErr?'#dc2626':'#15803d')+'; color:white; padding:10px 24px; border-radius:40px; z-index:9999;'; document.body.appendChild(toast); setTimeout(()=>toast.remove(),3000); }
+    
+    // --- Export with FIXED SUMMARY POSITION (increased height and margin) ---
+    function getRecordsToExport() {
+        let base = (dataSourceSelect.value === 'all') ? [...allPurchases] : [...currentFilteredPurchases];
+        if (limitCheckbox.checked) { let limit = parseInt(limitCountInput.value) || 10; if(limit < base.length) base = base.slice(0, limit); }
+        return base;
+    }
+    
+    function downloadCSV(records, fileName) {
+        if(!records.length){alert("No records");return;}
+        let csv = "Date,Company Name,Product Name,Quantity,Unit Price (Rs.),Total Price (Rs.),Company Paid (Rs.),Due (Rs.),Notes\n";
+        for(const p of records) {
+            const due = (p.totalPrice||0) - (p.companyPaid||0);
+            csv += `"${p.date||''}","${(p.companyName||'').replace(/"/g,'""')}","${(p.productName||'').replace(/"/g,'""')}",${p.quantity||0},${p.unitPrice||0},${p.totalPrice||0},${p.companyPaid||0},${due},"${(p.notes||'').replace(/"/g,'""')}"\n`;
+        }
+        const blob = new Blob([csv], {type:"text/csv"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click(); URL.revokeObjectURL(a.href);
+    }
+    
+    async function downloadPDF(records, fileName) {
+        if(!records.length){alert("No records to export.");return;} 
+        showToast('Generating PDF...');
+        try{
+            const {jsPDF} = window.jspdf; 
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [250, 300] });
+            const w = doc.internal.pageSize.getWidth();
+            const h = doc.internal.pageSize.getHeight();
+            const cx = w/2; 
+            let y = 12;
+            
+            drawWatermark(doc, w, h); 
+            drawPDFLogo(doc, 12, y, 14);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(245, 158, 11);
+            doc.text("SP CONSTRUCTION - PURCHASE REPORT", cx, y+8, { align: "center" });
+            
+            doc.setDrawColor(245,158,11);
+            doc.setLineWidth(0.5);
+            doc.line(10, y+12, w-10, y+12);
+            y += 18;
+            
+            // Left side: Admin Info, Right side: Quick Stats
+            doc.setFontSize(9);
+            doc.setTextColor(80,80,80);
+            doc.setFont("helvetica", "bold");
+            doc.text(`Generated By: ${currentAdminInfo.name} (${currentAdminInfo.userId})`, 10, y);
+            doc.text(`Email: ${currentAdminInfo.email}`, 10, y+5);
+            doc.text(`Mobile: ${currentAdminInfo.mobile}`, 10, y+10);
+            
+            const totals = computeTotals(records);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, w-10, y, { align: "right" });
+            doc.text(`Total Records: ${totals.recordCount}`, w-10, y+5, { align: "right" });
+            doc.text(`Total Qty: ${totals.totalQty} Pcs | Total Spent: Rs. ${formatIndianNumber(totals.totalSpent)}`, w-10, y+10, { align: "right" });
+            y += 20;
+            
+            doc.setDrawColor(245,158,11);
+            doc.setLineWidth(0.3);
+            doc.line(10, y-2, w-10, y-2);
+            
+            // Table
+            const tableData = records.map(p => [
+                p.date||'N/A', p.companyName||'N/A', p.productName||'N/A', p.quantity||0,
+                `Rs. ${formatIndianNumber(p.unitPrice||0)}`, `Rs. ${formatIndianNumber(p.totalPrice||0)}`,
+                `Rs. ${formatIndianNumber(p.companyPaid||0)}`, `Rs. ${formatIndianNumber((p.totalPrice||0)-(p.companyPaid||0))}`,
+                (p.notes||'-').substring(0,25)
+            ]);
+            
+            doc.autoTable({
+                startY: y+2,
+                head: [["Date", "Company", "Product", "Qty", "Unit", "Total", "Paid", "Due", "Notes"]],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [245,158,11], textColor: 255, fontStyle: 'bold', fontSize: 8, halign: 'center' },
+                bodyStyles: { fontSize: 7.5, cellPadding: 1.5, textColor: [30,30,30], fontStyle: 'bold', halign: 'center' },
+                columnStyles: {
+                    0: { cellWidth: 16, halign: 'center' }, 1: { cellWidth: 26, halign: 'left' },
+                    2: { cellWidth: 26, halign: 'left' }, 3: { cellWidth: 10, halign: 'center' },
+                    4: { cellWidth: 16, halign: 'right' }, 5: { cellWidth: 18, halign: 'right' },
+                    6: { cellWidth: 18, halign: 'right' }, 7: { cellWidth: 18, halign: 'right' },
+                    8: { cellWidth: 30, halign: 'left' }
+                },
+                margin: { left: 8, right: 8 },
+                didDrawPage: (data) => {
+                    const pageCount = doc.internal.getNumberOfPages();
+                    for(let i=1; i<=pageCount; i++){
+                        doc.setPage(i);
+                        drawWatermark(doc, w, h);
+                        doc.setFontSize(7);
+                        doc.setTextColor(148,163,184);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`Page ${i} of ${pageCount}`, cx, h-6, { align: "center" });
+                    }
+                }
+            });
+            
+            let finalY = doc.lastAutoTable.finalY + 8;
+            
+            // ** FIX: Increased height check and box height **
+            // বক্সের উচ্চতা 20px (প্রায় 5.3mm) বাড়ানো হয়েছে, এবং মার্জিন বড় করা হয়েছে
+            const boxHeight = 48; // আগে ছিল 40, এখন 48 (বৃদ্ধি 8mm ≈ 30px)
+            if (finalY + boxHeight + 10 > h - 10) { // আগে ছিল h-15, এখন h-10 (মার্জিন বেড়েছে)
+                doc.addPage();
+                drawWatermark(doc, w, h);
+                finalY = 15;
+            }
+            
+            const boxW = 180, boxX = (w-boxW)/2;
+            doc.setDrawColor(245,158,11);
+            doc.setFillColor(255,248,225);
+            doc.rect(boxX, finalY, boxW, boxHeight, 'FD');
+            
+            doc.setFontSize(12);
+            doc.setTextColor(245,158,11);
+            doc.setFont("helvetica", "bold");
+            doc.text("OVERALL SUMMARY", cx, finalY+10);
+            
+            doc.setDrawColor(245,158,11);
+            doc.setLineWidth(0.2);
+            doc.line(cx-50, finalY+14, cx+50, finalY+14);
+            
+            doc.setFontSize(9);
+            doc.setTextColor(51,51,51);
+            doc.text(`Total Records: ${totals.recordCount} | Total Qty: ${formatIndianNumber(totals.totalQty)} Pcs`, cx, finalY+26);
+            doc.text(`Total Spent: Rs. ${formatIndianNumber(totals.totalSpent)}`, cx, finalY+35);
+            doc.text(`Total Paid by Company: Rs. ${formatIndianNumber(totals.totalPaid)} | Total Due: Rs. ${formatIndianNumber(totals.totalDue)}`, cx, finalY+44);
+            
+            const lastPage = doc.internal.getNumberOfPages();
+            doc.setPage(lastPage);
+            doc.setFontSize(6);
+            doc.setTextColor(148,163,184);
+            doc.setFont("helvetica", "bold");
+            doc.text("This is a system generated purchase report from SP Construction Management System.", cx, h-5, { align: "center" });
+            
+            doc.save(fileName);
+            showToast('PDF Downloaded Successfully!');
+        } catch(e){ 
+            console.error(e); 
+            showToast('PDF Generation Failed', true); 
+        }
+    }
+    
+    function handleDownload() { 
+        const rec = getRecordsToExport(); 
+        if(!rec.length){alert("No records to export.");return;} 
+        const format = downloadFormatSelect.value; 
+        const file = `purchases_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.${format==='csv'?'csv':'pdf'}`; 
+        if(format==='csv') downloadCSV(rec, file); 
+        else downloadPDF(rec, file); 
+    }
+    function toggleLimitInput() { limitCountInput.disabled = !limitCheckbox.checked; }
+    let debTimer; function onSearch() { clearTimeout(debTimer); debTimer = setTimeout(()=>filterRecords(searchInput.value),300); }
+    
+    function bindEvents() { 
+        searchInput.addEventListener('input', onSearch); 
+        limitCheckbox.addEventListener('change', toggleLimitInput); 
+        downloadBtn.addEventListener('click', handleDownload); 
+        toggleLimitInput(); 
+        openAddModalBtn.addEventListener('click', openAddModal); 
+        modalCancelBtn.addEventListener('click', closeModal); 
+        modalSaveBtn.addEventListener('click', saveModalRecord); 
+    }
+    
+    function showAccessDenied() { 
+        document.getElementById('purchaseContent').style.display = 'none'; 
+        document.getElementById('mainContentCard').innerHTML += `<div class="access-denied"><i class="fas fa-shield-alt"></i><h2>Access Denied</h2><p>Admin only.</p><button onclick="window.location.href='dashboard.html'">Back</button></div>`; 
+    }
+    
+    async function checkAdminAndLoad(user) {
+        if(!user){window.location.href='login.html'; return;}
+        try{
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`)); 
+            const userData = userSnap.val();
+            if(!userData || (userData.role !== 'admin' && userData.isAdmin !== true)){ showAccessDenied(); return; }
+            isAdminUser = true; 
+            await loadCurrentAdminInfo(user); 
+            await loadCompanies(); 
+            await loadAllPurchases(); 
+            await loadCompanyLogo();
+            await loadBannerImage();
+            await loadPdfLogo();
+            bindEvents();
+            window.onValue(window.ref(db, 'purchases'), ()=>{ if(isAdminUser) loadAllPurchases(); });
+            window.onValue(window.ref(db, 'companies'), ()=>{ if(isAdminUser) loadCompanies(); });
+            window.onValue(window.ref(db, `companyAssets/banners`), () => { if(isAdminUser) loadBannerImage(); });
+            window.onValue(window.ref(db, `companyAssets/footerLogo`), () => { if(isAdminUser) loadCompanyLogo(); });
+        } catch(e){ showAccessDenied(); }
+    }
+    
+    window.onAuthStateChanged(auth, async (user) => { 
+        if(!user){ window.location.href='login.html'; return; } 
+        await checkAdminAndLoad(user); 
+    });
+</script>
+</body>
+</html>
