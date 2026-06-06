@@ -555,7 +555,10 @@
     <div class="header">
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
-            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>ATTENDANCE MANAGER</p></div>
+            <div class="logo-text">
+                <h1 id="headerTitle">All Users Attendance List</h1>
+                <p id="headerSubtitle">ATTENDANCE MANAGER</p>
+            </div>
         </div>
         <div class="header-buttons">
             <button class="add-new-btn" id="openAddModalBtn"><i class="fas fa-plus-circle"></i> Add New</button>
@@ -751,6 +754,8 @@
     const downloadFormatSelect = document.getElementById('downloadFormat');
     const downloadBtn = document.getElementById('downloadBtn');
     const headerLogo = document.getElementById('headerLogo');
+    const headerTitleSpan = document.getElementById('headerTitle');
+    const headerSubtitleSpan = document.getElementById('headerSubtitle');
     const attendanceContent = document.getElementById('attendanceContent');
     const accessDeniedDiv = document.getElementById('accessDeniedMessage');
     
@@ -823,7 +828,41 @@
         return rate;
     }
     
-    // ========== COMPANY LOGO LOAD FUNCTION ==========
+    // ========== GLOBAL BRANDING FUNCTIONS (same as dashboard) ==========
+    async function loadGlobalBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(db, `companyAssets/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Global branding loaded:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'ATTENDANCE MANAGER';
+                console.log("No global branding, using defaults");
+            }
+        } catch(err) {
+            console.warn("Error loading global branding:", err);
+        }
+    }
+    
+    function listenToGlobalBranding() {
+        const brandingRef = window.ref(db, `companyAssets/branding`);
+        window.onValue(brandingRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const brand = snapshot.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Real-time global branding update:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'ATTENDANCE MANAGER';
+                console.log("Global branding removed, reset to defaults");
+            }
+        });
+    }
+    
     async function loadCompanyLogo() {
         try {
             const logoRef = window.ref(db, `companyAssets/footerLogo`);
@@ -849,17 +888,17 @@
     function listenLogoChanges() {
         const logoRef = window.ref(db, `companyAssets/footerLogo`);
         window.onValue(logoRef, (snapshot) => {
-            const val = snapshot.val();
             if (headerLogo) {
-                if (val && val.startsWith('data:image')) {
-                    companyLogoBase64 = val;
-                    headerLogo.innerHTML = `<img src="${val}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    companyLogoBase64 = snapshot.val();
+                    headerLogo.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                 } else {
                     headerLogo.innerHTML = `<span>SP</span>`;
                 }
             }
         });
     }
+    // ========== END GLOBAL BRANDING ==========
     
     function updateAdminInfoDisplay() {
         if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
@@ -1010,6 +1049,8 @@
             await loadCompanyLogo();
             listenLogoChanges();
             await loadBannerImage();
+            await loadGlobalBranding();
+            listenToGlobalBranding();
         } catch (error) {
             showAccessDenied();
         }
@@ -1121,7 +1162,7 @@
                         <button class="edit-btn" onclick="openEditModal('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
                         <button class="delete-btn" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i> Del</button>
                     </td>
-                </tr>
+                </table>
             `;
         }
         tbody.innerHTML = html;
