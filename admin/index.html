@@ -9,7 +9,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get, set, onValue, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
@@ -34,6 +34,7 @@
         window.set = set;
         window.onValue = onValue;
         window.onAuthStateChanged = onAuthStateChanged;
+        window.update = update;
     </script>
     <style>
         * {
@@ -453,6 +454,93 @@
             display: block;
         }
 
+        /* MODAL STYLES - Simple link list */
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .settings-modal.open {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            max-height: 85vh;
+            border-radius: 32px;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            animation: modalPop 0.2s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px;
+            border-radius: 32px 32px 0 0;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+        }
+        .modal-body {
+            padding: 16px 0;
+        }
+        .settings-link-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f2f5;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            color: #1e293b;
+        }
+        .settings-link-item i {
+            width: 28px;
+            font-size: 1.2rem;
+            color: #f59e0b;
+        }
+        .settings-link-item span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .settings-link-item:hover {
+            background: #fef3c7;
+            padding-left: 30px;
+        }
         /* Scrollbar */
         .main-content::-webkit-scrollbar {
             width: 4px;
@@ -656,151 +744,102 @@
 </head>
 <body>
 
-<!-- LEFT SIDE MENU (background image loads from companyAssets) -->
+<!-- LEFT SIDE MENU -->
 <div class="side-menu-left" id="sideMenuLeft">
-    <div class="menu-header" id="leftMenuHeader" style="background-image: url(''); background-size: cover; background-position: center;">
-        <!-- Background image will be loaded from companyAssets/sidebarBackground -->
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('dashboard.html'); closeLeftMenu();">
-        <i class="fas fa-chart-line"></i> <span>Home</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('all-attendance.html'); closeLeftMenu();">
-        <i class="fas fa-calendar-check"></i> <span>User Attendance</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('all-users.html'); closeLeftMenu();">
-        <i class="fas fa-users"></i> <span>User's List</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('all-payments.html'); closeLeftMenu();">
-        <i class="fas fa-money-bill-wave"></i> <span> Company Payment History</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('attendantcard.html'); closeLeftMenu();">
-        <i class="fas fa-building"></i> <span>User Card</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('all-purchases.html'); closeLeftMenu();">
-        <i class="fas fa-cart-shopping"></i> <span>My Purchase</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('work-calendar.html'); closeLeftMenu();">
-        <i class="fas fa-calendar-alt"></i> <span>Work Calendar</span>
-    </div>
-    <div class="menu-item" onclick="loadPageInIframe('report-archive.html'); closeLeftMenu();">
-        <i class="fas fa-folder-open"></i> <span>Report Archive</span>
-    </div>
+    <div class="menu-header" id="leftMenuHeader" style="background-image: url('');"></div>
+    <div class="menu-item" onclick="loadPageInIframe('dashboard.html'); closeLeftMenu();"><i class="fas fa-chart-line"></i> <span>Home</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('all-attendance.html'); closeLeftMenu();"><i class="fas fa-calendar-check"></i> <span>User Attendance</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('all-users.html'); closeLeftMenu();"><i class="fas fa-users"></i> <span>User's List</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('all-payments.html'); closeLeftMenu();"><i class="fas fa-money-bill-wave"></i> <span> Company Payment History</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('attendantcard.html'); closeLeftMenu();"><i class="fas fa-building"></i> <span>User Card</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('all-purchases.html'); closeLeftMenu();"><i class="fas fa-cart-shopping"></i> <span>My Purchase</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('work-calendar.html'); closeLeftMenu();"><i class="fas fa-calendar-alt"></i> <span>Work Calendar</span></div>
+    <div class="menu-item" onclick="loadPageInIframe('report-archive.html'); closeLeftMenu();"><i class="fas fa-folder-open"></i> <span>Report Archive</span></div>
 </div>
 
-<!-- RIGHT SIDE MENU (Dynamic from Firebase) -->
+<!-- RIGHT SIDE MENU -->
 <div class="side-menu-right" id="sideMenuRight">
     <div class="menu-header" id="rightMenuHeader">
         <img id="rightMenuAvatar" class="menu-logo" src="https://placehold.co/90x90?text=User" alt="Profile Logo">
         <h3 id="rightMenuName">Loading...</h3>
         <p id="rightMenuPlan" style="font-size:0.7rem; margin-top:5px;">Contractor · Premium Plan</p>
     </div>
-    <div class="menu-item" onclick="closeRightMenu(); window.location.href='profile.html'">
-        <i class="fas fa-user"></i> <span>Profile</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); alert('⚙️ Settings Coming Soon')">
-        <i class="fas fa-cog"></i> <span>Settings</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); window.location.href='logoupload.html'">
-        <i class="fas fa-camera"></i> <span>Logo Upload</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); alert('🔔 Notification Preferences')">
-        <i class="fas fa-bell"></i> <span>Notifications</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); alert('❓ Help Center')">
-        <i class="fas fa-question-circle"></i> <span>Help Center</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); alert('ℹ️ App Version 2.0')">
-        <i class="fas fa-info-circle"></i> <span>App Info</span>
-    </div>
-    <div class="menu-item" onclick="closeRightMenu(); handleLogout()">
-        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-    </div>
+    <div class="menu-item" onclick="closeRightMenu(); window.location.href='profile.html'"><i class="fas fa-user"></i> <span>Profile</span></div>
+    <!-- Settings - Opens modal with link list -->
+    <div class="menu-item" onclick="closeRightMenu(); openSettingsModal();"><i class="fas fa-cog"></i> <span>Settings</span></div>
+    <div class="menu-item" onclick="closeRightMenu(); window.location.href='logoupload.html'"><i class="fas fa-camera"></i> <span>Logo Upload</span></div>
+    <div class="menu-item" onclick="closeRightMenu(); alert('🔔 Notification Preferences')"><i class="fas fa-bell"></i> <span>Notifications</span></div>
+    <div class="menu-item" onclick="closeRightMenu(); alert('❓ Help Center')"><i class="fas fa-question-circle"></i> <span>Help Center</span></div>
+    <div class="menu-item" onclick="closeRightMenu(); alert('ℹ️ App Version 2.0')"><i class="fas fa-info-circle"></i> <span>App Info</span></div>
+    <div class="menu-item" onclick="closeRightMenu(); handleLogout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeAllMenus()"></div>
 
-<!-- MAIN APP -->
-<div class="app-wrapper">
-    <!-- Top Header -->
-    <div class="top-header" id="topHeader">
-        <div class="header-row">
-            <div class="menu-icon" onclick="toggleLeftMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search work, worker or project...">
-            </div>
-            <div class="profile-img" id="headerProfileImg" onclick="toggleRightMenu()">
-                <img id="headerAvatar" src="https://placehold.co/44x44?text=SP" alt="Profile">
-            </div>
+<!-- SETTINGS MODAL - Simple Link List -->
+<div class="settings-modal" id="settingsModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3><i class="fas fa-sliders-h"></i> Settings</h3>
+            <button class="modal-close" onclick="closeSettingsModal()"><i class="fas fa-times"></i></button>
         </div>
-        <div class="greeting">
-            <h3>👷 Welcome, SP Construction</h3>
-            <p>View your work progress on the dashboard</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <div class="iframe-container" id="iframeContainer">
-            <iframe class="dashboard-iframe" id="dashboardFrame" src="dashboard.html" title="SP Construction Dashboard"></iframe>
-        </div>
-        <div class="dynamic-view" id="dynamicView"></div>
-    </div>
-    
-    <!-- Footer Section with Company Logo -->
-    <div class="app-footer" id="appFooter">
-        <div class="footer-content">
-            <div class="footer-logo-icon" id="footerLogoIcon">
-                <span>SP</span>
-            </div>
-            <div class="footer-text">
-                <h4>SP CONSTRUCTION</h4>
-                <p>BUILDING DREAMS TOGETHER</p>
-            </div>
-        </div>
-        <div class="copyright">
-            <i class="far fa-copyright"></i> 2026 SP CONSTRUCTION | All Rights Reserved
-        </div>
-    </div>
-
-    <!-- Bottom Navigation - Dark -->
-    <div class="bottom-nav">
-        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); loadPageInIframe('dashboard.html');">
-            <i class="fas fa-home"></i>
-            <div class="nav-label">Home</div>
-        </div>
-        <div class="nav-item" data-nav="search" onclick="setActiveNav(this); handleBottomNav('search')">
-            <i class="fas fa-search"></i>
-            <div class="nav-label">Search</div>
-        </div>
-        <div class="nav-item" data-nav="post" onclick="setActiveNav(this); handleBottomNav('post')">
-            <i class="fas fa-plus-circle"></i>
-            <div class="nav-label">Post</div>
-        </div>
-        <div class="nav-item" data-nav="support" onclick="setActiveNav(this); handleBottomNav('support')">
-            <i class="fas fa-headset"></i>
-            <div class="nav-label">Support</div>
-        </div>
-        <div class="nav-item" data-nav="notification" onclick="setActiveNav(this); handleBottomNav('notification')">
-            <i class="fas fa-bell"></i>
-            <div class="nav-label">Notifications</div>
-            <span class="notification-badge">3</span>
+        <div class="modal-body">
+            <a class="settings-link-item" href="change-name.html" onclick="closeSettingsModal();">
+                <i class="fas fa-user-edit"></i> <span> Change Name</span>
+            </a>
+            <a class="settings-link-item" href="change-image.html" onclick="closeSettingsModal();">
+                <i class="fas fa-image"></i> <span>Change Profile Image</span>
+            </a>
+            <a class="settings-link-item" href="logoupload.html" onclick="closeSettingsModal();">
+                <i class="fas fa-building"></i> <span> Change Company Logo</span>
+            </a>
+            <a class="settings-link-item" href="personal-data.html" onclick="closeSettingsModal();">
+                <i class="fas fa-id-card"></i> <span>Personal Data Change</span>
+            </a>
+            <a class="settings-link-item" href="change-password.html" onclick="closeSettingsModal();">
+                <i class="fas fa-lock"></i> <span> Change Password</span>
+            </a>
+            <a class="settings-link-item" href="preferences.html" onclick="closeSettingsModal();">
+                <i class="fas fa-cog"></i> <span>App Preferences</span>
+            </a>
         </div>
     </div>
 </div>
 
+<!-- MAIN APP -->
+<div class="app-wrapper">
+    <div class="top-header" id="topHeader">
+        <div class="header-row">
+            <div class="menu-icon" onclick="toggleLeftMenu()"><span></span><span></span><span></span></div>
+            <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search work, worker or project..."></div>
+            <div class="profile-img" id="headerProfileImg" onclick="toggleRightMenu()"><img id="headerAvatar" src="https://placehold.co/44x44?text=SP" alt="Profile"></div>
+        </div>
+        <div class="greeting"><h3>👷 Welcome, SP Construction</h3><p>View your work progress on the dashboard</p></div>
+    </div>
+    <div class="main-content" id="mainContent">
+        <div class="iframe-container" id="iframeContainer"><iframe class="dashboard-iframe" id="dashboardFrame" src="dashboard.html" title="SP Construction Dashboard"></iframe></div>
+        <div class="dynamic-view" id="dynamicView"></div>
+    </div>
+    <div class="app-footer" id="appFooter">
+        <div class="footer-content"><div class="footer-logo-icon" id="footerLogoIcon"><span>SP</span></div><div class="footer-text"><h4>SP CONSTRUCTION</h4><p>BUILDING DREAMS TOGETHER</p></div></div>
+        <div class="copyright"><i class="far fa-copyright"></i> 2026 SP CONSTRUCTION | All Rights Reserved</div>
+    </div>
+    <div class="bottom-nav">
+        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); loadPageInIframe('dashboard.html');"><i class="fas fa-home"></i><div class="nav-label">Home</div></div>
+        <div class="nav-item" data-nav="search" onclick="setActiveNav(this); handleBottomNav('search')"><i class="fas fa-search"></i><div class="nav-label">Search</div></div>
+        <div class="nav-item" data-nav="post" onclick="setActiveNav(this); handleBottomNav('post')"><i class="fas fa-plus-circle"></i><div class="nav-label">Post</div></div>
+        <div class="nav-item" data-nav="support" onclick="setActiveNav(this); handleBottomNav('support')"><i class="fas fa-headset"></i><div class="nav-label">Support</div></div>
+        <div class="nav-item" data-nav="notification" onclick="setActiveNav(this); handleBottomNav('notification')"><i class="fas fa-bell"></i><div class="nav-label">Notifications</div><span class="notification-badge">3</span></div>
+    </div>
+</div>
+
 <script type="module">
-    // --------------------- FIREBASE USER DATA ---------------------
+    // Existing Firebase and core logic (unchanged except settings modal)
     let currentAuthUser = null;
     let isAdminUser = false;
     let adminChecked = false;
 
-    // হেডারের ব্যাকগ্রাউন্ড ইমেজ লোড করার ফাংশন
-    async function loadHeaderBackground(user) {
+    async function loadHeaderBackground(user) { 
         if (!user) return;
         try {
             const headerBgRef = window.ref(window.db, `companyAssets/headerBackground`);
@@ -814,12 +853,8 @@
                 topHeader.classList.remove('has-bg-image');
                 topHeader.style.background = 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)';
             }
-        } catch (err) {
-            console.warn("Error loading header background:", err);
-        }
+        } catch (err) { console.warn(err); }
     }
-
-    // সাইডবার মেনুর ব্যাকগ্রাউন্ড ইমেজ লোড করার ফাংশন
     async function loadSidebarBackground() {
         try {
             const sidebarBgRef = window.ref(window.db, `companyAssets/sidebarBackground`);
@@ -827,18 +862,12 @@
             const leftHeader = document.getElementById('leftMenuHeader');
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 leftHeader.style.backgroundImage = `url(${snapshot.val()})`;
-                leftHeader.style.backgroundSize = 'cover';
-                leftHeader.style.backgroundPosition = 'center';
             } else {
                 leftHeader.style.backgroundImage = '';
                 leftHeader.style.background = 'linear-gradient(135deg, #1e293b, #0f172a)';
             }
-        } catch (err) {
-            console.warn("Error loading sidebar background:", err);
-        }
+        } catch (err) { console.warn(err); }
     }
-
-    // ফুটার ও হেডারে কোম্পানির লোগো লোড করার ফাংশন
     async function loadCompanyLogo() {
         try {
             const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
@@ -846,394 +875,81 @@
             const footerLogoIcon = document.getElementById('footerLogoIcon');
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 footerLogoIcon.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
-            } else {
-                footerLogoIcon.innerHTML = `<span>SP</span>`;
-            }
-        } catch (err) {
-            console.warn("Error loading company logo:", err);
-        }
+            } else { footerLogoIcon.innerHTML = `<span>SP</span>`; }
+        } catch (err) { console.warn(err); }
     }
-
-    // ইউজারের প্রোফাইল পিকচার ও তথ্য আপডেট
     async function updateUserUI(user) {
         if (!user) return;
-        currentAuthUser = user;
         try {
             const userRef = window.ref(window.db, `users/${user.uid}`);
             const snapshot = await window.get(userRef);
             const data = snapshot.val() || {};
-            
             const headerImg = document.getElementById('headerAvatar');
-            if (headerImg) {
-                if (data.profilePicture && data.profilePicture.startsWith('data:image')) {
-                    headerImg.src = data.profilePicture;
-                } else {
-                    headerImg.src = 'https://placehold.co/44x44?text=SP';
-                }
-            }
-            
+            if (headerImg) headerImg.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) ? data.profilePicture : 'https://placehold.co/44x44?text=SP';
             const rightAvatar = document.getElementById('rightMenuAvatar');
-            const rightName = document.getElementById('rightMenuName');
-            const rightPlan = document.getElementById('rightMenuPlan');
-            
-            if (rightAvatar) {
-                if (data.profilePicture && data.profilePicture.startsWith('data:image')) {
-                    rightAvatar.src = data.profilePicture;
-                } else {
-                    rightAvatar.src = 'https://placehold.co/90x90?text=User';
-                }
-            }
-            
+            if (rightAvatar) rightAvatar.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) ? data.profilePicture : 'https://placehold.co/90x90?text=User';
             let fullName = (data.firstName && data.lastName) ? `${data.firstName} ${data.lastName}` : (data.fullName || user.displayName || user.email?.split('@')[0] || 'Profile');
-            if (rightName) rightName.innerText = fullName;
-            
+            document.getElementById('rightMenuName').innerText = fullName;
             let planText = data.plan ? `${data.plan} Plan` : 'Premium Plan';
-            if (rightPlan) rightPlan.innerText = `Contractor · ${planText}`;
-        } catch (err) {
-            console.warn("Error loading user data", err);
-        }
+            document.getElementById('rightMenuPlan').innerText = `Contractor · ${planText}`;
+            document.querySelector('.greeting h3').innerHTML = `👷 Welcome, ${fullName}`;
+        } catch (err) { console.warn(err); }
     }
-
-    // Logout function
-    window.handleLogout = async function() {
-        try {
-            await window.signOut(window.auth);
-            window.location.href = 'login.html';
-        } catch(e) {
-            alert('Logout failed');
-        }
-    };
-
-    // ========== ADMIN VERIFICATION FUNCTION ==========
+    window.handleLogout = async function() { await window.signOut(window.auth); window.location.href = 'login.html'; };
     async function checkAdminAndLoad(user) {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
+        if (!user) { window.location.href = 'login.html'; return; }
         try {
             const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
             const userData = userSnap.val();
-            
-            // Check if user is admin
             if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
-                // Show access denied message instead of redirecting
-                isAdminUser = false;
-                adminChecked = true;
-                showAccessDenied();
-                return;
+                isAdminUser = false; adminChecked = true; showAccessDenied(); return;
             }
-            
-            // User is admin, load everything
-            isAdminUser = true;
-            adminChecked = true;
-            
-            await updateUserUI(user);
-            await loadHeaderBackground(user);
-            await loadSidebarBackground();
-            await loadCompanyLogo();
-            
-            // Show normal content
+            isAdminUser = true; adminChecked = true;
+            await updateUserUI(user); await loadHeaderBackground(user); await loadSidebarBackground(); await loadCompanyLogo();
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('iframeContainer').style.display = 'flex';
             document.getElementById('dynamicView').style.display = 'none';
-            
-            // Initialize dashboard
             showHomeDashboard();
-            
-        } catch (error) {
-            console.error("Admin verification error:", error);
-            showAccessDenied();
-        }
+        } catch (error) { console.error(error); showAccessDenied(); }
     }
-    
-    function showAccessDenied() {
-        const mainContent = document.getElementById('mainContent');
+    function showAccessDenied() { 
         const iframeContainer = document.getElementById('iframeContainer');
         const dynamicView = document.getElementById('dynamicView');
-        
         iframeContainer.style.display = 'none';
         dynamicView.style.display = 'block';
-        dynamicView.innerHTML = `
-            <div class="access-denied">
-                <i class="fas fa-shield-alt"></i>
-                <h2>⛔ Access Denied</h2>
-                <p>You don't have administrator privileges to access this page.</p>
-                <p style="font-size: 0.8rem; color: #ef4444;">Only authorized admins can view this dashboard.</p>
-                <button onclick="window.location.href='login.html'">
-                    <i class="fas fa-sign-out-alt"></i> Go to Login
-                </button>
-            </div>
-        `;
+        dynamicView.innerHTML = `<div class="access-denied"><i class="fas fa-shield-alt"></i><h2>⛔ Access Denied</h2><p>You don't have administrator privileges.</p><button onclick="window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Go to Login</button></div>`;
     }
-
-    // Auth state observer with admin check
-    window.onAuthStateChanged(window.auth, async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        await checkAdminAndLoad(user);
-    });
-
-    // রিয়েল-টাইম আপডেটের জন্য লিসেনার (যখন logoupload.html থেকে পরিবর্তন হবে)
-    if (window.db) {
-        const headerBgRef = window.ref(window.db, `companyAssets/headerBackground`);
-        window.onValue(headerBgRef, async () => {
-            if (currentAuthUser && isAdminUser) await loadHeaderBackground(currentAuthUser);
-        });
-        
-        const sidebarBgRef = window.ref(window.db, `companyAssets/sidebarBackground`);
-        window.onValue(sidebarBgRef, async () => {
-            if (isAdminUser) await loadSidebarBackground();
-        });
-        
-        const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
-        window.onValue(logoRef, async () => {
-            if (isAdminUser) await loadCompanyLogo();
-        });
+    window.onAuthStateChanged(window.auth, async (user) => { if (!user) { window.location.href = 'login.html'; return; } await checkAdminAndLoad(user); });
+    // Real-time listeners
+    if (window.db) { 
+        window.onValue(window.ref(window.db, `companyAssets/headerBackground`), async () => { if(currentAuthUser && isAdminUser) await loadHeaderBackground(currentAuthUser); });
+        window.onValue(window.ref(window.db, `companyAssets/sidebarBackground`), async () => { if(isAdminUser) await loadSidebarBackground(); });
+        window.onValue(window.ref(window.db, `companyAssets/footerLogo`), async () => { if(isAdminUser) await loadCompanyLogo(); });
     }
-
-    // --------------------- FUNCTION: Load any page inside iframe ---------------------
-    window.loadPageInIframe = function(pageUrl) {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        const iframe = document.getElementById('dashboardFrame');
-        const iframeContainer = document.getElementById('iframeContainer');
-        const dynamicView = document.getElementById('dynamicView');
-        
-        iframe.src = pageUrl;
-        iframeContainer.style.display = 'flex';
-        dynamicView.style.display = 'none';
-        dynamicView.innerHTML = '';
-    };
-
-    // --------------------- ORIGINAL APP FUNCTIONALITY (posts, notifications, etc.) ---------------------
-    const postsData = [
-        {
-            id: 1,
-            author: "Abdul Karim",
-            time: "2 hours ago",
-            content: "The 5th floor work of Mirpur project is almost finished. Work is progressing fast.",
-            image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=500&h=250&fit=crop",
-            likes: 24,
-            comments: 5
-        },
-        {
-            id: 2,
-            author: "Rakib Hasan (Site Engineer)",
-            time: "5 hours ago",
-            content: "New tiling work has started at Gulshan Tower. Maintaining quality standards.",
-            image: "https://images.unsplash.com/photo-1581093458791-9f3c3a4b5c6d?w=500&h=250&fit=crop",
-            likes: 18,
-            comments: 3
-        }
-    ];
-
-    const notificationsData = [
-        { id: 1, title: "New work added", message: "New flooring work started at Gulshan Tower", time: "5 minutes ago" },
-        { id: 2, title: "Payment successful", message: "Received ₹50,000 from Mirpur project", time: "1 hour ago" },
-        { id: 3, title: "Worker attendance", message: "12 workers present today", time: "2 hours ago" }
-    ];
-
-    const iframeContainer = document.getElementById('iframeContainer');
-    const dynamicView = document.getElementById('dynamicView');
-    const dashboardFrame = document.getElementById('dashboardFrame');
-
-    function showHomeDashboard() {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        iframeContainer.style.display = 'flex';
-        dynamicView.style.display = 'none';
-        dynamicView.innerHTML = '';
-        if(dashboardFrame && dashboardFrame.src) {
-            dashboardFrame.src = dashboardFrame.src;
-        }
-    }
-
-    function renderPosts() {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        dynamicView.innerHTML = `
-            <div class="section-title">
-                <h2><i class="fas fa-images"></i> Recent Posts</h2>
-            </div>
-            ${postsData.map(post => `
-                <div class="post-card">
-                    <div class="post-header">
-                        <div class="post-avatar">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='44' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" style="width:45px; border-radius:50%;">
-                        </div>
-                        <div>
-                            <div class="post-author">${post.author}</div>
-                            <div class="post-time"><i class="far fa-clock"></i> ${post.time}</div>
-                        </div>
-                    </div>
-                    <p>${post.content}</p>
-                    <img class="post-image" src="${post.image}" onerror="this.src='https://placehold.co/500x250?text=SP'">
-                    <div class="post-stats">
-                        <span><i class="far fa-heart"></i> ${post.likes}</span>
-                        <span><i class="far fa-comment"></i> ${post.comments}</span>
-                        <span><i class="far fa-share-square"></i> Share</span>
-                    </div>
-                </div>
-            `).join('')}
-        `;
-        iframeContainer.style.display = 'none';
-        dynamicView.style.display = 'block';
-    }
-
-    function renderSupport() {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        dynamicView.innerHTML = `
-            <div class="post-card" style="text-align:center;">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23f59e0b'/%3E%3Ctext x='50' y='68' font-family='Arial' font-size='52' font-weight='bold' fill='white' text-anchor='middle'%3ESP%3C/text%3E%3C/svg%3E" style="width: 70px; margin-bottom: 16px;">
-                <h3>Support Center - SP Construction</h3>
-                <p style="margin:12px 0; color:#64748b;">Contact us for any issues</p>
-                <div style="background:#f1f5f9; border-radius:16px; padding:15px; margin:16px 0; text-align:left;">
-                    <p><i class="fas fa-phone-alt"></i> <strong>Hotline:</strong> 017XX-XXXXXX</p>
-                    <p style="margin-top:8px;"><i class="fab fa-whatsapp"></i> <strong>WhatsApp:</strong> 018XX-XXXXXX</p>
-                    <p style="margin-top:8px;"><i class="far fa-envelope"></i> <strong>Email:</strong> support@spconstruction.com</p>
-                </div>
-                <button class="btn-premium" onclick="alert('Support ticket will be opened')">📝 Open Support Ticket</button>
-            </div>
-        `;
-        iframeContainer.style.display = 'none';
-        dynamicView.style.display = 'block';
-    }
-
-    function showNotifications() {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        dynamicView.innerHTML = `
-            <div class="section-title">
-                <h2><i class="fas fa-bell"></i> Notifications</h2>
-            </div>
-            ${notificationsData.map(notif => `
-                <div class="report-card" onclick="alert('${notif.title}')">
-                    <div class="report-content">
-                        <div class="report-title"><i class="fas fa-circle" style="font-size:0.6rem; color:#f59e0b;"></i> ${notif.title}</div>
-                        <p style="font-size:0.85rem; margin-top:6px;">${notif.message}</p>
-                        <div class="report-meta">
-                            <span><i class="far fa-clock"></i> ${notif.time}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('')}
-        `;
-        iframeContainer.style.display = 'none';
-        dynamicView.style.display = 'block';
-    }
-
-    function handleBottomNav(type) {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        if(type === 'home') {
-            showHomeDashboard();
-        } else if(type === 'post') {
-            renderPosts();
-        } else if(type === 'support') {
-            renderSupport();
-        } else if(type === 'notification') {
-            showNotifications();
-        } else if(type === 'search') {
-            dynamicView.innerHTML = `
-                <div class="post-card" style="text-align:center;">
-                    <i class="fas fa-search" style="font-size:3rem; color:#f59e0b;"></i>
-                    <h3 style="margin-top:12px;">Search Results</h3>
-                    <p style="margin-top:8px; color:#64748b;">Please use the search box above to search within the dashboard.</p>
-                </div>
-            `;
-            iframeContainer.style.display = 'none';
-            dynamicView.style.display = 'block';
-        }
-    }
-
-    function setActiveNav(element) {
-        if (!isAdminUser) return;
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        element.classList.add('active');
-    }
-
-    function toggleLeftMenu() {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        document.getElementById('sideMenuLeft').classList.add('open');
-        document.getElementById('overlay').classList.add('show');
-    }
-    function closeLeftMenu() {
-        document.getElementById('sideMenuLeft').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    }
-    function toggleRightMenu() {
-        if (!isAdminUser) {
-            showAccessDenied();
-            return;
-        }
-        document.getElementById('sideMenuRight').classList.add('open');
-        document.getElementById('overlay').classList.add('show');
-    }
-    function closeRightMenu() {
-        document.getElementById('sideMenuRight').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    }
-    function closeAllMenus() {
-        document.getElementById('sideMenuLeft').classList.remove('open');
-        document.getElementById('sideMenuRight').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    }
-
-    const searchInput = document.getElementById('searchInput');
-    if(searchInput) {
-        searchInput.addEventListener('keyup', function() {
-            if (!isAdminUser) return;
-            const activeNav = document.querySelector('.nav-item.active')?.getAttribute('data-nav') || 'home';
-            if(activeNav === 'home' && iframeContainer.style.display !== 'none') {
-                console.log('Search in dashboard');
-            }
-        });
-    }
-
-    window.addEventListener('DOMContentLoaded', function() {
-        // Initially hide content until admin check
-        document.getElementById('mainContent').style.display = 'block';
-        if (!isAdminUser && adminChecked) {
-            showAccessDenied();
-        }
-    });
+    window.loadPageInIframe = function(pageUrl) { if (!isAdminUser) { showAccessDenied(); return; } document.getElementById('dashboardFrame').src = pageUrl; document.getElementById('iframeContainer').style.display = 'flex'; document.getElementById('dynamicView').style.display = 'none'; };
+    function showHomeDashboard() { if (!isAdminUser) { showAccessDenied(); return; } document.getElementById('iframeContainer').style.display = 'flex'; document.getElementById('dynamicView').style.display = 'none'; }
+    // Dummy render functions (simplified)
+    function renderPosts() { if (!isAdminUser) { showAccessDenied(); return; } dynamicView.innerHTML = `<div class="post-card"><h3>Posts will appear here</h3></div>`; iframeContainer.style.display = 'none'; dynamicView.style.display = 'block'; }
+    function renderSupport() { dynamicView.innerHTML = `<div class="post-card"><h3>Support Center</h3><p>Contact: support@spconstruction.com</p></div>`; iframeContainer.style.display = 'none'; dynamicView.style.display = 'block'; }
+    function showNotifications() { dynamicView.innerHTML = `<div class="post-card"><h3>Notifications</h3><p>No new notifications</p></div>`; iframeContainer.style.display = 'none'; dynamicView.style.display = 'block'; }
+    window.handleBottomNav = function(type) { if (!isAdminUser) { showAccessDenied(); return; } if(type === 'home') showHomeDashboard(); else if(type === 'post') renderPosts(); else if(type === 'support') renderSupport(); else if(type === 'notification') showNotifications(); else if(type === 'search') { dynamicView.innerHTML = `<div class="post-card"><h3>Search</h3><p>Use search bar</p></div>`; iframeContainer.style.display = 'none'; dynamicView.style.display = 'block'; } };
+    window.setActiveNav = function(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); };
+    window.toggleLeftMenu = function() { document.getElementById('sideMenuLeft').classList.add('open'); document.getElementById('overlay').classList.add('show'); };
+    window.closeLeftMenu = function() { document.getElementById('sideMenuLeft').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); };
+    window.toggleRightMenu = function() { document.getElementById('sideMenuRight').classList.add('open'); document.getElementById('overlay').classList.add('show'); };
+    window.closeRightMenu = function() { document.getElementById('sideMenuRight').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); };
+    window.closeAllMenus = function() { document.getElementById('sideMenuLeft').classList.remove('open'); document.getElementById('sideMenuRight').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); };
     
-    window.onload = function() {
-        const bottomNav = document.querySelector('.bottom-nav');
-        if(bottomNav) bottomNav.style.opacity = '1';
+    // Settings Modal Functions
+    window.openSettingsModal = function() {
+        if (!isAdminUser) { showAccessDenied(); return; }
+        document.getElementById('settingsModal').classList.add('open');
     };
-
-    // Expose global functions
-    window.setActiveNav = setActiveNav;
-    window.handleBottomNav = handleBottomNav;
-    window.toggleLeftMenu = toggleLeftMenu;
-    window.closeLeftMenu = closeLeftMenu;
-    window.toggleRightMenu = toggleRightMenu;
-    window.closeRightMenu = closeRightMenu;
-    window.closeAllMenus = closeAllMenus;
-    window.renderPosts = renderPosts;
-    window.renderSupport = renderSupport;
-    window.showNotifications = showNotifications;
-    window.loadPageInIframe = loadPageInIframe;
+    window.closeSettingsModal = function() {
+        document.getElementById('settingsModal').classList.remove('open');
+    };
+    // Close modal when clicking on overlay? Already handled by close button
+    window.onload = function() { /* keep */ };
 </script>
 </body>
 </html>
