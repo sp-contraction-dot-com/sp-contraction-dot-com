@@ -348,7 +348,7 @@
         .action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
         .action-btn-secondary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
         
-        /* Footer - White Background */
+        /* Footer */
         .footer {
             background: white;
             border-radius: 28px 28px 24px 24px;
@@ -394,6 +394,12 @@
             font-size: 1.1rem;
             font-weight: 700;
             color: #1e293b;
+        }
+        .footer-subtitle {
+            font-size: 0.6rem;
+            color: #f59e0b;
+            letter-spacing: 1px;
+            margin-top: 4px;
         }
         .footer-brand p {
             font-size: 0.8rem;
@@ -499,13 +505,11 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1>SP CONSTRUCTION</h1>
-                <p>ADMIN DASHBOARD</p>
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                <p id="headerSubtitle">ADMIN DASHBOARD</p>
             </div>
         </div>
-        <div class="nav-buttons">
-            
-        </div>
+        <div class="nav-buttons"></div>
     </div>
     
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
@@ -535,46 +539,11 @@
         <span></span>
     </div>
     <div class="stats-grid">
-        <div class="stat-card card-company-1">
-            <div class="stat-info">
-                <h4><i class="fas fa-coins"></i> Total Earnings</h4>
-                <div class="value" id="totalEarnings">₹0</div>
-                <div class="sub-text">All Time Revenue</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-        </div>
-        <div class="stat-card card-company-2">
-            <div class="stat-info">
-                <h4><i class="fas fa-building"></i> Company Paid</h4>
-                <div class="value" id="totalCompanyPaid">₹0</div>
-                <div class="sub-text">Received from Companies</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
-        </div>
-        <div class="stat-card card-company-3">
-            <div class="stat-info">
-                <h4><i class="fas fa-clock"></i> Company Due</h4>
-                <div class="value" id="totalCompanyDue">₹0</div>
-                <div class="sub-text">Outstanding Balance</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
-        </div>
-        <div class="stat-card card-company-4">
-            <div class="stat-info">
-                <h4><i class="fas fa-calendar-day"></i> Today's Receivable</h4>
-                <div class="value" id="todaysReceivable">₹0</div>
-                <div class="sub-text">Earned today from companies</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-sun"></i></div>
-        </div>
-        <div class="stat-card card-company-5">
-            <div class="stat-info">
-                <h4><i class="fas fa-chart-line"></i> Total Company Due</h4>
-                <div class="value" id="totalCompanyDueCumulative">₹0</div>
-                <div class="sub-text">Previous Due + Today's Receivable</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
-        </div>
+        <div class="stat-card card-company-1"><div class="stat-info"><h4><i class="fas fa-coins"></i> Total Earnings</h4><div class="value" id="totalEarnings">₹0</div><div class="sub-text">All Time Revenue</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
+        <div class="stat-card card-company-2"><div class="stat-info"><h4><i class="fas fa-building"></i> Company Paid</h4><div class="value" id="totalCompanyPaid">₹0</div><div class="sub-text">Received from Companies</div></div><div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div></div>
+        <div class="stat-card card-company-3"><div class="stat-info"><h4><i class="fas fa-clock"></i> Company Due</h4><div class="value" id="totalCompanyDue">₹0</div><div class="sub-text">Outstanding Balance</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
+        <div class="stat-card card-company-4"><div class="stat-info"><h4><i class="fas fa-calendar-day"></i> Today's Receivable</h4><div class="value" id="todaysReceivable">₹0</div><div class="sub-text">Earned today from companies</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
+        <div class="stat-card card-company-5"><div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Company Due</h4><div class="value" id="totalCompanyDueCumulative">₹0</div><div class="sub-text">Previous Due + Today's Receivable</div></div><div class="stat-icon"><i class="fas fa-chart-simple"></i></div></div>
     </div>
     
     <!-- ========== SECTION 2: WORKERS & ATTENDANCE ========== -->
@@ -584,46 +553,11 @@
         <span></span>
     </div>
     <div class="stats-grid">
-        <div class="stat-card card-worker-1">
-            <div class="stat-info">
-                <h4><i class="fas fa-users"></i> Registered Users</h4>
-                <div class="value" id="totalRegisteredUsers">0</div>
-                <div class="sub-text">Total Accounts</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
-        </div>
-        <div class="stat-card card-worker-2">
-            <div class="stat-info">
-                <h4><i class="fas fa-hard-hat"></i> Active Workers</h4>
-                <div class="value" id="totalWorkers">0</div>
-                <div class="sub-text">Currently Working</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
-        </div>
-        <div class="stat-card card-worker-3">
-            <div class="stat-info">
-                <h4><i class="fas fa-check-circle"></i> Present Today</h4>
-                <div class="value" id="presentToday">0</div>
-                <div class="sub-text">Today's Attendance</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-sun"></i></div>
-        </div>
-        <div class="stat-card card-worker-4">
-            <div class="stat-info">
-                <h4><i class="fas fa-wallet"></i> Paid to Workers</h4>
-                <div class="value" id="totalPaidToUser">₹0</div>
-                <div class="sub-text">Amount Disbursed</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
-        </div>
-        <div class="stat-card card-worker-5">
-            <div class="stat-info">
-                <h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4>
-                <div class="value" id="totalDueToWorkers">₹0</div>
-                <div class="sub-text">Pending salary</div>
-            </div>
-            <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
-        </div>
+        <div class="stat-card card-worker-1"><div class="stat-info"><h4><i class="fas fa-users"></i> Registered Users</h4><div class="value" id="totalRegisteredUsers">0</div><div class="sub-text">Total Accounts</div></div><div class="stat-icon"><i class="fas fa-user-plus"></i></div></div>
+        <div class="stat-card card-worker-2"><div class="stat-info"><h4><i class="fas fa-hard-hat"></i> Active Workers</h4><div class="value" id="totalWorkers">0</div><div class="sub-text">Currently Working</div></div><div class="stat-icon"><i class="fas fa-briefcase"></i></div></div>
+        <div class="stat-card card-worker-3"><div class="stat-info"><h4><i class="fas fa-check-circle"></i> Present Today</h4><div class="value" id="presentToday">0</div><div class="sub-text">Today's Attendance</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
+        <div class="stat-card card-worker-4"><div class="stat-info"><h4><i class="fas fa-wallet"></i> Paid to Workers</h4><div class="value" id="totalPaidToUser">₹0</div><div class="sub-text">Amount Disbursed</div></div><div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div></div>
+        <div class="stat-card card-worker-5"><div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4><div class="value" id="totalDueToWorkers">₹0</div><div class="sub-text">Pending salary</div></div><div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div></div>
     </div>
     
     <!-- CHARTS SECTION -->
@@ -636,57 +570,27 @@
         <div class="chart-card"><h3><i class="fas fa-chart-line"></i> Daily Earnings Trend (₹)</h3><div class="canvas-wrapper"><canvas id="dailyEarningChart"></canvas></div></div>
     </div>
     
-    <!-- Registered Users List (last 10) -->
+    <!-- Registered Users List -->
     <div class="data-section">
-        <div class="section-header">
-            <div class="section-title"><i class="fas fa-users"></i><h3>Registered Users List</h3></div>
-            <a href="all-users.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a>
-        </div>
+        <div class="section-header"><div class="section-title"><i class="fas fa-users"></i><h3>Registered Users List</h3></div><a href="all-users.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
-                </tbody>
-            </table>
+            <table><thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="6">Loading...</td></tr></tbody></table>
         </div>
     </div>
     
-    <!-- Company Payment Records (last 10) -->
+    <!-- Company Payment Records -->
     <div class="data-section">
-        <div class="section-header">
-            <div class="section-title"><i class="fas fa-building"></i><h3>Company Payment Records</h3></div>
-            <a href="all-payments.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a>
-        </div>
+        <div class="section-header"><div class="section-title"><i class="fas fa-building"></i><h3>Company Payment Records</h3></div><a href="all-payments.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr>
-                </thead>
-                <tbody id="companyPaymentTableBody">
-                    <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
-                </tbody>
-            </table>
+            <table><thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead><tbody id="companyPaymentTableBody"><tr><td colspan="6">Loading...</td></tr></tbody></table>
         </div>
     </div>
     
-    <!-- Worker Attendance Records (last 10) -->
+    <!-- Worker Attendance Records -->
     <div class="data-section">
-        <div class="section-header">
-            <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Worker Attendance Records</h3></div>
-            <a href="all-attendance.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a>
-        </div>
+        <div class="section-header"><div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Worker Attendance Records</h3></div><a href="all-attendance.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr>
-                </thead>
-                <tbody id="attendanceTableBody">
-                    <tr><td colspan="7" style="text-align:center;">Loading...</td></tr>
-                </tbody>
-            </table>
+            <table><thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead><tbody id="attendanceTableBody"><tr><td colspan="7">Loading...</td></tr></tbody></table>
         </div>
     </div>
     
@@ -703,39 +607,15 @@
             <div class="footer-brand">
                 <div class="footer-logo">
                     <div class="logo-icon" id="footerLogoIcon"><span>SP</span></div>
-                    <h2>SP CONSTRUCTION</h2>
+                    <div><h2 id="footerBrandTitle">SP CONSTRUCTION</h2><div class="footer-subtitle" id="footerBrandSubtitle">ADMIN DASHBOARD</div></div>
                 </div>
                 <p>Building dreams with quality and precision. Trusted contractor for residential and commercial projects across the region.</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                </div>
+                <div class="social-icons"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
             </div>
-            <div class="footer-links">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                    <li><a href="attendance.html"><i class="fas fa-calendar-check"></i> Attendance</a></li>
-                    <li><a href="financial-report.html"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
-                    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
-                    <li><a href="worker-list.html"><i class="fas fa-users"></i> Workers</a></li>
-                </ul>
-            </div>
-            <div class="footer-contact">
-                <h4>Contact Info</h4>
-                <ul>
-                    <li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra</li>
-                    <li><i class="fas fa-phone-alt"></i> +91 98674 78423</li>
-                    <li><i class="fas fa-envelope"></i> spbuild.official@gmail.com</li>
-                    <li><i class="fas fa-clock"></i> Mon - Sat: 9:00 AM - 6:00 PM</li>
-                </ul>
-            </div>
+            <div class="footer-links"><h4>Quick Links</h4><ul><li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li><li><a href="attendance.html"><i class="fas fa-calendar-check"></i> Attendance</a></li><li><a href="financial-report.html"><i class="fas fa-money-bill-wave"></i> Payments</a></li><li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li><li><a href="worker-list.html"><i class="fas fa-users"></i> Workers</a></li></ul></div>
+            <div class="footer-contact"><h4>Contact Info</h4><ul><li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra</li><li><i class="fas fa-phone-alt"></i> +91 98674 78423</li><li><i class="fas fa-envelope"></i> spbuild.official@gmail.com</li><li><i class="fas fa-clock"></i> Mon - Sat: 9:00 AM - 6:00 PM</li></ul></div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 SP Construction. All rights reserved. | Developed with <i class="fas fa-heart" style="color: #ef4444;"></i> by SP Tech Team</p>
-        </div>
+        <div class="footer-bottom"><p>&copy; 2025 SP Construction. All rights reserved. | Developed with <i class="fas fa-heart" style="color: #ef4444;"></i> by SP Tech Team</p></div>
     </footer>
 </div>
 
@@ -743,170 +623,146 @@
     let allAttendanceRecords = [];
     let allPaymentRecords = [];
     let allUsers = [];
-    let totalRegisteredUsersCount = 0;
     let attendanceRateChart = null, weeklyPaymentChart = null, paymentPieChart = null, dailyEarningChart = null;
     let currentAuthUser = null;
-    
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
-    async function loadCompanyLogo() {
+    // ========== GLOBAL BRANDING ==========
+    async function loadGlobalBranding() {
         try {
-            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
-            const snapshot = await window.get(logoRef);
-            const footerLogoIcon = document.getElementById('footerLogoIcon');
-            const headerLogoIcon = document.getElementById('headerLogo');
-            
-            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                const logoUrl = snapshot.val();
-                if (footerLogoIcon) footerLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Company Logo">`;
-                if (headerLogoIcon) headerLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Company Logo">`;
+            const brandSnap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                document.getElementById('headerTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('headerSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
+                document.getElementById('footerBrandTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('footerBrandSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
             } else {
-                if (footerLogoIcon) footerLogoIcon.innerHTML = `<span>SP</span>`;
-                if (headerLogoIcon) headerLogoIcon.innerHTML = `<span>SP</span>`;
+                document.getElementById('headerTitle').textContent = 'SP CONSTRUCTION';
+                document.getElementById('headerSubtitle').textContent = 'ADMIN DASHBOARD';
+                document.getElementById('footerBrandTitle').textContent = 'SP CONSTRUCTION';
+                document.getElementById('footerBrandSubtitle').textContent = 'ADMIN DASHBOARD';
             }
-        } catch(err) {
-            console.warn("Error loading company logo:", err);
-        }
+        } catch(err) { console.warn(err); }
     }
     
-    async function loadBannerImage() {
-        try {
-            const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
-            const snapshot = await window.get(bannersRef);
-            const bannerSection = document.getElementById('bannerSection');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            
+    function listenToGlobalBranding() {
+        window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/branding`), (snapshot) => {
             if (snapshot.exists()) {
-                const banners = Object.values(snapshot.val());
-                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
-                    bannerSection.style.backgroundImage = `url(${banners[0].image})`;
-                    bannerSection.style.backgroundSize = 'cover';
-                    bannerSection.style.backgroundPosition = 'center';
-                    if (placeholder) placeholder.style.display = 'none';
-                    return;
-                }
+                const brand = snapshot.val();
+                document.getElementById('headerTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('headerSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
+                document.getElementById('footerBrandTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('footerBrandSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
+            } else {
+                document.getElementById('headerTitle').textContent = 'SP CONSTRUCTION';
+                document.getElementById('headerSubtitle').textContent = 'ADMIN DASHBOARD';
+                document.getElementById('footerBrandTitle').textContent = 'SP CONSTRUCTION';
+                document.getElementById('footerBrandSubtitle').textContent = 'ADMIN DASHBOARD';
             }
-            bannerSection.style.backgroundImage = '';
-            if (placeholder) placeholder.style.display = 'flex';
-        } catch(e) {
-            console.warn("Error loading banner:", e);
-        }
+        });
     }
     
-    function formatNumber(value) {
-        if (value === null || value === undefined) return '0';
-        let num = parseFloat(value);
-        if (isNaN(num)) return '0';
-        return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-    
-    function showLoading(show) {
-        document.getElementById('loading').classList.toggle('show', show);
-    }
-    
-    function updateLiveDate() {
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('liveDate').innerHTML = new Date().toLocaleDateString('en-US', options);
-    }
-    updateLiveDate();
-    setInterval(updateLiveDate, 60000);
-    
+    // ========== DATA LOADING ==========
     async function loadDashboardData() {
+        console.log("🔄 Loading dashboard data...");
         showLoading(true);
         try {
+            // Load attendance
             const attSnap = await window.get(window.ref(window.db, 'attendance'));
-            allAttendanceRecords = attSnap.exists() ? Object.entries(attSnap.val()).map(([id, data]) => ({ id, ...data })).sort((a,b)=>new Date(b.date)-new Date(a.date)) : [];
+            if (attSnap.exists()) {
+                allAttendanceRecords = Object.entries(attSnap.val()).map(([id, data]) => ({ id, ...data }));
+                console.log(`✅ Attendance records loaded: ${allAttendanceRecords.length}`);
+            } else {
+                allAttendanceRecords = [];
+                console.warn("⚠️ No attendance data found");
+            }
             
+            // Load payments
             const paySnap = await window.get(window.ref(window.db, 'companyDailyPayments'));
-            allPaymentRecords = paySnap.exists() ? Object.entries(paySnap.val()).map(([id, data]) => ({ id, ...data })).sort((a,b)=>new Date(b.date)-new Date(a.date)) : [];
+            if (paySnap.exists()) {
+                allPaymentRecords = Object.entries(paySnap.val()).map(([id, data]) => ({ id, ...data }));
+                console.log(`✅ Payment records loaded: ${allPaymentRecords.length}`);
+            } else {
+                allPaymentRecords = [];
+                console.warn("⚠️ No payment data found");
+            }
             
+            // Load users
             const usersSnap = await window.get(window.ref(window.db, 'users'));
             if (usersSnap.exists()) {
                 allUsers = Object.values(usersSnap.val());
-                totalRegisteredUsersCount = allUsers.length;
-            } else totalRegisteredUsersCount = 0;
-            document.getElementById('totalRegisteredUsers').textContent = totalRegisteredUsersCount;
-            
-            const user = window.auth.currentUser;
-            if (user) {
-                currentAuthUser = user;
-                const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
-                if (userSnap.exists()) {
-                    let name = userSnap.val().fullName || userSnap.val().firstName || 'Admin';
-                    document.getElementById('welcomeName').innerHTML = name.split(' ')[0];
-                } else {
-                    document.getElementById('welcomeName').innerHTML = user.email?.split('@')[0] || 'Admin';
-                }
+                console.log(`✅ Users loaded: ${allUsers.length}`);
+                document.getElementById('totalRegisteredUsers').textContent = allUsers.length;
+            } else {
+                allUsers = [];
+                document.getElementById('totalRegisteredUsers').textContent = '0';
+                console.warn("⚠️ No users found");
             }
             
-            await loadCompanyLogo();
-            await loadBannerImage();
-            
+            // Update stats cards (they will use the arrays)
             updateStats();
+            
+            // Update tables and charts
             updateUsersTable();
             updateAttendanceTable();
             updateCompanyPaymentTable();
             updateCharts();
-        } catch(e) { console.error(e); }
+            
+        } catch(e) { 
+            console.error("❌ Error loading data:", e);
+        }
         showLoading(false);
     }
     
     function updateStats() {
-        let uniqueWorkers = new Set(allAttendanceRecords.map(r=>r.workerId)).size;
+        // Attendance stats
+        let uniqueWorkers = new Set(allAttendanceRecords.map(r=>r.workerId || r.userId || r.id)).size;
         document.getElementById('totalWorkers').textContent = uniqueWorkers;
         
         let today = new Date().toISOString().split('T')[0];
-        let presentCount = allAttendanceRecords.filter(r=>r.date===today && r.status==='present').length;
+        let presentCount = allAttendanceRecords.filter(r => (r.date === today) && (r.status === 'present' || r.status === 'Present')).length;
         document.getElementById('presentToday').textContent = presentCount;
         
-        let totalEarn = allAttendanceRecords.reduce((s,r)=>s+(r.earnings||0),0);
-        let totalPaidToWorker = allAttendanceRecords.reduce((s,r)=>s+(r.paid||0),0);
-        let companyPaid = allPaymentRecords.reduce((s,p)=>s+(p.companyPaid||0),0);
-        let previousCompanyDue = allPaymentRecords.reduce((s,p)=>s+((p.totalEarning||0)-(p.companyPaid||0)),0);
+        let totalEarn = allAttendanceRecords.reduce((s,r)=>s+(Number(r.earnings) || 0),0);
+        let totalPaidToWorker = allAttendanceRecords.reduce((s,r)=>s+(Number(r.paid) || 0),0);
+        let companyPaid = allPaymentRecords.reduce((s,p)=>s+(Number(p.companyPaid) || 0),0);
+        let previousCompanyDue = allPaymentRecords.reduce((s,p)=>s+((Number(p.totalEarning) || 0) - (Number(p.companyPaid) || 0)),0);
         
-        let todaysEarnings = allAttendanceRecords.filter(r=>r.date===today).reduce((s,r)=>s+(r.earnings||0),0);
-        let todaysCompanyPaid = allPaymentRecords.filter(p=>p.date===today).reduce((s,p)=>s+(p.companyPaid||0),0);
-        let todaysReceivable = todaysEarnings - todaysCompanyPaid;
-        if (todaysReceivable < 0) todaysReceivable = 0;
-        
+        let todaysEarnings = allAttendanceRecords.filter(r=>r.date===today).reduce((s,r)=>s+(Number(r.earnings) || 0),0);
+        let todaysCompanyPaid = allPaymentRecords.filter(p=>p.date===today).reduce((s,p)=>s+(Number(p.companyPaid) || 0),0);
+        let todaysReceivable = Math.max(0, todaysEarnings - todaysCompanyPaid);
         let totalCompanyDueCumulative = previousCompanyDue + todaysReceivable;
-        let totalDueToWorkers = totalEarn - totalPaidToWorker;
-        if (totalDueToWorkers < 0) totalDueToWorkers = 0;
+        let totalDueToWorkers = Math.max(0, totalEarn - totalPaidToWorker);
         
-        document.getElementById('totalEarnings').innerHTML = '₹' + formatNumber(totalEarn);
-        document.getElementById('totalPaidToUser').innerHTML = '₹' + formatNumber(totalPaidToWorker);
-        document.getElementById('totalCompanyPaid').innerHTML = '₹' + formatNumber(companyPaid);
-        document.getElementById('totalCompanyDue').innerHTML = '₹' + formatNumber(previousCompanyDue);
-        document.getElementById('totalDueToWorkers').innerHTML = '₹' + formatNumber(totalDueToWorkers);
-        document.getElementById('todaysReceivable').innerHTML = '₹' + formatNumber(todaysReceivable);
-        document.getElementById('totalCompanyDueCumulative').innerHTML = '₹' + formatNumber(totalCompanyDueCumulative);
-    }
-    
-    function getUserAvatarHTML(user) {
-        if (user.profilePicture && user.profilePicture.startsWith('data:image')) {
-            return `<img src="${user.profilePicture}" class="user-avatar" style="object-fit:cover;">`;
-        } else {
-            let name = user.fullName || (user.firstName + ' ' + user.lastName).trim() || user.email?.charAt(0) || 'U';
-            let initial = name.charAt(0).toUpperCase();
-            return `<div class="user-avatar" style="background:#f59e0b; color:white;">${initial}</div>`;
-        }
+        function fmt(n) { return '₹' + Math.round(n).toLocaleString(); }
+        document.getElementById('totalEarnings').innerHTML = fmt(totalEarn);
+        document.getElementById('totalPaidToUser').innerHTML = fmt(totalPaidToWorker);
+        document.getElementById('totalCompanyPaid').innerHTML = fmt(companyPaid);
+        document.getElementById('totalCompanyDue').innerHTML = fmt(previousCompanyDue);
+        document.getElementById('totalDueToWorkers').innerHTML = fmt(totalDueToWorkers);
+        document.getElementById('todaysReceivable').innerHTML = fmt(todaysReceivable);
+        document.getElementById('totalCompanyDueCumulative').innerHTML = fmt(totalCompanyDueCumulative);
     }
     
     function updateUsersTable() {
-        let tbody = document.getElementById('usersTableBody');
-        let sortedUsers = [...allUsers].sort((a,b) => new Date(b.registeredAt || 0) - new Date(a.registeredAt || 0));
-        let last10 = sortedUsers.slice(0, 10);
-        if (!last10.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 No users found</td></tr>';
+        const tbody = document.getElementById('usersTableBody');
+        if (!tbody) return;
+        if (!allUsers.length) {
+            tbody.innerHTML = '<tr><td colspan="6">📭 No users registered yet</td></tr>';
             return;
         }
+        let sorted = [...allUsers].sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
         let html = '';
-        for (let u of last10) {
-            let fullName = u.fullName || (u.firstName + ' ' + u.lastName).trim() || u.email?.split('@')[0] || 'N/A';
+        for (let u of sorted.slice(0,10)) {
+            let name = u.fullName || (u.firstName + ' ' + u.lastName).trim() || u.email?.split('@')[0] || 'N/A';
+            let photo = (u.profilePicture && u.profilePicture.startsWith('data:image')) 
+                ? `<img src="${u.profilePicture}" class="user-avatar" style="object-fit:cover;">`
+                : `<div class="user-avatar" style="background:#f59e0b; color:white;">${name.charAt(0).toUpperCase()}</div>`;
             let regDate = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'N/A';
             html += `<tr>
-                <td>${getUserAvatarHTML(u)}</td>
-                <td><strong>${escapeHtml(fullName)}</strong></td>
+                <td>${photo}</td>
+                <td><strong>${escapeHtml(name)}</strong></td>
                 <td>${escapeHtml(u.email || 'N/A')}</td>
                 <td>${escapeHtml(u.mobile || u.phone || 'N/A')}</td>
                 <td style="color:#f59e0b;">${escapeHtml(u.userId || u.uid?.slice(0,8) || 'N/A')}</td>
@@ -917,53 +773,58 @@
     }
     
     function updateAttendanceTable() {
-        let tbody = document.getElementById('attendanceTableBody');
-        let last10 = allAttendanceRecords.slice(0, 10);
-        if (!last10.length) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">📭 No attendance records found</td></tr>';
+        const tbody = document.getElementById('attendanceTableBody');
+        if (!tbody) return;
+        if (!allAttendanceRecords.length) {
+            tbody.innerHTML = '<tr><td colspan="7">📭 No attendance records found</td></tr>';
             return;
         }
+        let sorted = [...allAttendanceRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
         let html = '';
-        for (let r of last10) {
-            let badge = r.status === 'present' ? 'badge-present' : (r.status === 'absent' ? 'badge-absent' : 'badge-halfday');
-            let text = r.status === 'present' ? 'Present' : (r.status === 'absent' ? 'Absent' : 'Half Day');
+        for (let r of sorted.slice(0,10)) {
+            let statusClass = r.status === 'present' ? 'badge-present' : (r.status === 'absent' ? 'badge-absent' : 'badge-halfday');
+            let statusText = r.status === 'present' ? 'Present' : (r.status === 'absent' ? 'Absent' : 'Half Day');
             html += `<tr>
                 <td>${r.date || 'N/A'}</td>
-                <td><strong>${escapeHtml(r.workerName || 'N/A')}</strong></td>
-                <td style="color:#f59e0b;">${escapeHtml(r.workerId || 'N/A')}</td>
-                <td><span class="${badge}">${text}</span></td>
-                <td>${r.hours || 0}</td>
-                <td>₹${formatNumber(r.earnings || 0)}</td>
-                <td>${escapeHtml(r.workDesc || '-')}</td>
+                <td><strong>${escapeHtml(r.workerName || r.name || 'N/A')}</strong></td>
+                <td style="color:#f59e0b;">${escapeHtml(r.workerId || r.userId || 'N/A')}</td>
+                <td><span class="${statusClass}">${statusText}</span></td>
+                <td>${r.hours || r.workHours || 0}</td>
+                <td>₹${(Number(r.earnings) || 0).toLocaleString()}</td>
+                <td>${escapeHtml(r.workDesc || r.description || '-')}</td>
             </tr>`;
         }
         tbody.innerHTML = html;
     }
     
     function updateCompanyPaymentTable() {
-        let tbody = document.getElementById('companyPaymentTableBody');
-        let last10 = allPaymentRecords.slice(0, 10);
-        if (!last10.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">📭 No payment records found</td></tr>';
+        const tbody = document.getElementById('companyPaymentTableBody');
+        if (!tbody) return;
+        if (!allPaymentRecords.length) {
+            tbody.innerHTML = '<tr><td colspan="6">📭 No payment records found</td></tr>';
             return;
         }
+        let sorted = [...allPaymentRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
         let html = '';
-        for (let p of last10) {
-            const due = (p.totalEarning - p.companyPaid) || 0;
-            const dueColor = due < 0 ? '#dc2626' : '#15803d';
+        for (let p of sorted.slice(0,10)) {
+            let due = (Number(p.totalEarning) || 0) - (Number(p.companyPaid) || 0);
             html += `<tr>
                 <td>${p.date || 'N/A'}</td>
                 <td><strong>${escapeHtml(p.companyName || 'N/A')}</strong></td>
                 <td>${p.totalWorker || 0}</td>
-                <td class="amount-positive">₹${formatNumber(p.totalEarning || 0)}</td>
-                <td class="amount-positive">₹${formatNumber(p.companyPaid || 0)}</td>
-                <td style="color:${dueColor};">₹${formatNumber(due)}</td>
+                <td class="amount-positive">₹${(Number(p.totalEarning)||0).toLocaleString()}</td>
+                <td class="amount-positive">₹${(Number(p.companyPaid)||0).toLocaleString()}</td>
+                <td style="color:${due<0?'#dc2626':'#15803d'};">₹${Math.abs(due).toLocaleString()}</td>
             </tr>`;
         }
         tbody.innerHTML = html;
     }
     
     function updateCharts() {
+        if (!window.Chart) {
+            console.warn("Chart.js not loaded");
+            return;
+        }
         let last7 = [];
         for (let i = 6; i >= 0; i--) {
             let d = new Date();
@@ -971,71 +832,101 @@
             last7.push(d.toISOString().split('T')[0]);
         }
         
-        let attRates = last7.map(d => {
-            let dayRec = allAttendanceRecords.filter(r => r.date === d);
+        let attRates = last7.map(date => {
+            let dayRec = allAttendanceRecords.filter(r => r.date === date);
             if (!dayRec.length) return 0;
             let present = dayRec.filter(r => r.status === 'present').length;
             return (present / dayRec.length) * 100;
         });
         
-        let weekPay = last7.map(d => allPaymentRecords.filter(p => p.date === d).reduce((s,p) => s + (p.companyPaid || 0), 0));
-        let dailyEarn = last7.map(d => allAttendanceRecords.filter(r => r.date === d).reduce((s,r) => s + (r.earnings || 0), 0));
+        let weekPay = last7.map(date => allPaymentRecords.filter(p => p.date === date).reduce((s,p) => s + (Number(p.companyPaid) || 0), 0));
+        let dailyEarn = last7.map(date => allAttendanceRecords.filter(r => r.date === date).reduce((s,r) => s + (Number(r.earnings) || 0), 0));
         
-        let totalPaid = 0, totalDue = 0;
-        allPaymentRecords.forEach(p => {
-            totalPaid += p.companyPaid || 0;
-            totalDue += (p.totalEarning || 0) - (p.companyPaid || 0);
-        });
+        let totalPaid = allPaymentRecords.reduce((s,p) => s + (Number(p.companyPaid) || 0), 0);
+        let totalDue = allPaymentRecords.reduce((s,p) => s + ((Number(p.totalEarning) || 0) - (Number(p.companyPaid) || 0)), 0);
         
         const ctx1 = document.getElementById('attendanceRateChart')?.getContext('2d');
         const ctx2 = document.getElementById('weeklyPaymentChart')?.getContext('2d');
         const ctx3 = document.getElementById('paymentPieChart')?.getContext('2d');
         const ctx4 = document.getElementById('dailyEarningChart')?.getContext('2d');
         
-        if (!ctx1 || !ctx2 || !ctx3 || !ctx4) return;
+        if (ctx1 && attendanceRateChart) attendanceRateChart.destroy();
+        if (ctx2 && weeklyPaymentChart) weeklyPaymentChart.destroy();
+        if (ctx3 && paymentPieChart) paymentPieChart.destroy();
+        if (ctx4 && dailyEarningChart) dailyEarningChart.destroy();
         
-        if (attendanceRateChart) attendanceRateChart.destroy();
-        if (weeklyPaymentChart) weeklyPaymentChart.destroy();
-        if (paymentPieChart) paymentPieChart.destroy();
-        if (dailyEarningChart) dailyEarningChart.destroy();
-        
-        attendanceRateChart = new Chart(ctx1, {
-            type: 'line',
-            data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Attendance Rate (%)', data: attRates, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#f59e0b', pointRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + '%' } } }, scales: { y: { beginAtZero: true, max: 100 } } }
-        });
-        
-        weeklyPaymentChart = new Chart(ctx2, {
-            type: 'bar',
-            data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Company Payment (₹)', data: weekPay, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8 }] },
-            options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + formatNumber(ctx.raw) } } } }
-        });
-        
-        paymentPieChart = new Chart(ctx3, {
-            type: 'doughnut',
-            data: { labels: ['Company Paid', 'Company Due'], datasets: [{ data: [totalPaid, Math.abs(totalDue)], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] },
-            options: { responsive: true, cutout: '55%', plugins: { tooltip: { callbacks: { label: (ctx) => ctx.label + ': ₹' + formatNumber(ctx.raw) } } } }
-        });
-        
-        dailyEarningChart = new Chart(ctx4, {
-            type: 'line',
-            data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Daily Earnings (₹)', data: dailyEarn, borderColor: '#ec489a', backgroundColor: 'rgba(236,72,153,0.1)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#ec489a', pointRadius: 4 }] },
-            options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + formatNumber(ctx.raw) } } } }
-        });
+        if (ctx1) {
+            attendanceRateChart = new Chart(ctx1, {
+                type: 'line',
+                data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Attendance Rate (%)', data: attRates, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, tension: 0.4, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + '%' } } }, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+        }
+        if (ctx2) {
+            weeklyPaymentChart = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Company Payment (₹)', data: weekPay, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8 }] },
+                options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + ctx.raw.toLocaleString() } } } }
+            });
+        }
+        if (ctx3) {
+            paymentPieChart = new Chart(ctx3, {
+                type: 'doughnut',
+                data: { labels: ['Company Paid', 'Company Due'], datasets: [{ data: [totalPaid, Math.abs(totalDue)], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] },
+                options: { responsive: true, cutout: '55%', plugins: { tooltip: { callbacks: { label: (ctx) => ctx.label + ': ₹' + ctx.raw.toLocaleString() } } } }
+            });
+        }
+        if (ctx4) {
+            dailyEarningChart = new Chart(ctx4, {
+                type: 'line',
+                data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Daily Earnings (₹)', data: dailyEarn, borderColor: '#ec489a', backgroundColor: 'rgba(236,72,153,0.1)', borderWidth: 3, tension: 0.3, fill: true }] },
+                options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + ctx.raw.toLocaleString() } } } }
+            });
+        }
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-    }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m])); }
+    function showLoading(show) { document.getElementById('loading').classList.toggle('show', show); }
     
-    window.handleLogout = async function() {
-        showLoading(true);
+    function updateLiveDate() {
+        document.getElementById('liveDate').innerHTML = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    }
+    updateLiveDate();
+    setInterval(updateLiveDate, 60000);
+    
+    async function loadCompanyLogo() {
         try {
-            await window.signOut(window.auth);
-            window.location.href = 'login.html';
-        } catch(e) { alert('Logout failed'); showLoading(false); }
-    };
+            const snap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`));
+            const footerIcon = document.getElementById('footerLogoIcon');
+            const headerIcon = document.getElementById('headerLogo');
+            if (snap.exists() && snap.val()?.startsWith('data:image')) {
+                const url = snap.val();
+                footerIcon.innerHTML = `<img src="${url}" alt="Logo">`;
+                headerIcon.innerHTML = `<img src="${url}" alt="Logo">`;
+            } else {
+                footerIcon.innerHTML = `<span>SP</span>`;
+                headerIcon.innerHTML = `<span>SP</span>`;
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    async function loadBannerImage() {
+        try {
+            const snap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`));
+            const banner = document.getElementById('bannerSection');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            if (snap.exists()) {
+                const banners = Object.values(snap.val());
+                if (banners[0]?.image?.startsWith('data:image')) {
+                    banner.style.backgroundImage = `url(${banners[0].image})`;
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            banner.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) { console.warn(e); }
+    }
     
     function listenRealTime() {
         window.onValue(window.ref(window.db, 'attendance'), () => loadDashboardData());
@@ -1045,30 +936,26 @@
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
     }
     
-    // ========== ADMIN VERIFICATION CODE (CHANGED) ==========
+    // ========== AUTH INIT ==========
     window.onAuthStateChanged(window.auth, async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Check if user is admin
+        if (!user) { window.location.href = 'login.html'; return; }
         try {
             const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
             const userData = userSnap.val();
-            
             if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
-                alert("❌ Access Denied! You don't have admin privileges.");
+                alert("Access Denied");
                 window.location.href = 'index-user.html';
                 return;
             }
-            
             document.getElementById('welcomeName').innerHTML = userData.fullName?.split(' ')[0] || 'Admin';
             await loadDashboardData();
             listenRealTime();
-            
-        } catch (error) {
-            console.error("Admin verification error:", error);
+            await loadGlobalBranding();
+            listenToGlobalBranding();
+            await loadCompanyLogo();
+            await loadBannerImage();
+        } catch(e) {
+            console.error(e);
             window.location.href = 'login.html';
         }
     });
