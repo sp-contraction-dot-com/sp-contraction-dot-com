@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Brand Settings | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
+            authDomain: "sp-build-official.firebaseapp.com",
+            projectId: "sp-build-official",
+            storageBucket: "sp-build-official.firebasestorage.app",
+            messagingSenderId: "377403616440",
+            appId: "1:377403616440:web:bfae56e748f05de22a184d",
+            measurementId: "G-P319FN0C0N",
+            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        
+        // DOM elements
+        const logoImg = document.getElementById('logoImg');
+        const logoPlaceholder = document.getElementById('logoPlaceholder');
+        const editLogoBtn = document.getElementById('editLogoBtn');
+        const logoUpload = document.getElementById('logoUpload');
+        const removeLogoBtn = document.getElementById('removeLogoBtn');
+        const titleInput = document.getElementById('brandTitle');
+        const subtitleInput = document.getElementById('brandSubtitle');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const toast = document.getElementById('toast');
+        
+        let currentUser = null;
+        const COMPANY_ASSETS = 'companyAssets';
+        const LOGO_PATH = `${COMPANY_ASSETS}/footerLogo`;
+        const BRANDING_PATH = `${COMPANY_ASSETS}/branding`; // global for all admins
+        
+        function showToast(msg, isError = false) {
+            toast.textContent = msg;
+            toast.className = `toast ${isError ? 'error' : 'success'} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // Load global branding
+        async function loadGlobalBranding() {
+            try {
+                const [logoSnap, textSnap] = await Promise.all([
+                    get(ref(db, LOGO_PATH)),
+                    get(ref(db, BRANDING_PATH))
+                ]);
+                // Logo
+                if (logoSnap.exists() && logoSnap.val()?.startsWith('data:image')) {
+                    logoImg.src = logoSnap.val();
+                    logoImg.style.display = 'block';
+                    logoPlaceholder.style.display = 'none';
+                } else {
+                    logoImg.style.display = 'none';
+                    logoPlaceholder.style.display = 'flex';
+                }
+                // Title & Subtitle
+                if (textSnap.exists()) {
+                    const data = textSnap.val();
+                    titleInput.value = data.title || '';
+                    subtitleInput.value = data.subtitle || '';
+                } else {
+                    titleInput.value = '';
+                    subtitleInput.value = '';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        
+        // Save text branding globally
+        saveBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            const title = titleInput.value.trim();
+            const subtitle = subtitleInput.value.trim();
+            if (!title && !subtitle) {
+                showToast('Please enter title or subtitle', true);
+                return;
+            }
+            try {
+                await set(ref(db, BRANDING_PATH), { title, subtitle, updatedAt: Date.now() });
+                showToast('✓ Branding updated for all admins');
+            } catch (err) {
+                showToast('Error: ' + err.message, true);
+            }
+        });
+        
+        // Reset to default
+        resetBtn.addEventListener('click', async () => {
+            if (!currentUser) return;
+            if (confirm('Reset to default "SP CONSTRUCTION" / "ADMIN DASHBOARD"?')) {
+                try {
+                    await set(ref(db, BRANDING_PATH), null);
+                    titleInput.value = '';
+                    subtitleInput.value = '';
+                    showToast('Reset to default');
+                } catch (err) {
+                    showToast('Error: ' + err.message, true);
+                }
+            }
+        });
+        
+        // Logo upload
+        editLogoBtn.addEventListener('click', () => logoUpload.click());
+        logoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showToast('Only images allowed', true);
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                const base64 = ev.target.result;
+                try {
+                    await set(ref(db, LOGO_PATH), base64);
+                    logoImg.src = base64;
+                    logoImg.style.display = 'block';
+                    logoPlaceholder.style.display = 'none';
+                    showToast('✓ Logo updated for all admins');
+                    logoUpload.value = '';
+                } catch (err) {
+                    showToast('Upload failed: ' + err.message, true);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        removeLogoBtn.addEventListener('click', async () => {
+            if (confirm('Remove logo?')) {
+                try {
+                    await set(ref(db, LOGO_PATH), null);
+                    logoImg.style.display = 'none';
+                    logoPlaceholder.style.display = 'flex';
+                    showToast('Logo removed');
+                } catch (err) {
+                    showToast('Error: ' + err.message, true);
+                }
+            }
+        });
+        
+        // Auth & admin check
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const userSnap = await get(ref(db, `users/${user.uid}`));
+                const userData = userSnap.val();
+                if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                    alert('Access Denied');
+                    window.location.href = 'index-user.html';
+                    return;
+                }
+                currentUser = user;
+                await loadGlobalBranding();
+            } catch (err) {
+                console.error(err);
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #eef2f6, #f8fafc);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .card {
+            max-width: 460px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+        }
+        .card-header i {
+            font-size: 2rem;
+            background: #f59e0b;
+            padding: 0.7rem;
+            border-radius: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .card-header h2 { font-size: 1.3rem; font-weight: 700; }
+        .card-body { padding: 1.8rem; }
+        .logo-section { display: flex; justify-content: center; margin-bottom: 1rem; position: relative; }
+        .logo-wrapper { position: relative; width: 100px; height: 100px; }
+        .logo-circle {
+            width: 100%; height: 100%;
+            background: #f1f5f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-placeholder { font-size: 2.5rem; font-weight: 800; color: #f59e0b; }
+        .edit-icon {
+            position: absolute;
+            bottom: 0; right: 0;
+            background: #f59e0b;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .remove-link { text-align: center; margin: 0.5rem 0 1.5rem; font-size: 0.7rem; }
+        .remove-link span { color: #ef4444; cursor: pointer; text-decoration: underline; }
+        .form-group { margin-bottom: 1.2rem; }
+        label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #475569; display: block; margin-bottom: 0.3rem; }
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        input:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+        .button-group { display: flex; gap: 0.8rem; margin: 1.5rem 0 1rem; }
+        button {
+            flex: 1;
+            padding: 0.7rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-save { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .btn-reset { background: #f1f5f9; color: #475569; }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s;
+        }
+        .toast.show { opacity: 1; visibility: visible; }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        .back-link { text-align: center; margin-top: 1rem; }
+        .back-link a { font-size: 0.75rem; color: #64748b; text-decoration: none; }
+        .back-link a:hover { color: #f59e0b; }
+        @media (max-width: 480px) { .card-body { padding: 1.2rem; } .button-group { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-header"><i class="fas fa-brush"></i><h2>Brand Settings</h2></div>
+    <div class="card-body">
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <div class="logo-circle">
+                    <img id="logoImg" style="display: none;" alt="Logo">
+                    <div id="logoPlaceholder" class="logo-placeholder">SP</div>
+                </div>
+                <div class="edit-icon" id="editLogoBtn"><i class="fas fa-pencil-alt"></i></div>
+                <input type="file" id="logoUpload" accept="image/*" style="display: none;">
+            </div>
+        </div>
+        <div class="remove-link"><span id="removeLogoBtn"><i class="fas fa-trash-alt"></i> Remove Logo</span></div>
+        
+        <div class="form-group"><label>Title</label><input type="text" id="brandTitle" placeholder="e.g., SP CONSTRUCTION"></div>
+        <div class="form-group"><label>Subtitle</label><input type="text" id="brandSubtitle" placeholder="e.g., ADMIN DASHBOARD"></div>
+        
+        <div class="button-group">
+            <button class="btn-save" id="saveBtn"><i class="fas fa-save"></i> Save</button>
+            <button class="btn-reset" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+        </div>
+        <div class="back-link"><a href="dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+</body>
+</html>
