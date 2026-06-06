@@ -12,7 +12,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
@@ -34,6 +34,10 @@
         window.ref = ref;
         window.get = get;
         window.onValue = onValue;
+        window.set = set;
+        window.push = push;
+        window.remove = remove;
+        window.update = update;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     
@@ -245,7 +249,6 @@
             width: 14px;
         }
         
-        /* Editable Date Row */
         .date-row {
             display: flex;
             gap: 12px;
@@ -633,10 +636,20 @@
             border: 1px solid #eef2ff;
             transition: all 0.2s;
         }
-        .stat-item:hover {
+        /* Only Amount Paid card is clickable */
+        .clickable-card {
+            cursor: pointer;
+        }
+        .clickable-card:hover {
+            transform: translateY(-4px);
             background: linear-gradient(135deg, #fef3c7, #fffbeb);
-            transform: scale(1.02);
             border-color: #f59e0b;
+        }
+        /* Non-clickable cards have no hover effect and default cursor */
+        .stat-item:not(.clickable-card):hover {
+            transform: none;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-color: #eef2ff;
         }
         .stat-label {
             font-size: 0.65rem;
@@ -751,7 +764,6 @@
             color: #64748b;
         }
         
-        /* Access Denied Message */
         .access-denied {
             display: flex;
             flex-direction: column;
@@ -788,6 +800,196 @@
             font-weight: 600;
         }
         
+        /* Main Modal (for listing records) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 750px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #fef3c7;
+        }
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .modal-header button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        
+        /* Search inside modal */
+        .modal-search {
+            margin-bottom: 15px;
+        }
+        .modal-search input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .modal-search input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
+        }
+        
+        .records-table-wrapper {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .records-table th {
+            background: #f8fafc;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .records-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .record-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 0 4px;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+        .edit-record {
+            color: #3b82f6;
+        }
+        .edit-record:hover {
+            background: #eff6ff;
+        }
+        .delete-record {
+            color: #ef4444;
+        }
+        .delete-record:hover {
+            background: #fee2e2;
+        }
+        .no-records-msg {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
+        
+        /* Small modal for editing payment */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 1200;
+            justify-content: center;
+            align-items: center;
+        }
+        .edit-modal.show {
+            display: flex;
+        }
+        .edit-modal-content {
+            background: white;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 380px;
+            padding: 24px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+        }
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fef3c7;
+        }
+        .edit-modal-header h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .edit-modal-header button {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .edit-modal .form-group {
+            margin-bottom: 20px;
+        }
+        .edit-modal .form-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+            color: #475569;
+        }
+        .edit-modal .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+        .edit-modal .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .edit-modal .form-actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-save { background: #22c55e; color: white; }
+        .btn-cancel { background: #e2e8f0; color: #475569; }
+        
         @media (max-width: 550px) {
             body { padding: 12px; }
             .header { padding: 15px 20px; }
@@ -809,6 +1011,7 @@
             .date-select { min-width: 100%; }
             .year-input-wrapper { flex-direction: column; }
             .custom-year-input { width: 100%; }
+            .modal-content { padding: 15px; }
         }
     </style>
 </head>
@@ -849,7 +1052,6 @@
                 <button class="clear-selection" id="clearSelectionBtn"><i class="fas fa-times"></i> Change</button>
             </div>
             
-            <!-- Month and Year Filter -->
             <div class="date-row">
                 <div class="date-select">
                     <label><i class="fas fa-calendar-alt"></i> Select Month</label>
@@ -922,9 +1124,63 @@
     <div id="accessDeniedMessage" style="display:none;"></div>
 </div>
 
+<!-- Main Modal for Amount Paid records -->
+<div id="recordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Amount Paid</h3>
+            <button onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <!-- Search inside modal -->
+        <div class="modal-search">
+            <input type="text" id="modalSearchInput" placeholder="🔍 Search by date (YYYY-MM-DD) or amount...">
+        </div>
+        
+        <div class="records-table-wrapper">
+            <table class="records-table" id="recordsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Paid (Rs.)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsTableBody">
+                    <tr><td colspan="3" class="no-records-msg">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Dedicated Edit Modal (popup) -->
+<div id="editPaymentModal" class="edit-modal">
+    <div class="edit-modal-content">
+        <div class="edit-modal-header">
+            <h4><i class="fas fa-edit"></i> Edit Payment</h4>
+            <button onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="form-group">
+            <label>Date</label>
+            <input type="text" id="editDate" readonly style="background:#f1f5f9;">
+        </div>
+        <div class="form-group">
+            <label>Amount Paid (₹)</label>
+            <input type="number" id="editAmount" placeholder="0.00">
+        </div>
+        <div class="form-actions">
+            <button class="btn-save" id="updatePaymentBtn">Update</button>
+            <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div id="toastMsg" class="toast-message">📄 Generating PDF...</div>
 
 <script type="module">
+    const db = window.db;
+    
     let currentUserData = null;
     let allAttendanceRecords = [];
     let currentDisplayRecords = [];
@@ -940,7 +1196,13 @@
     let currentWorkerId = null;
     let allAttendanceCache = null;
     let isAdminUser = false;
-    let adminChecked = false;
+    
+    let activeCardType = null;
+    let activeWorkerId = null;
+    let activeWorkerName = "";
+    let currentAttendanceRecords = [];
+    let editingRecordId = null;
+    let filteredRecords = [];
     
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
@@ -979,7 +1241,6 @@
         return months[month - 1];
     }
     
-    // ========== ADMIN VERIFICATION FUNCTION ==========
     function showAccessDenied() {
         const mainContent = document.getElementById('mainContent');
         const accessDeniedDiv = document.getElementById('accessDeniedMessage');
@@ -1005,37 +1266,26 @@
             window.location.href = 'login.html';
             return;
         }
-        
         try {
-            const userSnap = await window.get(window.ref(window.db, `users/${user.uid}`));
+            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
             const userData = userSnap.val();
-            
-            // Check if user is admin
             if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
                 isAdminUser = false;
-                adminChecked = true;
                 showAccessDenied();
                 return;
             }
-            
-            // User is admin, load everything
             isAdminUser = true;
-            adminChecked = true;
-            
             const mainContent = document.getElementById('mainContent');
             const accessDeniedDiv = document.getElementById('accessDeniedMessage');
             if (mainContent) mainContent.style.display = 'block';
             if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
-            
             await initApp();
-            
         } catch (error) {
             console.error("Admin verification error:", error);
             showAccessDenied();
         }
     }
     
-    // Year dropdown starts from CURRENT YEAR to future years only
     function initYearSelect() {
         const yearSelect = document.getElementById('yearSelect');
         const currentYear = new Date().getFullYear();
@@ -1051,14 +1301,12 @@
     
     async function loadAllUsers() {
         try {
-            const usersRef = window.ref(window.db, 'users');
+            const usersRef = window.ref(db, 'users');
             const snapshot = await window.get(usersRef);
             if (snapshot.exists()) {
                 const users = snapshot.val();
                 allUsersList = Object.values(users);
                 console.log(`✅ Loaded ${allUsersList.length} users from database`);
-            } else {
-                console.log(`⚠️ No users found in database`);
             }
         } catch (error) {
             console.error("Error loading users:", error);
@@ -1067,17 +1315,15 @@
     
     async function loadAllAttendanceCache() {
         if (allAttendanceCache !== null) return allAttendanceCache;
-        
         try {
-            const attendanceRef = window.ref(window.db, 'attendance');
+            const attendanceRef = window.ref(db, 'attendance');
             const snapshot = await window.get(attendanceRef);
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                allAttendanceCache = Object.values(data);
+                allAttendanceCache = Object.entries(data).map(([id, rec]) => ({ id, ...rec }));
                 console.log(`✅ Loaded ${allAttendanceCache.length} total attendance records`);
             } else {
                 allAttendanceCache = [];
-                console.log(`⚠️ No attendance records found`);
             }
             return allAttendanceCache;
         } catch (error) {
@@ -1090,14 +1336,11 @@
     function filterAttendanceByWorkerId(workerIdValue) {
         if (!allAttendanceCache) return [];
         if (!workerIdValue) return [];
-        
         const searchId = workerIdValue.toString().trim();
         const records = allAttendanceCache.filter(record => {
             const recordWorkerId = (record.workerId || '').toString().trim();
             return recordWorkerId.toLowerCase() === searchId.toLowerCase();
         });
-        
-        console.log(`🔍 Found ${records.length} records for worker ID: ${workerIdValue}`);
         return records;
     }
     
@@ -1107,12 +1350,10 @@
         
         searchInput.addEventListener('input', function() {
             const query = this.value.trim().toLowerCase();
-            
             if (query.length === 0) {
                 dropdown.classList.remove('show');
                 return;
             }
-            
             const matches = allUsersList.filter(user => {
                 const fullName = (user.fullName || `${user.firstName || ''} ${user.lastName || ''}`).toLowerCase();
                 const uid = (user.userId || '').toLowerCase();
@@ -1153,12 +1394,9 @@
                             selectUser(user);
                             dropdown.classList.remove('show');
                         });
-                    } catch(e) {
-                        console.error("Error parsing user data:", e);
-                    }
+                    } catch(e) { console.error("Error parsing user data:", e); }
                 }
             });
-            
             dropdown.classList.add('show');
         });
         
@@ -1173,16 +1411,12 @@
         selectedWorker = user;
         const displayName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown';
         const userIdText = user.userId || 'N/A';
-        
         document.getElementById('searchInput').value = displayName;
         document.getElementById('selectedUserName').innerHTML = escapeHtml(displayName);
         document.getElementById('selectedUserId').innerHTML = escapeHtml(userIdText);
         document.getElementById('selectedUserInfo').classList.add('show');
         document.getElementById('clearSearch').classList.add('show');
-        
         currentWorkerId = user.userId;
-        console.log(`🔍 Selected user: ${displayName} (ID: ${currentWorkerId})`);
-        
         loadWorkerAttendance(currentWorkerId);
     }
     
@@ -1192,73 +1426,42 @@
         document.getElementById('searchInput').value = '';
         document.getElementById('selectedUserInfo').classList.remove('show');
         document.getElementById('clearSearch').classList.remove('show');
-        
-        console.log(`🔄 Reset to current user: ${userFullName} (ID: ${userId})`);
         loadWorkerAttendance(userId);
     }
     
     function getSelectedYear() {
         const yearSelect = document.getElementById('yearSelect');
         const customYearInput = document.getElementById('customYearInput');
-        
         if (customYearInput.value && customYearInput.value.trim() !== '') {
             const year = parseInt(customYearInput.value.trim());
-            if (!isNaN(year) && year > 1900 && year < 3000) {
-                return year.toString();
-            }
+            if (!isNaN(year) && year > 1900 && year < 3000) return year.toString();
         }
         return yearSelect.value;
     }
     
     async function loadWorkerAttendance(workerIdValue) {
-        if (!workerIdValue) {
-            console.log(`❌ Cannot load attendance: No worker ID provided`);
-            showToast('No worker ID found', true);
-            return;
-        }
-        
+        if (!workerIdValue) return;
         showLoading(true);
-        console.log(`📊 Loading attendance for worker ID: "${workerIdValue}"`);
-        
         try {
             await loadAllAttendanceCache();
-            
             let records = filterAttendanceByWorkerId(workerIdValue);
-            
-            if (records.length > 0) {
-                console.log(`✅ Found ${records.length} records for worker ID: ${workerIdValue}`);
-                if (records[0]) {
-                    console.log(`📋 First record sample:`, records[0]);
-                }
-            } else {
-                console.log(`❌ No attendance records found for worker ID: "${workerIdValue}"`);
-                showToast(`No attendance records found for this worker`, true);
-            }
-            
             records.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
             allAttendanceRecords = records;
             currentDisplayRecords = [...records];
-            
             applyDateFilters();
-            
         } catch (error) {
             console.error("Error loading attendance:", error);
-            showToast('Error loading attendance data', true);
             allAttendanceRecords = [];
             currentDisplayRecords = [];
             applyDateFilters();
         }
-        
         showLoading(false);
     }
     
     function applyDateFilters() {
         const selectedMonth = document.getElementById('monthSelect').value;
         const selectedYear = getSelectedYear();
-        
         let filtered = [...allAttendanceRecords];
-        
         if (selectedMonth) {
             filtered = filtered.filter(record => {
                 if (!record.date) return false;
@@ -1273,10 +1476,7 @@
                 return parseInt(recordYear) === parseInt(selectedYear);
             });
         }
-        
         currentDisplayRecords = filtered;
-        console.log(`📅 After date filter: ${currentDisplayRecords.length} records`);
-        
         let filterParts = [];
         if (selectedWorker) {
             const workerName = selectedWorker.fullName || `${selectedWorker.firstName || ''} ${selectedWorker.lastName || ''}`.trim() || 'Worker';
@@ -1286,15 +1486,12 @@
         }
         if (selectedMonth) filterParts.push(`Month: ${getMonthName(parseInt(selectedMonth))}`);
         if (selectedYear && selectedYear !== '') filterParts.push(`Year: ${selectedYear}`);
-        
         if (filterParts.length === 0) {
             document.getElementById('searchDisplayBadge').innerHTML = `<i class="fas fa-globe"></i> Showing all records`;
         } else {
             document.getElementById('searchDisplayBadge').innerHTML = `<i class="fas fa-filter"></i> ${filterParts.join(' · ')}`;
         }
-        
         const stats = calculateStats(currentDisplayRecords);
-        
         let displayUser;
         if (selectedWorker) {
             displayUser = {
@@ -1313,34 +1510,29 @@
                 photo: userProfilePic
             };
         }
-        
         renderCard(stats, displayUser, displayUser.photo, companyLogoBase64);
     }
     
     async function loadCompanyLogo() {
         try {
-            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+            const logoRef = window.ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`);
             const snapshot = await window.get(logoRef);
             const headerLogo = document.getElementById('headerLogo');
-            
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 companyLogoBase64 = snapshot.val();
                 if (headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Company Logo">`;
             } else {
                 if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
             }
-        } catch(err) {
-            console.warn("Error loading company logo:", err);
-        }
+        } catch(err) { console.warn("Error loading company logo:", err); }
     }
     
     async function loadBannerImage() {
         try {
-            const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
+            const bannersRef = window.ref(db, `${COMPANY_ASSETS_PATH}/banners`);
             const snapshot = await window.get(bannersRef);
             const bannerSection = document.getElementById('bannerSection');
             const placeholder = document.getElementById('bannerPlaceholder');
-            
             if (snapshot.exists()) {
                 const banners = Object.values(snapshot.val());
                 if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
@@ -1353,31 +1545,24 @@
             }
             bannerSection.style.backgroundImage = '';
             if (placeholder) placeholder.style.display = 'flex';
-        } catch(e) {
-            console.warn("Error loading banner:", e);
-        }
+        } catch(e) { console.warn("Error loading banner:", e); }
     }
     
     async function loadPdfLogo() {
         try {
-            const pdfLogoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
+            const pdfLogoRef = window.ref(db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
             const snapshot = await window.get(pdfLogoRef);
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 pdfLogoBase64 = snapshot.val();
             }
-        } catch(e) {
-            console.warn("Error loading PDF logo:", e);
-        }
+        } catch(e) { console.warn("Error loading PDF logo:", e); }
     }
     
     async function loadCurrentUser() {
         const user = window.auth.currentUser;
         if (!user) return null;
-        
-        console.log(`👤 Logged in user email: ${user.email}`);
-        
         try {
-            const usersRef = window.ref(window.db, 'users');
+            const usersRef = window.ref(db, 'users');
             const snapshot = await window.get(usersRef);
             if (snapshot.exists()) {
                 const users = snapshot.val();
@@ -1389,23 +1574,18 @@
                         userMobile = currentUserData.mobile || 'N/A';
                         userEmail = currentUserData.email || user.email;
                         userProfilePic = currentUserData.profilePicture || null;
-                        console.log(`✅ Loaded admin user: ${userFullName} (ID: ${userId})`);
                         break;
                     }
                 }
             }
-            
             if (!currentUserData) {
                 userFullName = user.email?.split('@')[0] || 'Admin';
                 userId = user.uid?.substring(0, 8) || 'ADMIN001';
                 userMobile = 'N/A';
                 userEmail = user.email || 'N/A';
-                console.log(`⚠️ Admin user not found in users collection, using fallback: ${userFullName} (ID: ${userId})`);
             }
-            
             currentWorkerId = userId;
             await loadWorkerAttendance(userId);
-            
             return currentUserData;
         } catch (error) {
             console.error("Error loading user:", error);
@@ -1419,22 +1599,16 @@
         let totalEarnings = 0;
         let totalPaid = 0;
         let currentMonthPresent = 0;
-        
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth() + 1;
         
         records.forEach(record => {
-            if (record.status === 'present') {
-                totalPresent++;
-            } else if (record.status === 'halfday') {
-                totalPresent += 0.5;
-            }
-            
+            if (record.status === 'present') totalPresent++;
+            else if (record.status === 'halfday') totalPresent += 0.5;
             totalHours += record.hours || 0;
             totalEarnings += record.earnings || 0;
             totalPaid += record.paid || 0;
-            
             if (record.date && record.status !== 'absent') {
                 const [year, month] = record.date.split('-');
                 if (parseInt(year) === currentYear && parseInt(month) === currentMonth) {
@@ -1443,12 +1617,8 @@
                 }
             }
         });
-        
         const totalDue = totalEarnings - totalPaid;
         const avgDailyEarning = totalPresent > 0 ? totalEarnings / totalPresent : 0;
-        
-        console.log(`📊 Stats calculated - Present: ${totalPresent}, Earnings: ${totalEarnings}, Paid: ${totalPaid}, Due: ${totalDue}`);
-        
         return {
             totalPresent: totalPresent,
             totalHours: totalHours,
@@ -1464,11 +1634,9 @@
     async function performSearch() {
         if (selectedWorker) {
             currentWorkerId = selectedWorker.userId;
-            console.log(`🔍 Searching for worker: ${selectedWorker.fullName || selectedWorker.firstName} (ID: ${currentWorkerId})`);
             await loadWorkerAttendance(currentWorkerId);
         } else {
             showToast('Please select a worker from the dropdown', true);
-            console.log(`⚠️ Search clicked but no worker selected`);
         }
     }
     
@@ -1477,22 +1645,16 @@
         document.getElementById('monthSelect').value = '';
         document.getElementById('yearSelect').value = '';
         document.getElementById('customYearInput').value = '';
-        console.log(`🔄 Reset all filters, loading current user attendance`);
         loadWorkerAttendance(userId);
     }
     
     function setupClearButton() {
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearch');
-        
         searchInput.addEventListener('input', function() {
-            if (this.value.length > 0 && !selectedWorker) {
-                clearBtn.classList.add('show');
-            } else if (!selectedWorker) {
-                clearBtn.classList.remove('show');
-            }
+            if (this.value.length > 0 && !selectedWorker) clearBtn.classList.add('show');
+            else if (!selectedWorker) clearBtn.classList.remove('show');
         });
-        
         clearBtn.addEventListener('click', function() {
             if (!selectedWorker) {
                 searchInput.value = '';
@@ -1502,13 +1664,8 @@
     }
     
     async function downloadCardAsPDF(cardElement, employeeName, employeeId) {
-        if (!cardElement) {
-            showToast('❌ Card not found', true);
-            return;
-        }
-        
+        if (!cardElement) { showToast('❌ Card not found', true); return; }
         showToast('📄 Generating PDF...');
-        
         try {
             const cloneCard = cardElement.cloneNode(true);
             cloneCard.style.position = 'absolute';
@@ -1520,10 +1677,8 @@
             cloneCard.style.border = '2px solid #f59e0b';
             cloneCard.style.borderRadius = '28px';
             cloneCard.style.background = '#ffffff';
-            
             document.body.appendChild(cloneCard);
             await new Promise(resolve => setTimeout(resolve, 200));
-            
             const canvas = await html2canvas(cloneCard, {
                 scale: 3,
                 backgroundColor: '#ffffff',
@@ -1533,34 +1688,20 @@
                 windowWidth: 450,
                 imageTimeout: 0
             });
-            
             document.body.removeChild(cloneCard);
-            
             const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
-            
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-            
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
             if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
-                try {
-                    pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25);
-                } catch(e) { console.warn(e); }
+                try { pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); } catch(e) { console.warn(e); }
             }
-            
             const imgWidth = 90;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             const xPosition = (210 - imgWidth) / 2;
             const yPosition = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
-            
             pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
-            
             const safeName = employeeName.replace(/[^a-zA-Z0-9]/g, '_');
             pdf.save(`${safeName}_${employeeId}_attencard.pdf`);
-            
             showToast('✅ PDF downloaded successfully!');
         } catch (error) {
             console.error('PDF error:', error);
@@ -1568,16 +1709,155 @@
         }
     }
     
+    // ========== AMOUNT PAID MODAL FUNCTIONS ==========
+    async function openCardModal(cardType, cardLabel) {
+        if (!currentWorkerId) {
+            showToast("No worker selected", true);
+            return;
+        }
+        // Only allow amountPaid to be clickable
+        if (cardType !== 'amountPaid') return;
+        
+        activeCardType = cardType;
+        activeWorkerId = currentWorkerId;
+        activeWorkerName = selectedWorker ? (selectedWorker.fullName || `${selectedWorker.firstName} ${selectedWorker.lastName}`).trim() : userFullName;
+        document.getElementById('modalTitle').innerHTML = `Amount Paid - ${escapeHtml(activeWorkerName)}`;
+        
+        await loadAttendanceForAmountPaid();
+        document.getElementById('recordModal').classList.add('show');
+        
+        // Setup search listener
+        const searchInput = document.getElementById('modalSearchInput');
+        searchInput.value = '';
+        searchInput.removeEventListener('input', filterTable);
+        searchInput.addEventListener('input', filterTable);
+    }
+    
+    async function loadAttendanceForAmountPaid() {
+        if (!activeWorkerId) return;
+        showLoading(true);
+        try {
+            await loadAllAttendanceCache();
+            const workerRecords = filterAttendanceByWorkerId(activeWorkerId);
+            workerRecords.sort((a,b) => new Date(b.date) - new Date(a.date));
+            currentAttendanceRecords = workerRecords;
+            filteredRecords = [...currentAttendanceRecords];
+            renderAmountPaidTable(filteredRecords);
+        } catch (error) {
+            console.error("Error loading attendance for amount paid:", error);
+            showToast("Failed to load payment records", true);
+        }
+        showLoading(false);
+    }
+    
+    function filterTable() {
+        const searchTerm = document.getElementById('modalSearchInput').value.trim().toLowerCase();
+        if (!searchTerm) {
+            filteredRecords = [...currentAttendanceRecords];
+        } else {
+            filteredRecords = currentAttendanceRecords.filter(rec => {
+                return rec.date.includes(searchTerm) || 
+                       (rec.paid && rec.paid.toString().includes(searchTerm));
+            });
+        }
+        renderAmountPaidTable(filteredRecords);
+    }
+    
+    function renderAmountPaidTable(records) {
+        const tbody = document.getElementById('recordsTableBody');
+        if (!records.length) {
+            tbody.innerHTML = '<tr><td colspan="3" class="no-records-msg">No matching records found.</td></table>';
+            return;
+        }
+        tbody.innerHTML = records.map(rec => `
+            <tr>
+                <td>${rec.date}</td>
+                <td>₹ ${formatNumber(rec.paid || 0)}</td>
+                <td class="record-actions">
+                    <button class="edit-record" onclick="window.openEditPaymentModal('${rec.id}')"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="delete-record" onclick="window.deletePaymentRecord('${rec.id}')"><i class="fas fa-trash"></i> Clear</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    window.openEditPaymentModal = async function(attendanceId) {
+        const record = currentAttendanceRecords.find(r => r.id === attendanceId);
+        if (!record) return;
+        editingRecordId = attendanceId;
+        document.getElementById('editDate').value = record.date;
+        document.getElementById('editAmount').value = record.paid || 0;
+        document.getElementById('editPaymentModal').classList.add('show');
+    };
+    
+    async function updatePaymentFromEditModal() {
+        if (!editingRecordId) return;
+        const newPaid = parseFloat(document.getElementById('editAmount').value);
+        if (isNaN(newPaid) || newPaid < 0) {
+            showToast("Please enter a valid amount", true);
+            return;
+        }
+        showLoading(true);
+        try {
+            const recordRef = window.ref(db, `attendance/${editingRecordId}`);
+            const snap = await window.get(recordRef);
+            const existing = snap.val();
+            if (!existing) throw new Error("Record not found");
+            const earnings = existing.earnings || 0;
+            const newDue = earnings - newPaid;
+            await window.update(recordRef, { paid: newPaid, due: newDue });
+            showToast("Payment updated successfully");
+            await loadAttendanceForAmountPaid();
+            await loadWorkerAttendance(currentWorkerId);
+            closeEditModal();
+        } catch (error) {
+            console.error("Error updating payment:", error);
+            showToast("Failed to update payment", true);
+        }
+        showLoading(false);
+    }
+    
+    window.deletePaymentRecord = async function(attendanceId) {
+        if (!confirm("Are you sure you want to set the paid amount to 0?")) return;
+        showLoading(true);
+        try {
+            const recordRef = window.ref(db, `attendance/${attendanceId}`);
+            const snap = await window.get(recordRef);
+            const existing = snap.val();
+            if (existing) {
+                const earnings = existing.earnings || 0;
+                await window.update(recordRef, { paid: 0, due: earnings });
+            }
+            showToast("Payment cleared (set to 0)");
+            await loadAttendanceForAmountPaid();
+            await loadWorkerAttendance(currentWorkerId);
+        } catch (error) {
+            console.error("Error clearing payment:", error);
+            showToast("Failed to clear payment", true);
+        }
+        showLoading(false);
+    };
+    
+    function closeModal() {
+        document.getElementById('recordModal').classList.remove('show');
+        activeCardType = null;
+        activeWorkerId = null;
+    }
+    
+    function closeEditModal() {
+        document.getElementById('editPaymentModal').classList.remove('show');
+        editingRecordId = null;
+        document.getElementById('editAmount').value = '';
+    }
+    
     function renderCard(stats, userInfo, profilePic, companyLogo) {
         const container = document.getElementById('cardContainer');
         const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         const dueAmount = stats.totalDue;
         const dueClass = dueAmount < 0 ? 'due-value' : (dueAmount > 0 ? 'due-value' : 'paid-value');
-        
         const avatarHtml = profilePic && profilePic.startsWith('data:image') 
             ? `<img src="${profilePic}" alt="Profile">` 
             : `<div class="default-avatar">👷</div>`;
-        
         const logoHtml = (companyLogo && companyLogo.startsWith('data:image'))
             ? `<img src="${companyLogo}" alt="Company Logo">`
             : `<span>🏗️</span>`;
@@ -1586,9 +1866,7 @@
             <div class="premium-card" id="mainCard">
                 <div class="card-header">
                     <div class="header-left">
-                        <div class="month-badge">
-                            <i class="far fa-calendar-alt"></i> ${monthYear}
-                        </div>
+                        <div class="month-badge"><i class="far fa-calendar-alt"></i> ${monthYear}</div>
                         <div class="attendance-title">📋 Attendance Card</div>
                         <div class="member-id-text">🆔 Member ID : ${escapeHtml(userInfo.id)}</div>
                     </div>
@@ -1604,9 +1882,7 @@
                     </div>
                 </div>
                 <div class="user-section">
-                    <div class="avatar-frame">
-                        ${avatarHtml}
-                    </div>
+                    <div class="avatar-frame">${avatarHtml}</div>
                     <div class="user-details">
                         <h2>${escapeHtml(userInfo.name)}</h2>
                         <p><i class="fas fa-phone-alt"></i> ${escapeHtml(userInfo.mobile)}</p>
@@ -1614,48 +1890,54 @@
                     </div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="totalPresent">
                         <div class="stat-label"><i class="fas fa-user-check"></i> Total Present</div>
                         <div class="stat-value">${stats.totalPresent} <small>days</small></div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="totalEarnings">
                         <div class="stat-label"><i class="fas fa-coins"></i> Total Earnings</div>
                         <div class="stat-value earning-value">₹ ${formatNumber(stats.totalEarnings)}</div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item clickable-card" data-card-type="amountPaid" data-card-label="Amount Paid">
                         <div class="stat-label"><i class="fas fa-hand-holding-usd"></i> Amount Paid</div>
                         <div class="stat-value paid-value">₹ ${formatNumber(stats.totalPaid)}</div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="dueAmount">
                         <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Due Amount</div>
                         <div class="stat-value ${dueClass}">₹ ${formatNumber(dueAmount)}</div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="totalHours">
                         <div class="stat-label"><i class="fas fa-clock"></i> Total Hours</div>
                         <div class="stat-value hours-value">${formatNumber(stats.totalHours)} <small>hours</small></div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="avgDailyEarning">
                         <div class="stat-label"><i class="fas fa-charging-station"></i> Avg Daily Earning</div>
                         <div class="stat-value dailyrate-value">₹ ${formatNumber(stats.avgDailyEarning)} <small>/day</small></div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="thisMonthWork">
                         <div class="stat-label"><i class="fas fa-calendar-week"></i> This Month Work</div>
                         <div class="stat-value">${stats.currentMonthPresent} <small>days</small></div>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item" data-card-type="totalRecords">
                         <div class="stat-label"><i class="fas fa-database"></i> Total Records</div>
                         <div class="stat-value">${stats.totalRecords} <small>entries</small></div>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="download-btn" id="downloadPdfBtn">
-                        <i class="fas fa-download"></i> Download PDF
-                    </button>
+                    <button class="download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF</button>
                 </div>
             </div>
         `;
         
         container.innerHTML = html;
+        
+        // Only amount paid card is clickable
+        const amountPaidCard = document.querySelector('.stat-item.clickable-card');
+        if (amountPaidCard) {
+            amountPaidCard.addEventListener('click', () => {
+                openCardModal('amountPaid', 'Amount Paid');
+            });
+        }
         
         const downloadBtn = document.getElementById('downloadPdfBtn');
         if (downloadBtn) {
@@ -1667,7 +1949,7 @@
     }
     
     function listenForUpdates() {
-        const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+        const logoRef = window.ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`);
         window.onValue(logoRef, (snapshot) => {
             const val = snapshot.val();
             if (val && val.startsWith('data:image')) {
@@ -1676,91 +1958,66 @@
                 if (headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Company Logo">`;
             }
         });
-        
-        const bannerRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
+        const bannerRef = window.ref(db, `${COMPANY_ASSETS_PATH}/banners`);
         window.onValue(bannerRef, () => loadBannerImage());
-        
-        const pdfLogoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
+        const pdfLogoRef = window.ref(db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
         window.onValue(pdfLogoRef, (snapshot) => {
             const val = snapshot.val();
-            if (val && val.startsWith('data:image')) {
-                pdfLogoBase64 = val;
-            } else {
-                pdfLogoBase64 = null;
-            }
+            if (val && val.startsWith('data:image')) pdfLogoBase64 = val;
+            else pdfLogoBase64 = null;
         });
-        
-        const attendanceRef = window.ref(window.db, 'attendance');
+        const attendanceRef = window.ref(db, 'attendance');
         window.onValue(attendanceRef, () => {
             allAttendanceCache = null;
-            if (currentWorkerId && isAdminUser) {
-                loadWorkerAttendance(currentWorkerId);
-            }
+            if (currentWorkerId && isAdminUser) loadWorkerAttendance(currentWorkerId);
         });
     }
     
     function setupYearInputEvents() {
         const yearSelect = document.getElementById('yearSelect');
         const customYearInput = document.getElementById('customYearInput');
-        
         yearSelect.addEventListener('change', function() {
-            if (this.value !== '') {
-                customYearInput.value = '';
-            }
-            if (currentWorkerId && isAdminUser) {
-                applyDateFilters();
-            }
+            if (this.value !== '') customYearInput.value = '';
+            if (currentWorkerId && isAdminUser) applyDateFilters();
         });
-        
         customYearInput.addEventListener('input', function() {
-            if (this.value !== '') {
-                yearSelect.value = '';
-            }
-            if (currentWorkerId && isAdminUser) {
-                applyDateFilters();
-            }
+            if (this.value !== '') yearSelect.value = '';
+            if (currentWorkerId && isAdminUser) applyDateFilters();
         });
     }
     
     async function initApp() {
         showLoading(true);
-        console.log(`🚀 App starting...`);
-        
         initYearSelect();
         await loadAllUsers();
         await loadCompanyLogo();
         await loadBannerImage();
         await loadPdfLogo();
         await loadCurrentUser();
-        
         setupAutocomplete();
         setupClearButton();
         setupYearInputEvents();
-        
         document.getElementById('searchBtn').addEventListener('click', performSearch);
         document.getElementById('resetBtn').addEventListener('click', resetFilters);
         document.getElementById('clearSelectionBtn').addEventListener('click', clearSelectedUser);
-        document.getElementById('monthSelect').addEventListener('change', () => {
-            if (currentWorkerId && isAdminUser) {
-                console.log(`📅 Month filter changed to: ${document.getElementById('monthSelect').value}`);
-                applyDateFilters();
-            }
-        });
+        document.getElementById('monthSelect').addEventListener('change', () => { if (currentWorkerId && isAdminUser) applyDateFilters(); });
+        
+        document.getElementById('updatePaymentBtn').addEventListener('click', updatePaymentFromEditModal);
         
         listenForUpdates();
-        
         showLoading(false);
-        console.log(`✅ App ready!`);
     }
     
-    // Main auth check with admin verification
     window.onAuthStateChanged(window.auth, async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
+        if (!user) { window.location.href = 'login.html'; return; }
         await checkAdminAndLoad(user);
     });
+    
+    // Global functions
+    window.closeModal = closeModal;
+    window.closeEditModal = closeEditModal;
+    window.openEditPaymentModal = window.openEditPaymentModal;
+    window.deletePaymentRecord = window.deletePaymentRecord;
 </script>
 </body>
 </html>
