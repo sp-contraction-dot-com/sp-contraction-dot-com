@@ -9,20 +9,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -556,7 +546,7 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1 id="headerTitle">All Users Attendance List</h1>
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
                 <p id="headerSubtitle">ATTENDANCE MANAGER</p>
             </div>
         </div>
@@ -723,6 +713,10 @@
 </div>
 
 <script type="module">
+    // Firebase has been initialized at the top of this file (in the first script tag).
+    // The global variables window.auth, window.db etc. are already set.
+    // Therefore we can directly use them.
+    
     const db = window.db;
     const auth = window.auth;
     
@@ -1136,7 +1130,7 @@
     
     function renderTable() {
         if (!currentFilteredRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data">No attendance records found<\/td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="no-data">No attendance records found<\/td></td>';
             resultCountSpan.innerText = `0 records`;
             tfoot.innerHTML = '';
             updateStatsCards([]);
@@ -1162,7 +1156,7 @@
                         <button class="edit-btn" onclick="openEditModal('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
                         <button class="delete-btn" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i> Del</button>
                     </td>
-                </table>
+                </tr>
             `;
         }
         tbody.innerHTML = html;
