@@ -8,20 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, onValue, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -32,8 +22,6 @@
         window.ref = ref;
         window.get = get;
         window.onValue = onValue;
-        window.set = set;
-        window.signOut = signOut;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
@@ -198,7 +186,6 @@
         .card-company-2 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
         .card-company-3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .card-company-4 { background: linear-gradient(135deg, #f97316, #ea580c); }
-        .card-company-5 { background: linear-gradient(135deg, #f59e0b, #d97706); }
         
         /* Workers Section Card Colors */
         .card-worker-1 { background: linear-gradient(135deg, #10b981, #059669); }
@@ -505,8 +492,8 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1 id="headerTitle">Admin Dashboard</h1>
-                <p id="headerSubtitle">Primary Page</p>
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                <p id="headerSubtitle">ADMIN DASHBOARD</p>
             </div>
         </div>
         <div class="nav-buttons"></div>
@@ -532,7 +519,7 @@
         </div>
     </div>
     
-    <!-- ========== SECTION 1: COMPANY FINANCIAL INSIGHTS ========== -->
+    <!-- ========== SECTION 1: COMPANY FINANCIAL INSIGHTS (4 cards) ========== -->
     <div class="section-divider">
         <i class="fas fa-building"></i>
         <h2>COMPANY FINANCIAL INSIGHTS</h2>
@@ -543,7 +530,6 @@
         <div class="stat-card card-company-2"><div class="stat-info"><h4><i class="fas fa-building"></i> Company Paid</h4><div class="value" id="totalCompanyPaid">₹0</div><div class="sub-text">Received from Companies</div></div><div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div></div>
         <div class="stat-card card-company-3"><div class="stat-info"><h4><i class="fas fa-clock"></i> Company Due</h4><div class="value" id="totalCompanyDue">₹0</div><div class="sub-text">Outstanding Balance</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
         <div class="stat-card card-company-4"><div class="stat-info"><h4><i class="fas fa-calendar-day"></i> Today's Receivable</h4><div class="value" id="todaysReceivable">₹0</div><div class="sub-text">Earned today from companies</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
-        <div class="stat-card card-company-5"><div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Company Due</h4><div class="value" id="totalCompanyDueCumulative">₹0</div><div class="sub-text">Previous Due + Today's Receivable</div></div><div class="stat-icon"><i class="fas fa-chart-simple"></i></div></div>
     </div>
     
     <!-- ========== SECTION 2: WORKERS & ATTENDANCE ========== -->
@@ -574,7 +560,7 @@
     <div class="data-section">
         <div class="section-header"><div class="section-title"><i class="fas fa-users"></i><h3>Registered Users List</h3></div><a href="all-users.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table><thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="6">Loading...</td></tr></tbody></table>
+            <table><thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="6">Loading...<\/td></tr></tbody></table>
         </div>
     </div>
     
@@ -582,7 +568,7 @@
     <div class="data-section">
         <div class="section-header"><div class="section-title"><i class="fas fa-building"></i><h3>Company Payment Records</h3></div><a href="all-payments.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table><thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead><tbody id="companyPaymentTableBody"><tr><td colspan="6">Loading...</td></tr></tbody></table>
+            <table><thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead><tbody id="companyPaymentTableBody"><tr><td colspan="6">Loading...<\/td></tr></tbody></table>
         </div>
     </div>
     
@@ -590,7 +576,7 @@
     <div class="data-section">
         <div class="section-header"><div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Worker Attendance Records</h3></div><a href="all-attendance.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table><thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead><tbody id="attendanceTableBody"><tr><td colspan="7">Loading...</td></tr></tbody></table>
+            <table><thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead><tbody id="attendanceTableBody"><tr><td colspan="7">Loading...<\/td></tr></tbody></table>
         </div>
     </div>
     
@@ -607,7 +593,7 @@
             <div class="footer-brand">
                 <div class="footer-logo">
                     <div class="logo-icon" id="footerLogoIcon"><span>SP</span></div>
-                    <div><h2 id="footerBrandTitle">Admin Dashboard</h2><div class="footer-subtitle" id="footerBrandSubtitle">Primary Page</div></div>
+                    <div><h2 id="footerBrandTitle">SP CONSTRUCTION</h2><div class="footer-subtitle" id="footerBrandSubtitle">ADMIN DASHBOARD</div></div>
                 </div>
                 <p>Building dreams with quality and precision. Trusted contractor for residential and commercial projects across the region.</p>
                 <div class="social-icons"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
@@ -673,6 +659,7 @@
             if (attSnap.exists()) {
                 allAttendanceRecords = Object.entries(attSnap.val()).map(([id, data]) => ({ id, ...data }));
                 console.log(`✅ Attendance records loaded: ${allAttendanceRecords.length}`);
+                if (allAttendanceRecords.length) console.log("Sample attendance:", allAttendanceRecords[0]);
             } else {
                 allAttendanceRecords = [];
                 console.warn("⚠️ No attendance data found");
@@ -683,6 +670,7 @@
             if (paySnap.exists()) {
                 allPaymentRecords = Object.entries(paySnap.val()).map(([id, data]) => ({ id, ...data }));
                 console.log(`✅ Payment records loaded: ${allPaymentRecords.length}`);
+                if (allPaymentRecords.length) console.log("Sample payment:", allPaymentRecords[0]);
             } else {
                 allPaymentRecords = [];
                 console.warn("⚠️ No payment data found");
@@ -700,13 +688,10 @@
                 console.warn("⚠️ No users found");
             }
             
-            // Update stats cards (they will use the arrays)
             updateStats();
-            
-            // Update tables and charts
             updateUsersTable();
-            updateAttendanceTable();
-            updateCompanyPaymentTable();
+            updateAttendanceTable();    // FIXED: now called explicitly
+            updateCompanyPaymentTable(); // FIXED
             updateCharts();
             
         } catch(e) { 
@@ -716,7 +701,6 @@
     }
     
     function updateStats() {
-        // Attendance stats
         let uniqueWorkers = new Set(allAttendanceRecords.map(r=>r.workerId || r.userId || r.id)).size;
         document.getElementById('totalWorkers').textContent = uniqueWorkers;
         
@@ -726,13 +710,12 @@
         
         let totalEarn = allAttendanceRecords.reduce((s,r)=>s+(Number(r.earnings) || 0),0);
         let totalPaidToWorker = allAttendanceRecords.reduce((s,r)=>s+(Number(r.paid) || 0),0);
-        let companyPaid = allPaymentRecords.reduce((s,p)=>s+(Number(p.companyPaid) || 0),0);
-        let previousCompanyDue = allPaymentRecords.reduce((s,p)=>s+((Number(p.totalEarning) || 0) - (Number(p.companyPaid) || 0)),0);
+        let companyPaid = allPaymentRecords.reduce((s,p)=>s+(Number(p.companyPaid) || Number(p.paid) || 0),0);
+        let previousCompanyDue = allPaymentRecords.reduce((s,p)=>s+((Number(p.totalEarning) || Number(p.totalEarnings) || Number(p.earning) || 0) - (Number(p.companyPaid) || Number(p.paid) || 0)),0);
         
         let todaysEarnings = allAttendanceRecords.filter(r=>r.date===today).reduce((s,r)=>s+(Number(r.earnings) || 0),0);
-        let todaysCompanyPaid = allPaymentRecords.filter(p=>p.date===today).reduce((s,p)=>s+(Number(p.companyPaid) || 0),0);
+        let todaysCompanyPaid = allPaymentRecords.filter(p=>p.date===today).reduce((s,p)=>s+(Number(p.companyPaid) || Number(p.paid) || 0),0);
         let todaysReceivable = Math.max(0, todaysEarnings - todaysCompanyPaid);
-        let totalCompanyDueCumulative = previousCompanyDue + todaysReceivable;
         let totalDueToWorkers = Math.max(0, totalEarn - totalPaidToWorker);
         
         function fmt(n) { return '₹' + Math.round(n).toLocaleString(); }
@@ -742,14 +725,13 @@
         document.getElementById('totalCompanyDue').innerHTML = fmt(previousCompanyDue);
         document.getElementById('totalDueToWorkers').innerHTML = fmt(totalDueToWorkers);
         document.getElementById('todaysReceivable').innerHTML = fmt(todaysReceivable);
-        document.getElementById('totalCompanyDueCumulative').innerHTML = fmt(totalCompanyDueCumulative);
     }
     
     function updateUsersTable() {
         const tbody = document.getElementById('usersTableBody');
         if (!tbody) return;
         if (!allUsers.length) {
-            tbody.innerHTML = '<tr><td colspan="6">📭 No users registered yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">📭 No users registered yet<\/td></tr>';
             return;
         }
         let sorted = [...allUsers].sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
@@ -774,18 +756,21 @@
     
     function updateAttendanceTable() {
         const tbody = document.getElementById('attendanceTableBody');
+        console.log("updateAttendanceTable called, tbody exists:", !!tbody);
         if (!tbody) return;
         if (!allAttendanceRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="7">📭 No attendance records found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7">📭 No attendance records found<\/td></tr>';
+            console.log("No attendance records to display");
             return;
         }
+        // sort by date descending
         let sorted = [...allAttendanceRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
         let html = '';
         for (let r of sorted.slice(0,10)) {
             let statusClass = r.status === 'present' ? 'badge-present' : (r.status === 'absent' ? 'badge-absent' : 'badge-halfday');
             let statusText = r.status === 'present' ? 'Present' : (r.status === 'absent' ? 'Absent' : 'Half Day');
             html += `<tr>
-                <td>${r.date || 'N/A'}</td>
+                <td>${escapeHtml(r.date || 'N/A')}</td>
                 <td><strong>${escapeHtml(r.workerName || r.name || 'N/A')}</strong></td>
                 <td style="color:#f59e0b;">${escapeHtml(r.workerId || r.userId || 'N/A')}</td>
                 <td><span class="${statusClass}">${statusText}</span></td>
@@ -795,29 +780,38 @@
             </tr>`;
         }
         tbody.innerHTML = html;
+        console.log(`Rendered ${sorted.slice(0,10).length} attendance rows`);
     }
     
     function updateCompanyPaymentTable() {
         const tbody = document.getElementById('companyPaymentTableBody');
+        console.log("updateCompanyPaymentTable called, tbody exists:", !!tbody);
         if (!tbody) return;
         if (!allPaymentRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="6">📭 No payment records found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">📭 No payment records found<\/td></tr>';
+            console.log("No payment records to display");
             return;
         }
         let sorted = [...allPaymentRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
         let html = '';
         for (let p of sorted.slice(0,10)) {
-            let due = (Number(p.totalEarning) || 0) - (Number(p.companyPaid) || 0);
+            const totalEarning = Number(p.totalEarning) || Number(p.totalEarnings) || Number(p.earning) || 0;
+            const companyPaid = Number(p.companyPaid) || Number(p.paid) || Number(p.amountPaid) || 0;
+            const due = totalEarning - companyPaid;
+            const workers = p.totalWorker || p.workers || 0;
+            const companyName = p.companyName || p.company || 'N/A';
+            const date = p.date || 'N/A';
             html += `<tr>
-                <td>${p.date || 'N/A'}</td>
-                <td><strong>${escapeHtml(p.companyName || 'N/A')}</strong></td>
-                <td>${p.totalWorker || 0}</td>
-                <td class="amount-positive">₹${(Number(p.totalEarning)||0).toLocaleString()}</td>
-                <td class="amount-positive">₹${(Number(p.companyPaid)||0).toLocaleString()}</td>
+                <td>${escapeHtml(date)}</td>
+                <td><strong>${escapeHtml(companyName)}</strong></td>
+                <td>${workers}</td>
+                <td class="amount-positive">₹${totalEarning.toLocaleString()}</td>
+                <td class="amount-positive">₹${companyPaid.toLocaleString()}</td>
                 <td style="color:${due<0?'#dc2626':'#15803d'};">₹${Math.abs(due).toLocaleString()}</td>
             </tr>`;
         }
         tbody.innerHTML = html;
+        console.log(`Rendered ${sorted.slice(0,10).length} payment rows`);
     }
     
     function updateCharts() {
@@ -839,11 +833,11 @@
             return (present / dayRec.length) * 100;
         });
         
-        let weekPay = last7.map(date => allPaymentRecords.filter(p => p.date === date).reduce((s,p) => s + (Number(p.companyPaid) || 0), 0));
+        let weekPay = last7.map(date => allPaymentRecords.filter(p => p.date === date).reduce((s,p) => s + (Number(p.companyPaid) || Number(p.paid) || 0), 0));
         let dailyEarn = last7.map(date => allAttendanceRecords.filter(r => r.date === date).reduce((s,r) => s + (Number(r.earnings) || 0), 0));
         
-        let totalPaid = allPaymentRecords.reduce((s,p) => s + (Number(p.companyPaid) || 0), 0);
-        let totalDue = allPaymentRecords.reduce((s,p) => s + ((Number(p.totalEarning) || 0) - (Number(p.companyPaid) || 0)), 0);
+        let totalPaid = allPaymentRecords.reduce((s,p) => s + (Number(p.companyPaid) || Number(p.paid) || 0), 0);
+        let totalDue = allPaymentRecords.reduce((s,p) => s + ((Number(p.totalEarning) || Number(p.totalEarnings) || Number(p.earning) || 0) - (Number(p.companyPaid) || Number(p.paid) || 0)), 0);
         
         const ctx1 = document.getElementById('attendanceRateChart')?.getContext('2d');
         const ctx2 = document.getElementById('weeklyPaymentChart')?.getContext('2d');
