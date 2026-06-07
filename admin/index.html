@@ -5,27 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>SP Construction | Premium Contractor App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Firebase SDKs -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, set, onValue, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
+        import { getDatabase, ref, get, onValue, set, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
         
+        // Make Firebase services available globally
         window.auth = auth;
         window.db = database;
         window.signOut = signOut;
@@ -33,8 +24,8 @@
         window.get = get;
         window.set = set;
         window.onValue = onValue;
-        window.onAuthStateChanged = onAuthStateChanged;
         window.update = update;
+        window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
         * {
@@ -44,7 +35,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             background: linear-gradient(145deg, #e2e8f0 0%, #f1f5f9 100%);
             min-height: 100vh;
             display: flex;
@@ -389,7 +380,7 @@
             min-height: 160px;
         }
 
-        /* Right Menu Header - Larger Avatar */
+        /* Right Menu Header - Larger Avatar + Email */
         .side-menu-right .menu-header {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             padding: 40px 20px;
@@ -414,6 +405,12 @@
         .side-menu-right .menu-header p {
             color: rgba(255,255,255,0.8);
             font-size: 0.7rem;
+        }
+        .user-email-in-menu {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.7rem;
+            margin-top: 6px;
+            word-break: break-word;
         }
 
         .menu-item {
@@ -744,7 +741,7 @@
 </head>
 <body>
 
-<!-- LEFT SIDE MENU (already working) -->
+<!-- LEFT SIDE MENU -->
 <div class="side-menu-left" id="sideMenuLeft">
     <div class="menu-header" id="leftMenuHeader" style="background-image: url('');"></div>
     <div class="menu-item" onclick="loadPageInIframe('dashboard.html'); closeLeftMenu();"><i class="fas fa-chart-line"></i> <span>Home</span></div>
@@ -757,32 +754,26 @@
     <div class="menu-item" onclick="loadPageInIframe('report-archive.html'); closeLeftMenu();"><i class="fas fa-folder-open"></i> <span>Report Archive</span></div>
 </div>
 
-<!-- RIGHT SIDE MENU (FIXED: all items now load content into iframe) -->
+<!-- RIGHT SIDE MENU (now shows name, plan AND email) -->
 <div class="side-menu-right" id="sideMenuRight">
     <div class="menu-header" id="rightMenuHeader">
         <img id="rightMenuAvatar" class="menu-logo" src="https://placehold.co/90x90?text=User" alt="Profile Logo">
         <h3 id="rightMenuName">Loading...</h3>
         <p id="rightMenuPlan" style="font-size:0.7rem; margin-top:5px;">Contractor · Premium Plan</p>
+        <div class="user-email-in-menu" id="rightMenuEmail">📧 loading@example.com</div>
     </div>
-    <!-- Profile: loads profile.html in iframe -->
     <div class="menu-item" onclick="closeRightMenu(); loadPageInIframe('profile.html');"><i class="fas fa-user"></i> <span>Profile</span></div>
-    <!-- Settings: opens modal (modal links now also use iframe) -->
     <div class="menu-item" onclick="closeRightMenu(); openSettingsModal();"><i class="fas fa-cog"></i> <span>Settings</span></div>
-    <!-- Logo Upload: loads logoupload.html in iframe -->
     <div class="menu-item" onclick="closeRightMenu(); loadPageInIframe('logoupload.html');"><i class="fas fa-camera"></i> <span>Logo Upload</span></div>
-    <!-- Notifications: rich panel inside iframe -->
     <div class="menu-item" onclick="closeRightMenu(); loadNotificationsPanel();"><i class="fas fa-bell"></i> <span>Notifications</span></div>
-    <!-- Help Center: help panel inside iframe -->
     <div class="menu-item" onclick="closeRightMenu(); loadHelpPanel();"><i class="fas fa-question-circle"></i> <span>Help Center</span></div>
-    <!-- App Info: info panel inside iframe -->
     <div class="menu-item" onclick="closeRightMenu(); loadAppInfoPanel();"><i class="fas fa-info-circle"></i> <span>App Info</span></div>
-    <!-- Logout remains functional -->
     <div class="menu-item" onclick="closeRightMenu(); handleLogout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeAllMenus()"></div>
 
-<!-- SETTINGS MODAL - All links now load pages into iframe -->
+<!-- SETTINGS MODAL - all links open in iframe -->
 <div class="settings-modal" id="settingsModal">
     <div class="modal-container">
         <div class="modal-header">
@@ -820,7 +811,10 @@
             <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search work, worker or project..."></div>
             <div class="profile-img" id="headerProfileImg" onclick="toggleRightMenu()"><img id="headerAvatar" src="https://placehold.co/44x44?text=SP" alt="Profile"></div>
         </div>
-        <div class="greeting"><h3>👷 Welcome, SP Construction</h3><p>View your work progress on the dashboard</p></div>
+        <div class="greeting">
+            <h3 id="greetingText">👷 Welcome, Admin</h3>
+            <p>View your work progress on the dashboard</p>
+        </div>
     </div>
     <div class="main-content" id="mainContent">
         <div class="iframe-container" id="iframeContainer"><iframe class="dashboard-iframe" id="dashboardFrame" src="dashboard.html" title="SP Construction Dashboard"></iframe></div>
@@ -840,7 +834,7 @@
 </div>
 
 <script type="module">
-    // Firebase & core admin logic (unchanged)
+    // Firebase & core admin logic
     let currentAuthUser = null;
     let isAdminUser = false;
     let adminChecked = false;
@@ -861,6 +855,7 @@
             }
         } catch (err) { console.warn(err); }
     }
+    
     async function loadSidebarBackground() {
         try {
             const sidebarBgRef = window.ref(window.db, `companyAssets/sidebarBackground`);
@@ -874,6 +869,7 @@
             }
         } catch (err) { console.warn(err); }
     }
+    
     async function loadCompanyLogo() {
         try {
             const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
@@ -881,27 +877,63 @@
             const footerLogoIcon = document.getElementById('footerLogoIcon');
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 footerLogoIcon.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
-            } else { footerLogoIcon.innerHTML = `<span>SP</span>`; }
+            } else { 
+                footerLogoIcon.innerHTML = `<span>SP</span>`; 
+            }
         } catch (err) { console.warn(err); }
     }
+    
     async function updateUserUI(user) {
         if (!user) return;
         try {
             const userRef = window.ref(window.db, `users/${user.uid}`);
             const snapshot = await window.get(userRef);
             const data = snapshot.val() || {};
+            
+            // Header avatar
             const headerImg = document.getElementById('headerAvatar');
-            if (headerImg) headerImg.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) ? data.profilePicture : 'https://placehold.co/44x44?text=SP';
+            if (headerImg) {
+                headerImg.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) 
+                    ? data.profilePicture 
+                    : 'https://placehold.co/44x44?text=SP';
+            }
+            
+            // Right menu avatar & name
             const rightAvatar = document.getElementById('rightMenuAvatar');
-            if (rightAvatar) rightAvatar.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) ? data.profilePicture : 'https://placehold.co/90x90?text=User';
-            let fullName = (data.firstName && data.lastName) ? `${data.firstName} ${data.lastName}` : (data.fullName || user.displayName || user.email?.split('@')[0] || 'Profile');
+            if (rightAvatar) {
+                rightAvatar.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) 
+                    ? data.profilePicture 
+                    : 'https://placehold.co/90x90?text=User';
+            }
+            
+            let fullName = (data.firstName && data.lastName) 
+                ? `${data.firstName} ${data.lastName}` 
+                : (data.fullName || user.displayName || user.email?.split('@')[0] || 'Profile');
             document.getElementById('rightMenuName').innerText = fullName;
+            
+            // Plan
             let planText = data.plan ? `${data.plan} Plan` : 'Premium Plan';
             document.getElementById('rightMenuPlan').innerText = `Contractor · ${planText}`;
-            document.querySelector('.greeting h3').innerHTML = `👷 Welcome, ${fullName}`;
+            
+            // Email display
+            const userEmail = user.email || data.email || 'No email provided';
+            const emailElement = document.getElementById('rightMenuEmail');
+            if (emailElement) emailElement.innerText = `📧 ${userEmail}`;
+            
+            // Greeting in header
+            const greetingH3 = document.getElementById('greetingText');
+            if (greetingH3) greetingH3.innerHTML = `👷 Welcome, ${fullName}`;
+            
         } catch (err) { console.warn(err); }
     }
-    window.handleLogout = async function() { await window.signOut(window.auth); window.location.href = 'login.html'; };
+    
+    window.handleLogout = async function() { 
+        try {
+            await window.signOut(window.auth);
+            window.location.href = 'login.html';
+        } catch(e) { console.error(e); alert('Logout failed'); }
+    };
+    
     async function checkAdminAndLoad(user) {
         if (!user) { window.location.href = 'login.html'; return; }
         try {
@@ -911,13 +943,17 @@
                 isAdminUser = false; adminChecked = true; showAccessDenied(); return;
             }
             isAdminUser = true; adminChecked = true;
-            await updateUserUI(user); await loadHeaderBackground(user); await loadSidebarBackground(); await loadCompanyLogo();
+            await updateUserUI(user); 
+            await loadHeaderBackground(user); 
+            await loadSidebarBackground(); 
+            await loadCompanyLogo();
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('iframeContainer').style.display = 'flex';
             document.getElementById('dynamicView').style.display = 'none';
             showHomeDashboard();
         } catch (error) { console.error(error); showAccessDenied(); }
     }
+    
     function showAccessDenied() { 
         const iframeContainer = document.getElementById('iframeContainer');
         const dynamicView = document.getElementById('dynamicView');
@@ -925,11 +961,26 @@
         dynamicView.style.display = 'block';
         dynamicView.innerHTML = `<div class="access-denied"><i class="fas fa-shield-alt"></i><h2>⛔ Access Denied</h2><p>You don't have administrator privileges.</p><button onclick="window.location.href='login.html'"><i class="fas fa-sign-out-alt"></i> Go to Login</button></div>`;
     }
-    window.onAuthStateChanged(window.auth, async (user) => { if (!user) { window.location.href = 'login.html'; return; } await checkAdminAndLoad(user); });
+    
+    window.onAuthStateChanged(window.auth, async (user) => { 
+        if (!user) { 
+            window.location.href = 'login.html'; 
+            return; 
+        } 
+        await checkAdminAndLoad(user); 
+    });
+    
+    // Real‑time listeners for assets
     if (window.db) { 
-        window.onValue(window.ref(window.db, `companyAssets/headerBackground`), async () => { if(currentAuthUser && isAdminUser) await loadHeaderBackground(currentAuthUser); });
-        window.onValue(window.ref(window.db, `companyAssets/sidebarBackground`), async () => { if(isAdminUser) await loadSidebarBackground(); });
-        window.onValue(window.ref(window.db, `companyAssets/footerLogo`), async () => { if(isAdminUser) await loadCompanyLogo(); });
+        window.onValue(window.ref(window.db, `companyAssets/headerBackground`), async () => { 
+            if(currentAuthUser && isAdminUser) await loadHeaderBackground(currentAuthUser); 
+        });
+        window.onValue(window.ref(window.db, `companyAssets/sidebarBackground`), async () => { 
+            if(isAdminUser) await loadSidebarBackground(); 
+        });
+        window.onValue(window.ref(window.db, `companyAssets/footerLogo`), async () => { 
+            if(isAdminUser) await loadCompanyLogo(); 
+        });
     }
     
     // Core navigation: load external page in iframe
@@ -968,20 +1019,87 @@
         setIframeContent(html);
     };
     
-    function showHomeDashboard() { if (!isAdminUser) { showAccessDenied(); return; } document.getElementById('iframeContainer').style.display = 'flex'; document.getElementById('dynamicView').style.display = 'none'; }
-    function renderPosts() { if (!isAdminUser) { showAccessDenied(); return; } const dynamicView = document.getElementById('dynamicView'); dynamicView.innerHTML = `<div class="post-card"><h3>Posts will appear here</h3></div>`; document.getElementById('iframeContainer').style.display = 'none'; dynamicView.style.display = 'block'; }
-    function renderSupport() { const dynamicView = document.getElementById('dynamicView'); dynamicView.innerHTML = `<div class="post-card"><h3>Support Center</h3><p>Contact: support@spconstruction.com</p></div>`; document.getElementById('iframeContainer').style.display = 'none'; dynamicView.style.display = 'block'; }
-    function showNotifications() { const dynamicView = document.getElementById('dynamicView'); dynamicView.innerHTML = `<div class="post-card"><h3>Notifications</h3><p>No new notifications</p></div>`; document.getElementById('iframeContainer').style.display = 'none'; dynamicView.style.display = 'block'; }
-    window.handleBottomNav = function(type) { if (!isAdminUser) { showAccessDenied(); return; } if(type === 'home') showHomeDashboard(); else if(type === 'post') renderPosts(); else if(type === 'support') renderSupport(); else if(type === 'notification') showNotifications(); else if(type === 'search') { const dynamicView = document.getElementById('dynamicView'); dynamicView.innerHTML = `<div class="post-card"><h3>Search</h3><p>Use search bar</p></div>`; document.getElementById('iframeContainer').style.display = 'none'; dynamicView.style.display = 'block'; } };
-    window.setActiveNav = function(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); };
-    window.toggleLeftMenu = function() { document.getElementById('sideMenuLeft').classList.add('open'); document.getElementById('overlay').classList.add('show'); };
-    window.closeLeftMenu = function() { document.getElementById('sideMenuLeft').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); };
-    window.toggleRightMenu = function() { document.getElementById('sideMenuRight').classList.add('open'); document.getElementById('overlay').classList.add('show'); };
-    window.closeRightMenu = function() { document.getElementById('sideMenuRight').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); };
-    window.closeAllMenus = function() { document.getElementById('sideMenuLeft').classList.remove('open'); document.getElementById('sideMenuRight').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); };
-    window.openSettingsModal = function() { if (!isAdminUser) { showAccessDenied(); return; } document.getElementById('settingsModal').classList.add('open'); };
-    window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('open'); };
-    window.onload = function() { };
+    function showHomeDashboard() { 
+        if (!isAdminUser) { showAccessDenied(); return; } 
+        document.getElementById('iframeContainer').style.display = 'flex'; 
+        document.getElementById('dynamicView').style.display = 'none'; 
+    }
+    
+    function renderPosts() { 
+        if (!isAdminUser) { showAccessDenied(); return; } 
+        const dynamicView = document.getElementById('dynamicView'); 
+        dynamicView.innerHTML = `<div class="post-card"><h3>Posts will appear here</h3></div>`; 
+        document.getElementById('iframeContainer').style.display = 'none'; 
+        dynamicView.style.display = 'block'; 
+    }
+    
+    function renderSupport() { 
+        const dynamicView = document.getElementById('dynamicView'); 
+        dynamicView.innerHTML = `<div class="post-card"><h3>Support Center</h3><p>Contact: support@spconstruction.com</p></div>`; 
+        document.getElementById('iframeContainer').style.display = 'none'; 
+        dynamicView.style.display = 'block'; 
+    }
+    
+    function showNotifications() { 
+        const dynamicView = document.getElementById('dynamicView'); 
+        dynamicView.innerHTML = `<div class="post-card"><h3>Notifications</h3><p>No new notifications</p></div>`; 
+        document.getElementById('iframeContainer').style.display = 'none'; 
+        dynamicView.style.display = 'block'; 
+    }
+    
+    window.handleBottomNav = function(type) { 
+        if (!isAdminUser) { showAccessDenied(); return; } 
+        if(type === 'home') showHomeDashboard(); 
+        else if(type === 'post') renderPosts(); 
+        else if(type === 'support') renderSupport(); 
+        else if(type === 'notification') showNotifications(); 
+        else if(type === 'search') { 
+            const dynamicView = document.getElementById('dynamicView'); 
+            dynamicView.innerHTML = `<div class="post-card"><h3>Search</h3><p>Use search bar</p></div>`; 
+            document.getElementById('iframeContainer').style.display = 'none'; 
+            dynamicView.style.display = 'block'; 
+        } 
+    };
+    
+    window.setActiveNav = function(el) { 
+        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); 
+        el.classList.add('active'); 
+    };
+    
+    window.toggleLeftMenu = function() { 
+        document.getElementById('sideMenuLeft').classList.add('open'); 
+        document.getElementById('overlay').classList.add('show'); 
+    };
+    window.closeLeftMenu = function() { 
+        document.getElementById('sideMenuLeft').classList.remove('open'); 
+        document.getElementById('overlay').classList.remove('show'); 
+    };
+    window.toggleRightMenu = function() { 
+        document.getElementById('sideMenuRight').classList.add('open'); 
+        document.getElementById('overlay').classList.add('show'); 
+    };
+    window.closeRightMenu = function() { 
+        document.getElementById('sideMenuRight').classList.remove('open'); 
+        document.getElementById('overlay').classList.remove('show'); 
+    };
+    window.closeAllMenus = function() { 
+        document.getElementById('sideMenuLeft').classList.remove('open'); 
+        document.getElementById('sideMenuRight').classList.remove('open'); 
+        document.getElementById('overlay').classList.remove('show'); 
+    };
+    
+    window.openSettingsModal = function() { 
+        if (!isAdminUser) { showAccessDenied(); return; } 
+        document.getElementById('settingsModal').classList.add('open'); 
+    };
+    window.closeSettingsModal = function() { 
+        document.getElementById('settingsModal').classList.remove('open'); 
+    };
+    
+    // Initial setup
+    window.onload = function() { 
+        // any additional startup logic
+    };
 </script>
 </body>
 </html>
