@@ -9,20 +9,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -99,7 +89,7 @@
             gap: 8px;
         }
         .back-btn:hover { background: #f59e0b; color: white; transform: translateY(-2px); }
-        .add-payment-btn {
+        .add-new-btn {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             border: none;
             padding: 8px 24px;
@@ -114,7 +104,7 @@
             gap: 8px;
             box-shadow: 0 2px 6px rgba(34,197,94,0.3);
         }
-        .add-payment-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+        .add-new-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
         
         .stats-grid {
             display: grid;
@@ -566,10 +556,13 @@
     <div class="header">
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
-            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>PAYMENT MANAGER</p></div>
+            <div class="logo-text">
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                <p id="headerSubtitle">PAYMENT MANAGER</p>
+            </div>
         </div>
         <div class="header-buttons">
-            <button class="add-payment-btn" id="openAddPaymentBtn"><i class="fas fa-plus-circle"></i> Add New Payment</button>
+            <button class="add-new-btn" id="openAddPaymentBtn"><i class="fas fa-plus-circle"></i> Add New</button>
             <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
         </div>
     </div>
@@ -730,6 +723,8 @@
     const downloadFormatSelect = document.getElementById('downloadFormat');
     const downloadBtn = document.getElementById('downloadBtn');
     const headerLogo = document.getElementById('headerLogo');
+    const headerTitleSpan = document.getElementById('headerTitle');
+    const headerSubtitleSpan = document.getElementById('headerSubtitle');
     const paymentContent = document.getElementById('paymentContent');
     const accessDeniedDiv = document.getElementById('accessDeniedMessage');
     
@@ -758,6 +753,76 @@
     const statTotalDue = document.getElementById('statTotalDue');
     const statTotalWorkers = document.getElementById('statTotalWorkers');
     const statTotalCompanies = document.getElementById('statTotalCompanies');
+    
+    // ========== GLOBAL BRANDING FUNCTIONS (same as all-attendance) ==========
+    async function loadGlobalBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(db, `companyAssets/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Global branding loaded:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'PAYMENT MANAGER';
+                console.log("No global branding, using defaults");
+            }
+        } catch(err) {
+            console.warn("Error loading global branding:", err);
+        }
+    }
+    
+    function listenToGlobalBranding() {
+        const brandingRef = window.ref(db, `companyAssets/branding`);
+        window.onValue(brandingRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const brand = snapshot.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Real-time global branding update:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'PAYMENT MANAGER';
+                console.log("Global branding removed, reset to defaults");
+            }
+        });
+    }
+    
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            
+            if (headerLogo) {
+                if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    const logoUrl = snapshot.val();
+                    headerLogo.innerHTML = `<img src="${logoUrl}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    console.log("Company logo loaded successfully");
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                    console.log("No logo found, showing default SP");
+                }
+            }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+            if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
+        }
+    }
+    
+    function listenLogoChanges() {
+        const logoRef = window.ref(db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            if (headerLogo) {
+                if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    headerLogo.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                }
+            }
+        });
+    }
+    // ========== END GLOBAL BRANDING ==========
     
     function showToast(msg, isErr = false) {
         const toast = document.createElement('div');
@@ -791,16 +856,6 @@
     }
     
     function formatNumber(value) { return formatIndianNumber(parseFloat(value) || 0); }
-    
-    function updateHeaderLogo(base64) {
-        if (headerLogo) {
-            if (base64 && base64.startsWith('data:image')) {
-                headerLogo.innerHTML = `<img src="${base64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;">`;
-            } else {
-                headerLogo.innerHTML = `<span>SP</span>`;
-            }
-        }
-    }
     
     function updateAdminInfoDisplay() {
         if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
@@ -947,6 +1002,10 @@
             await loadAllPayments();
             await loadPdfLogo();
             await loadBannerImage();
+            await loadCompanyLogo();
+            listenLogoChanges();
+            await loadGlobalBranding();
+            listenToGlobalBranding();
         } catch (error) {
             showAccessDenied();
         }
@@ -1380,7 +1439,6 @@
             const totals = computeTotals(records);
             let finalY = doc.lastAutoTable.finalY + 8;
             
-            // Check if summary fits on same page, if not add new page
             const summaryHeight = 55;
             if (finalY + summaryHeight > pageHeight - 15) {
                 doc.addPage();
@@ -1392,7 +1450,6 @@
                 doc.text(`Page ${pageCount} of ${pageCount}`, centerX, pageHeight - 10, { align: "center" });
             }
             
-            // Summary Box - Completely inside borders, properly centered
             const boxWidth = 160;
             const boxX = (pageWidth - boxWidth) / 2;
             
@@ -1413,7 +1470,6 @@
             doc.setTextColor(51, 51, 51);
             doc.setFont("helvetica", "normal");
             
-            // Line 1 - Three columns within box (box width = 160, so x positions adjusted)
             const col1 = boxX + 12;
             const col2 = boxX + 68;
             const col3 = boxX + 124;
@@ -1422,7 +1478,6 @@
             doc.text(`Total Workers: ${formatIndianNumber(totals.totalWorkers)}`, col2, finalY + 22);
             doc.text(`Unique Companies: ${totals.uniqueCompanies}`, col3, finalY + 22);
             
-            // Line 2
             doc.text(`Total Earnings: Rs. ${formatIndianNumber(totals.totalEarnings)}`, col1, finalY + 32);
             doc.text(`Total Paid: Rs. ${formatIndianNumber(totals.totalPaid)}`, col2, finalY + 32);
             
@@ -1430,7 +1485,6 @@
             doc.setTextColor(dueColor[0], dueColor[1], dueColor[2]);
             doc.text(`Total Due: Rs. ${formatIndianNumber(Math.abs(totals.totalDue))}`, col3, finalY + 32);
             
-            // Footer Note on last page (small font, centered)
             const lastPage = doc.internal.getNumberOfPages();
             doc.setPage(lastPage);
             doc.setFontSize(7);
