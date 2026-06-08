@@ -3,26 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Purchase / Shopping List | SP Construction</title>
+    <title>All Purchases | SP Construction</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -439,7 +429,10 @@
     <div class="header">
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
-            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>PURCHASE & EXPENSE</p></div>
+            <div class="logo-text">
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                <p id="headerSubtitle">PURCHASE & EXPENSE</p>
+            </div>
         </div>
         <div class="header-buttons">
             <button class="add-new-btn" id="openAddModalBtn"><i class="fas fa-shopping-cart"></i> Add New Purchase</button>
@@ -456,7 +449,7 @@
         <div class="stat-card card-6"><div class="stat-info"><h4>Total Due</h4><div class="value" id="statTotalDue">₹0</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
     </div>
 
-    <!-- BANNER SECTION - IMPROVED LIKE DASHBOARD -->
+    <!-- BANNER SECTION -->
     <div class="banner-section" id="bannerSection">
         <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
@@ -589,6 +582,8 @@
     const downloadFormatSelect = document.getElementById('downloadFormat');
     const downloadBtn = document.getElementById('downloadBtn');
     const headerLogo = document.getElementById('headerLogo');
+    const headerTitleSpan = document.getElementById('headerTitle');
+    const headerSubtitleSpan = document.getElementById('headerSubtitle');
     const statTotalRecords = document.getElementById('statTotalRecords');
     const statTotalQty = document.getElementById('statTotalQty');
     const statTotalSpent = document.getElementById('statTotalSpent');
@@ -617,6 +612,70 @@
     const modalSaveBtn = document.getElementById('modalSaveBtn');
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const openAddModalBtn = document.getElementById('openAddModalBtn');
+    
+    // ========== GLOBAL BRANDING FUNCTIONS ==========
+    async function loadGlobalBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(db, `companyAssets/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Global branding loaded:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'PURCHASE & EXPENSE';
+                console.log("No global branding, using defaults");
+            }
+        } catch(err) {
+            console.warn("Error loading global branding:", err);
+        }
+    }
+    
+    function listenToGlobalBranding() {
+        const brandingRef = window.ref(db, `companyAssets/branding`);
+        window.onValue(brandingRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const brand = snapshot.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Real-time global branding update:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'PURCHASE & EXPENSE';
+                console.log("Global branding removed, reset to defaults");
+            }
+        });
+    }
+    
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            const logoSnap = await window.get(logoRef);
+            if (headerLogo) {
+                if (logoSnap.exists() && logoSnap.val() && logoSnap.val().startsWith('data:image')) {
+                    companyLogoBase64 = logoSnap.val();
+                    headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                }
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    function listenLogoChanges() {
+        const logoRef = window.ref(db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            if (headerLogo) {
+                if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    headerLogo.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                }
+            }
+        });
+    }
+    // ========== END GLOBAL BRANDING ==========
     
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     function formatIndianNumber(num) { if (num === null || isNaN(num)) return '0'; let n = Math.round(parseFloat(num)); return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
@@ -817,7 +876,7 @@
             currentFilteredPurchases = [...allPurchases];
             renderTable();
             if (searchInput.value.trim()) filterRecords(searchInput.value);
-        } catch (error) { tbody.innerHTML = '<tr><td colspan="10" class="no-data">Error loading data</td></tr>'; }
+        } catch (error) { tbody.innerHTML = '<tr><td colspan="10" class="no-data">Error loading data</td></table>'; }
     }
     
     async function addPurchaseRecord(recordData) {
@@ -908,18 +967,7 @@
         closeModal();
     }
     
-    // --- Assets & Banner (Fixed like Dashboard) ---
-    async function loadCompanyLogo() {
-        try {
-            const logoRef = window.ref(db, `companyAssets/footerLogo`);
-            const logoSnap = await window.get(logoRef);
-            if (logoSnap.exists() && logoSnap.val().startsWith('data:image')) {
-                companyLogoBase64 = logoSnap.val();
-                if(headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Logo">`;
-            }
-        } catch(e) { console.warn(e); }
-    }
-    
+    // --- Banner and PDF logo loading (unchanged from original) ---
     async function loadBannerImage() {
         try {
             const bannersRef = window.ref(db, `companyAssets/banners`);
@@ -963,7 +1011,7 @@
     
     function showToast(msg, isErr = false) { const toast = document.createElement('div'); toast.innerText = msg; toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:'+(isErr?'#dc2626':'#15803d')+'; color:white; padding:10px 24px; border-radius:40px; z-index:9999;'; document.body.appendChild(toast); setTimeout(()=>toast.remove(),3000); }
     
-    // --- Export with FIXED SUMMARY POSITION (increased height and margin) ---
+    // --- Export with fixed summary positioning (unchanged) ---
     function getRecordsToExport() {
         let base = (dataSourceSelect.value === 'all') ? [...allPurchases] : [...currentFilteredPurchases];
         if (limitCheckbox.checked) { let limit = parseInt(limitCountInput.value) || 10; if(limit < base.length) base = base.slice(0, limit); }
@@ -1059,11 +1107,8 @@
             });
             
             let finalY = doc.lastAutoTable.finalY + 8;
-            
-            // ** FIX: Increased height check and box height **
-            // বক্সের উচ্চতা 20px (প্রায় 5.3mm) বাড়ানো হয়েছে, এবং মার্জিন বড় করা হয়েছে
-            const boxHeight = 48; // আগে ছিল 40, এখন 48 (বৃদ্ধি 8mm ≈ 30px)
-            if (finalY + boxHeight + 10 > h - 10) { // আগে ছিল h-15, এখন h-10 (মার্জিন বেড়েছে)
+            const boxHeight = 48;
+            if (finalY + boxHeight + 10 > h - 10) {
                 doc.addPage();
                 drawWatermark(doc, w, h);
                 finalY = 15;
@@ -1143,6 +1188,9 @@
             await loadCompanyLogo();
             await loadBannerImage();
             await loadPdfLogo();
+            await loadGlobalBranding();
+            listenToGlobalBranding();
+            listenLogoChanges();
             bindEvents();
             window.onValue(window.ref(db, 'purchases'), ()=>{ if(isAdminUser) loadAllPurchases(); });
             window.onValue(window.ref(db, 'companies'), ()=>{ if(isAdminUser) loadCompanies(); });
