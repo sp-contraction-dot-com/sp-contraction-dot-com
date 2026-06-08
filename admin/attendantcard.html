@@ -10,20 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -42,21 +32,19 @@
     </script>
     
     <style>
+        /* (all CSS remains exactly the same as in your original file – no changes) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
         .container {
             max-width: 550px;
             width: 100%;
             margin: 0 auto;
         }
-        
         .header {
             background: #ffffff;
             border-radius: 28px;
@@ -636,7 +624,6 @@
             border: 1px solid #eef2ff;
             transition: all 0.2s;
         }
-        /* Only Amount Paid card is clickable */
         .clickable-card {
             cursor: pointer;
         }
@@ -645,7 +632,6 @@
             background: linear-gradient(135deg, #fef3c7, #fffbeb);
             border-color: #f59e0b;
         }
-        /* Non-clickable cards have no hover effect and default cursor */
         .stat-item:not(.clickable-card):hover {
             transform: none;
             background: linear-gradient(135deg, #f8fafc, #f1f5f9);
@@ -800,7 +786,6 @@
             font-weight: 600;
         }
         
-        /* Main Modal (for listing records) */
         .modal {
             display: none;
             position: fixed;
@@ -847,7 +832,6 @@
             color: #64748b;
         }
         
-        /* Search inside modal */
         .modal-search {
             margin-bottom: 15px;
         }
@@ -913,7 +897,6 @@
             color: #94a3b8;
         }
         
-        /* Small modal for editing payment */
         .edit-modal {
             display: none;
             position: fixed;
@@ -1024,8 +1007,8 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1>SP CONSTRUCTION</h1>
-                <p>ADMIN - ATTENDANCE CARD</p>
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                <p id="headerSubtitle">ADMIN - ATTENDANCE CARD</p>
             </div>
         </div>
         <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
@@ -1131,24 +1114,13 @@
             <h3 id="modalTitle">Amount Paid</h3>
             <button onclick="closeModal()"><i class="fas fa-times"></i></button>
         </div>
-        
-        <!-- Search inside modal -->
         <div class="modal-search">
             <input type="text" id="modalSearchInput" placeholder="🔍 Search by date (YYYY-MM-DD) or amount...">
         </div>
-        
         <div class="records-table-wrapper">
             <table class="records-table" id="recordsTable">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Paid (Rs.)</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="recordsTableBody">
-                    <tr><td colspan="3" class="no-records-msg">Loading...</td></tr>
-                </tbody>
+                <thead><tr><th>Date</th><th>Paid (Rs.)</th><th>Actions</th></tr></thead>
+                <tbody id="recordsTableBody"><tr><td colspan="3" class="no-records-msg">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -1204,7 +1176,45 @@
     let editingRecordId = null;
     let filteredRecords = [];
     
+    const headerTitleSpan = document.getElementById('headerTitle');
+    const headerSubtitleSpan = document.getElementById('headerSubtitle');
     const COMPANY_ASSETS_PATH = 'companyAssets';
+    
+    // ========== GLOBAL BRANDING FUNCTIONS ==========
+    async function loadGlobalBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(db, `${COMPANY_ASSETS_PATH}/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Global branding loaded:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'ADMIN - ATTENDANCE CARD';
+                console.log("No global branding, using defaults");
+            }
+        } catch(err) {
+            console.warn("Error loading global branding:", err);
+        }
+    }
+    
+    function listenToGlobalBranding() {
+        const brandingRef = window.ref(db, `${COMPANY_ASSETS_PATH}/branding`);
+        window.onValue(brandingRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const brand = snapshot.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                console.log("Real-time global branding update:", brand);
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'ADMIN - ATTENDANCE CARD';
+                console.log("Global branding removed, reset to defaults");
+            }
+        });
+    }
+    // ========== END GLOBAL BRANDING ==========
     
     function showToast(message, isError = false) {
         const toast = document.getElementById('toastMsg');
@@ -1715,7 +1725,6 @@
             showToast("No worker selected", true);
             return;
         }
-        // Only allow amountPaid to be clickable
         if (cardType !== 'amountPaid') return;
         
         activeCardType = cardType;
@@ -1726,7 +1735,6 @@
         await loadAttendanceForAmountPaid();
         document.getElementById('recordModal').classList.add('show');
         
-        // Setup search listener
         const searchInput = document.getElementById('modalSearchInput');
         searchInput.value = '';
         searchInput.removeEventListener('input', filterTable);
@@ -1766,7 +1774,7 @@
     function renderAmountPaidTable(records) {
         const tbody = document.getElementById('recordsTableBody');
         if (!records.length) {
-            tbody.innerHTML = '<tr><td colspan="3" class="no-records-msg">No matching records found.</td></table>';
+            tbody.innerHTML = '<tr><td colspan="3" class="no-records-msg">No matching records found.</td></tr>';
             return;
         }
         tbody.innerHTML = records.map(rec => `
@@ -1850,6 +1858,7 @@
         document.getElementById('editAmount').value = '';
     }
     
+    // ========== FIXED renderCard function ==========
     function renderCard(stats, userInfo, profilePic, companyLogo) {
         const container = document.getElementById('cardContainer');
         const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -1861,6 +1870,10 @@
         const logoHtml = (companyLogo && companyLogo.startsWith('data:image'))
             ? `<img src="${companyLogo}" alt="Company Logo">`
             : `<span>🏗️</span>`;
+        
+        // Read the current global branding from the header elements
+        const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
+        const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'BUILDING DREAMS';
         
         const html = `
             <div class="premium-card" id="mainCard">
@@ -1874,8 +1887,8 @@
                         <div class="card-company-brand">
                             <div class="card-company-logo">${logoHtml}</div>
                             <div class="card-company-info">
-                                <div class="card-company-name">SP CONSTRUCTION</div>
-                                <div class="card-company-tagline">BUILDING DREAMS</div>
+                                <div class="card-company-name">${escapeHtml(globalTitle)}</div>
+                                <div class="card-company-tagline">${escapeHtml(globalSubtitle)}</div>
                             </div>
                         </div>
                         <div class="premium-version">✨ Premium Version</div>
@@ -1931,7 +1944,6 @@
         
         container.innerHTML = html;
         
-        // Only amount paid card is clickable
         const amountPaidCard = document.querySelector('.stat-item.clickable-card');
         if (amountPaidCard) {
             amountPaidCard.addEventListener('click', () => {
@@ -1993,6 +2005,8 @@
         await loadCompanyLogo();
         await loadBannerImage();
         await loadPdfLogo();
+        await loadGlobalBranding();
+        listenToGlobalBranding();
         await loadCurrentUser();
         setupAutocomplete();
         setupClearButton();
@@ -2013,7 +2027,6 @@
         await checkAdminAndLoad(user);
     });
     
-    // Global functions
     window.closeModal = closeModal;
     window.closeEditModal = closeEditModal;
     window.openEditPaymentModal = window.openEditPaymentModal;
