@@ -9,22 +9,12 @@
     <!-- intl-tel-input for international phone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK with external config -->
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -37,10 +27,16 @@
         window.updateProfile = updateProfile;
         window.ref = ref;
         window.set = set;
+        window.get = get;
+        window.onValue = onValue;
         window.fetchSignInMethodsForEmail = fetchSignInMethodsForEmail;
     </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%);
@@ -48,43 +44,116 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 30px 20px;
         }
-        .auth-container { max-width: 500px; width: 100%; }
-        .logo-section { text-align: center; margin-bottom: 30px; }
+        .auth-container {
+            max-width: 520px;
+            width: 100%;
+            margin: auto;
+        }
+        .logo-section {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 0;
+        }
         .logo-wrapper {
-            display: inline-flex; align-items: center; gap: 12px;
-            background: rgba(255,255,255,0.05); padding: 10px 24px; border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.08);
+            padding: 10px 24px;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
         }
-        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
-        .logo-text h1 { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #fcd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .logo-text p { font-size: 0.6rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
-        .auth-card { background: rgba(255,255,255,0.98); border-radius: 32px; padding: 32px 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        .auth-header { text-align: center; margin-bottom: 28px; }
-        .auth-header h2 { font-size: 1.6rem; font-weight: 700; color: #1e293b; }
-        .auth-header p { font-size: 0.8rem; color: #64748b; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
-        .input-field { position: relative; display: flex; align-items: center; }
-        .input-field i:not(.toggle-password) { 
-            position: absolute; 
-            left: 16px; 
-            color: #94a3b8; 
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-icon span {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+        }
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #fcd34d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo-text p {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 1px;
+        }
+        .auth-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 32px;
+            padding: 32px 28px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .auth-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .auth-header p {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .input-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-field i:not(.toggle-password) {
+            position: absolute;
+            left: 16px;
+            color: #94a3b8;
             font-size: 1rem;
             z-index: 2;
         }
-        .input-field input { 
-            width: 100%; 
+        .input-field input {
+            width: 100%;
             padding: 14px 50px 14px 45px;
-            border: 2px solid #e2e8f0; 
+            border: 2px solid #e2e8f0;
             border-radius: 20px;
-            font-size: 0.95rem; 
+            font-size: 0.95rem;
             background: #f8fafc;
             transition: all 0.3s;
         }
-        .input-field input:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
-        
+        .input-field input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+        }
         .toggle-password {
             position: absolute;
             right: 16px;
@@ -99,38 +168,91 @@
             padding: 0;
             z-index: 2;
         }
-        .toggle-password:hover { color: #f59e0b; }
-        
-        .iti { width: 100%; display: block; }
-        .iti__flag-container { padding-left: 10px; }
-        .iti__selected-flag { background: transparent !important; border-radius: 20px 0 0 20px; padding-left: 12px; }
-        .phone-input { padding-left: 80px !important; }
-        
+        .toggle-password:hover {
+            color: #f59e0b;
+        }
+        .iti {
+            width: 100%;
+            display: block;
+        }
+        .iti__flag-container {
+            padding-left: 10px;
+        }
+        .iti__selected-flag {
+            background: transparent !important;
+            border-radius: 20px 0 0 20px;
+            padding-left: 12px;
+        }
+        .phone-input {
+            padding-left: 80px !important;
+        }
         .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 40px;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer;
-            background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
             transition: all 0.3s;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
-        .btn-secondary { background: transparent; border: 2px solid #e2e8f0; color: #334155; margin-top: 12px; }
-        .btn-secondary:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: none; }
-        .auth-links { text-align: center; margin-top: 20px; }
-        .auth-links a { color: #f59e0b; text-decoration: none; font-size: 0.8rem; }
-        .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-        .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245,158,11,0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #e2e8f0;
+            color: #334155;
+            margin-top: 12px;
+        }
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: none;
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .auth-links a {
+            color: #f59e0b;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
         .modal {
             display: none;
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.7);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-        .modal.show { display: flex; }
+        .modal.show {
+            display: flex;
+        }
         .modal-content {
             background: white;
             border-radius: 32px;
@@ -139,36 +261,100 @@
             width: 90%;
             text-align: center;
         }
-        .modal-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e, #15803d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-        .modal-icon i { font-size: 2.5rem; color: white; }
-        .user-id-box { background: #f1f5f9; padding: 15px; border-radius: 16px; margin: 15px 0; }
-        .user-id-box span { font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: #f59e0b; }
-        .copy-btn { background: #e2e8f0; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; margin-top: 5px; }
-        
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #22c55e, #15803d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .modal-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+        .user-id-box {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 16px;
+            margin: 15px 0;
+        }
+        .user-id-box span {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #f59e0b;
+        }
+        .copy-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
         .loading {
             display: none;
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 999;
             justify-content: center;
             align-items: center;
         }
-        .loading.show { display: flex; }
-        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .alert { padding: 12px 16px; border-radius: 16px; font-size: 0.8rem; margin-bottom: 20px; display: none; }
-        .alert-error { background: #ef444415; color: #b91c1c; border: 1px solid #ef444430; }
-        .alert-success { background: #22c55e15; color: #15803d; border: 1px solid #22c55e30; }
-        .alert.show { display: block; }
-        
-        .password-strength { margin-top: 8px; font-size: 0.7rem; }
-        .strength-weak { color: #ef4444; }
-        .strength-medium { color: #f59e0b; }
-        .strength-strong { color: #22c55e; }
-        
-        /* Resend email button */
+        .loading.show {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-error {
+            background: #ef444415;
+            color: #b91c1c;
+            border: 1px solid #ef444430;
+        }
+        .alert-success {
+            background: #22c55e15;
+            color: #15803d;
+            border: 1px solid #22c55e30;
+        }
+        .alert.show {
+            display: block;
+        }
+        .password-strength {
+            margin-top: 8px;
+            font-size: 0.7rem;
+        }
+        .strength-weak {
+            color: #ef4444;
+        }
+        .strength-medium {
+            color: #f59e0b;
+        }
+        .strength-strong {
+            color: #22c55e;
+        }
         .resend-info {
             margin-top: 10px;
             font-size: 0.75rem;
@@ -178,6 +364,24 @@
             color: #f59e0b;
             cursor: pointer;
             text-decoration: underline;
+        }
+        @media (max-width: 550px) {
+            body {
+                padding: 20px 15px;
+            }
+            .auth-card {
+                padding: 24px 20px;
+            }
+            .row-2 {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .logo-wrapper {
+                padding: 6px 16px;
+            }
+            .logo-text h1 {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -209,8 +413,11 @@
 <div class="auth-container">
     <div class="logo-section">
         <div class="logo-wrapper">
-            <div class="logo-icon"><span>SP</span></div>
-            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>BUILDING DREAMS</p></div>
+            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+            <div class="logo-text">
+                <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                <p id="headerSubtitle">BUILDING DREAMS</p>
+            </div>
         </div>
     </div>
     <div class="auth-card">
@@ -276,7 +483,68 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { firebaseConfig } from './js/firebase-config.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    const COMPANY_ASSETS_PATH = 'companyAssets';
+    const headerTitleSpan = document.getElementById('headerTitle');
+    const headerSubtitleSpan = document.getElementById('headerSubtitle');
+    const headerLogoDiv = document.getElementById('headerLogo');
+    
+    async function loadGlobalBranding() {
+        try {
+            const brandSnap = await get(ref(db, `${COMPANY_ASSETS_PATH}/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                headerSubtitleSpan.textContent = 'BUILDING DREAMS';
+            }
+        } catch(err) { console.warn(err); }
+    }
+    
+    async function loadCompanyLogo() {
+        try {
+            const logoSnap = await get(ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`));
+            if (logoSnap.exists() && logoSnap.val() && logoSnap.val().startsWith('data:image')) {
+                headerLogoDiv.innerHTML = `<img src="${logoSnap.val()}" alt="Company Logo">`;
+            } else {
+                headerLogoDiv.innerHTML = `<span>SP</span>`;
+            }
+        } catch(err) { console.warn(err); }
+    }
+    
+    loadGlobalBranding();
+    loadCompanyLogo();
+    
+    onValue(ref(db, `${COMPANY_ASSETS_PATH}/branding`), (snapshot) => {
+        if (snapshot.exists()) {
+            const brand = snapshot.val();
+            if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+            if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+        } else {
+            headerTitleSpan.textContent = 'SP CONSTRUCTION';
+            headerSubtitleSpan.textContent = 'BUILDING DREAMS';
+        }
+    });
+    
+    onValue(ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`), (snapshot) => {
+        if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+            headerLogoDiv.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
+        } else {
+            headerLogoDiv.innerHTML = `<span>SP</span>`;
+        }
+    });
+    
     let tempUserId = '';
     let tempUserEmail = '';
     let iti = null;
@@ -305,7 +573,6 @@
             strengthDiv.innerHTML = '';
             return;
         }
-        
         let strength = 0;
         if (password.length >= 6) strength++;
         if (password.length >= 8) strength++;
@@ -325,7 +592,6 @@
     window.togglePassword = function(fieldId) {
         const field = document.getElementById(fieldId);
         const toggleBtn = field.parentElement.querySelector('.toggle-password i');
-        
         if (field.type === 'password') {
             field.type = 'text';
             toggleBtn.classList.remove('fa-eye-slash');
@@ -346,7 +612,7 @@
         if (createdUser) {
             showLoading(true);
             try {
-                await window.sendEmailVerification(createdUser);
+                await sendEmailVerification(createdUser);
                 showLoading(false);
                 alert('Verification email resent! Please check your inbox.');
             } catch (error) {
@@ -356,14 +622,13 @@
         }
     };
     
-    // Initialize international phone input
     document.addEventListener('DOMContentLoaded', function() {
         const phoneInput = document.querySelector('#mobile');
         if (phoneInput && typeof intlTelInput !== 'undefined') {
             iti = window.intlTelInput(phoneInput, {
-                initialCountry: "bd",
+                initialCountry: "in",
                 separateDialCode: true,
-                preferredCountries: ["bd", "us", "gb", "in", "ae", "sa", "my", "sg"],
+                preferredCountries: ["in", "us", "gb", "ae", "sa", "sg", "my"],
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
             });
         }
@@ -373,10 +638,9 @@
         checkPasswordStrength(e.target.value);
     });
     
-    // Check if email already exists before registration
     async function checkEmailExists(email) {
         try {
-            const methods = await window.fetchSignInMethodsForEmail(window.auth, email);
+            const methods = await fetchSignInMethodsForEmail(auth, email);
             return methods.length > 0;
         } catch (error) {
             console.error("Error checking email:", error);
@@ -384,13 +648,12 @@
         }
     }
     
-    // Check if this is the first user (to make them admin)
     async function isFirstUser() {
         try {
-            const snapshot = await window.get(window.ref(window.db, 'users'));
+            const snapshot = await get(ref(db, 'users'));
             return !snapshot.exists() || Object.keys(snapshot.val()).length === 0;
         } catch (e) {
-            return true; // If error, assume first user
+            return true;
         }
     }
     
@@ -404,13 +667,11 @@
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         
-        // Get full international number from intl-tel-input
         if (iti) {
             const fullNumber = iti.getNumber();
             if (fullNumber) mobile = fullNumber;
         }
         
-        // Validation
         if (!firstName || !lastName) {
             showAlert('Please enter first name and last name', 'error');
             return;
@@ -446,7 +707,6 @@
         
         showLoading(true);
         
-        // First check if email already exists
         const emailExists = await checkEmailExists(email);
         if (emailExists) {
             showLoading(false);
@@ -454,28 +714,24 @@
             return;
         }
         
-        // Check if this is the first user
         const firstUser = await isFirstUser();
         
         try {
-            const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             createdUser = user;
             tempUserEmail = email;
             
             tempUserId = generateUserId();
             
-            await window.updateProfile(user, { displayName: fullName });
-            
-            // Send email verification
-            await window.sendEmailVerification(user);
+            await updateProfile(user, { displayName: fullName });
+            await sendEmailVerification(user);
             console.log("✅ Verification email sent to:", email);
             
-            // Save to database with role
             const userRole = firstUser ? 'admin' : 'user';
             const isAdmin = firstUser;
             
-            await window.set(window.ref(window.db, `users/${user.uid}`), {
+            await set(ref(db, `users/${user.uid}`), {
                 userId: tempUserId,
                 firstName: firstName,
                 lastName: lastName,
