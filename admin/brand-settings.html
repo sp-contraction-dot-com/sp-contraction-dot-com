@@ -7,41 +7,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
         
-        // DOM elements
+        // DOM elements – Logo
         const logoImg = document.getElementById('logoImg');
         const logoPlaceholder = document.getElementById('logoPlaceholder');
         const editLogoBtn = document.getElementById('editLogoBtn');
         const logoUpload = document.getElementById('logoUpload');
         const removeLogoBtn = document.getElementById('removeLogoBtn');
+        
+        // Text branding
         const titleInput = document.getElementById('brandTitle');
         const subtitleInput = document.getElementById('brandSubtitle');
         const saveBtn = document.getElementById('saveBtn');
         const resetBtn = document.getElementById('resetBtn');
+        
+        // PDF Header Image (banner for reports)
+        const pdfHeaderImg = document.getElementById('pdfHeaderImg');
+        const pdfHeaderPlaceholder = document.getElementById('pdfHeaderPlaceholder');
+        const editPdfHeaderBtn = document.getElementById('editPdfHeaderBtn');
+        const pdfHeaderUpload = document.getElementById('pdfHeaderUpload');
+        const removePdfHeaderBtn = document.getElementById('removePdfHeaderBtn');
+        
         const toast = document.getElementById('toast');
         
         let currentUser = null;
         const COMPANY_ASSETS = 'companyAssets';
         const LOGO_PATH = `${COMPANY_ASSETS}/footerLogo`;
-        const BRANDING_PATH = `${COMPANY_ASSETS}/branding`; // global for all admins
+        const BRANDING_PATH = `${COMPANY_ASSETS}/branding`;      // global title/subtitle
+        const PDF_HEADER_PATH = `${COMPANY_ASSETS}/pdfHeaderImage`;
         
         function showToast(msg, isError = false) {
             toast.textContent = msg;
@@ -49,12 +50,13 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // Load global branding
+        // Load all global assets
         async function loadGlobalBranding() {
             try {
-                const [logoSnap, textSnap] = await Promise.all([
+                const [logoSnap, textSnap, pdfHeaderSnap] = await Promise.all([
                     get(ref(db, LOGO_PATH)),
-                    get(ref(db, BRANDING_PATH))
+                    get(ref(db, BRANDING_PATH)),
+                    get(ref(db, PDF_HEADER_PATH))
                 ]);
                 // Logo
                 if (logoSnap.exists() && logoSnap.val()?.startsWith('data:image')) {
@@ -74,12 +76,21 @@
                     titleInput.value = '';
                     subtitleInput.value = '';
                 }
+                // PDF Header Image
+                if (pdfHeaderSnap.exists() && pdfHeaderSnap.val()?.startsWith('data:image')) {
+                    pdfHeaderImg.src = pdfHeaderSnap.val();
+                    pdfHeaderImg.style.display = 'block';
+                    pdfHeaderPlaceholder.style.display = 'none';
+                } else {
+                    pdfHeaderImg.style.display = 'none';
+                    pdfHeaderPlaceholder.style.display = 'flex';
+                }
             } catch (err) {
                 console.error(err);
             }
         }
         
-        // Save text branding globally
+        // Save text branding (global for all admins)
         saveBtn.addEventListener('click', async () => {
             if (!currentUser) return;
             const title = titleInput.value.trim();
@@ -96,7 +107,7 @@
             }
         });
         
-        // Reset to default
+        // Reset text to default
         resetBtn.addEventListener('click', async () => {
             if (!currentUser) return;
             if (confirm('Reset to default "SP CONSTRUCTION" / "ADMIN DASHBOARD"?')) {
@@ -111,7 +122,7 @@
             }
         });
         
-        // Logo upload
+        // Logo upload (company logo)
         editLogoBtn.addEventListener('click', () => logoUpload.click());
         logoUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -144,6 +155,45 @@
                     logoImg.style.display = 'none';
                     logoPlaceholder.style.display = 'flex';
                     showToast('Logo removed');
+                } catch (err) {
+                    showToast('Error: ' + err.message, true);
+                }
+            }
+        });
+        
+        // PDF Header Image upload (banner for reports)
+        editPdfHeaderBtn.addEventListener('click', () => pdfHeaderUpload.click());
+        pdfHeaderUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showToast('Only images allowed', true);
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                const base64 = ev.target.result;
+                try {
+                    await set(ref(db, PDF_HEADER_PATH), base64);
+                    pdfHeaderImg.src = base64;
+                    pdfHeaderImg.style.display = 'block';
+                    pdfHeaderPlaceholder.style.display = 'none';
+                    showToast('✓ PDF header banner updated');
+                    pdfHeaderUpload.value = '';
+                } catch (err) {
+                    showToast('Upload failed: ' + err.message, true);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        removePdfHeaderBtn.addEventListener('click', async () => {
+            if (confirm('Remove PDF header banner?')) {
+                try {
+                    await set(ref(db, PDF_HEADER_PATH), null);
+                    pdfHeaderImg.style.display = 'none';
+                    pdfHeaderPlaceholder.style.display = 'flex';
+                    showToast('PDF header banner removed');
                 } catch (err) {
                     showToast('Error: ' + err.message, true);
                 }
@@ -184,7 +234,7 @@
             padding: 1rem;
         }
         .card {
-            max-width: 460px;
+            max-width: 500px;
             width: 100%;
             background: white;
             border-radius: 2rem;
@@ -207,10 +257,25 @@
         }
         .card-header h2 { font-size: 1.3rem; font-weight: 700; }
         .card-body { padding: 1.8rem; }
-        .logo-section { display: flex; justify-content: center; margin-bottom: 1rem; position: relative; }
-        .logo-wrapper { position: relative; width: 100px; height: 100px; }
-        .logo-circle {
-            width: 100%; height: 100%;
+        
+        /* Logo section */
+        .logo-section, .pdf-header-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .logo-wrapper, .pdf-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        .pdf-wrapper {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+        }
+        .logo-circle, .pdf-circle {
             background: #f1f5f9;
             border-radius: 50%;
             display: flex;
@@ -218,14 +283,42 @@
             justify-content: center;
             border: 2px solid #e2e8f0;
             overflow: hidden;
+            width: 100px;
+            height: 100px;
         }
-        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
-        .logo-placeholder { font-size: 2.5rem; font-weight: 800; color: #f59e0b; }
+        .pdf-circle {
+            border-radius: 16px;
+            width: 100%;
+            height: auto;
+            min-height: 80px;
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+        }
+        .logo-circle img, .pdf-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-placeholder, .pdf-placeholder {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f59e0b;
+            text-align: center;
+        }
+        .pdf-placeholder {
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
         .edit-icon {
             position: absolute;
-            bottom: 0; right: 0;
+            bottom: 0;
+            right: 0;
             background: #f59e0b;
-            width: 32px; height: 32px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -234,8 +327,28 @@
             color: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
+        .pdf-wrapper .edit-icon {
+            bottom: 5px;
+            right: 5px;
+        }
         .remove-link { text-align: center; margin: 0.5rem 0 1.5rem; font-size: 0.7rem; }
         .remove-link span { color: #ef4444; cursor: pointer; text-decoration: underline; }
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 1.5rem 0 1rem;
+        }
+        .section-divider hr {
+            flex: 1;
+            border: none;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .section-divider i {
+            color: #f59e0b;
+            font-size: 0.8rem;
+        }
         .form-group { margin-bottom: 1.2rem; }
         label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #475569; display: block; margin-bottom: 0.3rem; }
         input {
@@ -277,6 +390,7 @@
             opacity: 0;
             visibility: hidden;
             transition: 0.2s;
+            white-space: nowrap;
         }
         .toast.show { opacity: 1; visibility: visible; }
         .toast.success { background: #059669; }
@@ -284,13 +398,18 @@
         .back-link { text-align: center; margin-top: 1rem; }
         .back-link a { font-size: 0.75rem; color: #64748b; text-decoration: none; }
         .back-link a:hover { color: #f59e0b; }
-        @media (max-width: 480px) { .card-body { padding: 1.2rem; } .button-group { flex-direction: column; } }
+        @media (max-width: 480px) {
+            .card-body { padding: 1.2rem; }
+            .button-group { flex-direction: column; }
+            .toast { white-space: normal; text-align: center; width: 80%; }
+        }
     </style>
 </head>
 <body>
 <div class="card">
     <div class="card-header"><i class="fas fa-brush"></i><h2>Brand Settings</h2></div>
     <div class="card-body">
+        <!-- Company Logo -->
         <div class="logo-section">
             <div class="logo-wrapper">
                 <div class="logo-circle">
@@ -303,6 +422,29 @@
         </div>
         <div class="remove-link"><span id="removeLogoBtn"><i class="fas fa-trash-alt"></i> Remove Logo</span></div>
         
+        <!-- PDF Header Banner (appears on PDF reports) -->
+        <div class="section-divider">
+            <i class="fas fa-file-pdf"></i> <span>PDF Report Banner</span> <hr>
+        </div>
+        <div class="pdf-header-section">
+            <div class="pdf-wrapper">
+                <div class="pdf-circle">
+                    <img id="pdfHeaderImg" style="display: none;" alt="PDF Banner">
+                    <div id="pdfHeaderPlaceholder" class="pdf-placeholder">
+                        <i class="fas fa-image" style="font-size: 1.5rem;"></i>
+                        <span>Upload Banner</span>
+                    </div>
+                </div>
+                <div class="edit-icon" id="editPdfHeaderBtn"><i class="fas fa-pencil-alt"></i></div>
+                <input type="file" id="pdfHeaderUpload" accept="image/*" style="display: none;">
+            </div>
+        </div>
+        <div class="remove-link"><span id="removePdfHeaderBtn"><i class="fas fa-trash-alt"></i> Remove Banner</span></div>
+        
+        <!-- Title & Subtitle -->
+        <div class="section-divider">
+            <i class="fas fa-heading"></i> <span>Header Text</span> <hr>
+        </div>
         <div class="form-group"><label>Title</label><input type="text" id="brandTitle" placeholder="e.g., SP CONSTRUCTION"></div>
         <div class="form-group"><label>Subtitle</label><input type="text" id="brandSubtitle" placeholder="e.g., ADMIN DASHBOARD"></div>
         
