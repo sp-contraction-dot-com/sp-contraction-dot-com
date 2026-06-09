@@ -30,7 +30,7 @@
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
-        /* (সমস্ত CSS আগের মতো – অপরিবর্তিত, শুধু সংক্ষেপে দেখানো হলো) */
+        /* ===== FULL CSS (unchanged from your working version) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -180,42 +180,6 @@
         }
         .section-title i { font-size: 1.3rem; color: #f59e0b; background: #fef3c7; padding: 10px; border-radius: 14px; }
         .section-title h3 { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
-        
-        .admin-info-section {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            position: relative;
-        }
-        .admin-info-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 16px;
-        }
-        .admin-info-left, .admin-info-right {
-            font-size: 0.75rem;
-            color: #475569;
-            line-height: 1.6;
-        }
-        .admin-info-left span, .admin-info-right span {
-            font-weight: 700;
-            color: #1e293b;
-        }
-        .separator-line {
-            background: linear-gradient(90deg, #f59e0b, #fef3c7, #f59e0b);
-            height: 2px;
-            width: 100%;
-            margin: 16px 0 0 0;
-            border-radius: 2px;
-        }
-        .separator-line-light {
-            background: linear-gradient(90deg, #e2e8f0, #f59e0b, #e2e8f0);
-            height: 1px;
-            width: 100%;
-            margin: 12px 0 8px 0;
-        }
         
         .search-wrapper {
             margin-bottom: 28px;
@@ -535,7 +499,7 @@
             <div class="table-container">
                 <table id="paymentsTable">
                     <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (Rs.)</th><th>Paid (Rs.)</th><th>Due (Rs.)</th><th style="width:120px;">Actions</th></tr></thead>
-                    <tbody id="paymentsTableBody"><td><td colspan="7" class="loading"><div class="spinner"></div>解决了</tbody>
+                    <tbody id="paymentsTableBody"><tr><td colspan="7" class="loading"><div class="spinner"></div>解决了</tbody>
                     <tfoot id="paymentsTableFooter"></tfoot>
                 </table>
             </div>
@@ -979,19 +943,47 @@
         if (!records.length) { alert("No records to generate PDF."); return; }
         showToast('Generating PDF...');
         try {
-            const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
-            const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'PAYMENT MANAGER';
-            const reportTitle = `${globalTitle} - PAYMENT REPORT`;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
             const w = doc.internal.pageSize.getWidth(), h = doc.internal.pageSize.getHeight();
-            const cx = w/2; let y = 12;
+            const cx = w/2;
+            let y = 12;
             
-            drawPDFLogo(doc, 14, y, 16);
-            doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(245,158,11);
-            doc.text(reportTitle, cx, y+10, { align:"center" });
-            doc.setDrawColor(245,158,11); doc.setLineWidth(0.6); doc.line(15, y+15, w-15, y+15);
-            y += 24;
+            // Try to load custom PDF header image
+            let pdfHeaderBase64 = null;
+            try {
+                const pdfHeaderSnap = await window.get(window.ref(db, `companyAssets/pdfHeaderImage`));
+                if (pdfHeaderSnap.exists() && pdfHeaderSnap.val() && pdfHeaderSnap.val().startsWith('data:image')) {
+                    pdfHeaderBase64 = pdfHeaderSnap.val();
+                }
+            } catch(e) { console.warn("Could not load PDF header image", e); }
+            
+            if (pdfHeaderBase64) {
+                const imgWidth = w - 20;
+                let imgHeight = 25;
+                try {
+                    doc.addImage(pdfHeaderBase64, 'JPEG', 10, y, imgWidth, imgHeight, undefined, 'FAST');
+                    y += imgHeight + 5;
+                } catch(e) {
+                    drawTextHeader(doc);
+                    y += 24;
+                }
+            } else {
+                drawTextHeader(doc);
+                y += 24;
+            }
+            
+            function drawTextHeader(doc) {
+                const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
+                const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'PAYMENT MANAGER';
+                drawPDFLogo(doc, 14, y, 16);
+                doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(245,158,11);
+                doc.text(`${globalTitle} - PAYMENT REPORT`, cx, y+10, { align:"center" });
+                doc.setDrawColor(245,158,11); doc.setLineWidth(0.6); doc.line(15, y+15, w-15, y+15);
+                doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text(globalSubtitle, cx, y+19, { align:"center" });
+            }
+            
+            // Admin info
             doc.setFontSize(8); doc.setTextColor(80,80,80); doc.setFont("helvetica","normal");
             doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, 12, y);
             doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, 12, y+5);
@@ -1012,7 +1004,7 @@
                 margin:{left:12,right:12},
                 didDrawPage: (data) => {
                     const pc = doc.internal.getNumberOfPages();
-                    for(let i=1;i<=pc;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(148,163,184); doc.text(`Page ${i} of ${pc}`, cx, h-10, { align:"center" }); }
+                    for(let i=1;i<=pc;i++){ doc.setPage(i); drawWatermarkOverlay(doc, w, h); doc.setFontSize(8); doc.setTextColor(148,163,184); doc.text(`Page ${i} of ${pc}`, cx, h-10, { align:"center" }); }
                 }
             });
             const totals = computeTotals(records);
@@ -1031,10 +1023,7 @@
             const dueColor = totals.totalDue<0?[220,38,38]:[34,197,94];
             doc.setTextColor(dueColor[0],dueColor[1],dueColor[2]);
             doc.text(`Total Due: Rs.${formatIndianNumber(Math.abs(totals.totalDue))}`, cx, finalY+44, { align:"center" });
-            for (let i=1; i<=doc.internal.getNumberOfPages(); i++) {
-                doc.setPage(i);
-                drawWatermarkOverlay(doc, w, h);
-            }
+            for (let i=1; i<=doc.internal.getNumberOfPages(); i++) { doc.setPage(i); drawWatermarkOverlay(doc, w, h); }
             doc.save(fileName);
             showToast('PDF downloaded!');
         } catch(e) { console.error(e); showToast('PDF generation failed', true); }
