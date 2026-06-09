@@ -560,7 +560,12 @@
     <div class="data-section">
         <div class="section-header"><div class="section-title"><i class="fas fa-users"></i><h3>Registered Users List</h3></div><a href="all-users.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table><thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="6">Loading...<\/td></tr></tbody></table>
+            <table>
+                <thead>
+                    <tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr>
+                </thead>
+                <tbody id="usersTableBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+            </table>
         </div>
     </div>
     
@@ -568,7 +573,12 @@
     <div class="data-section">
         <div class="section-header"><div class="section-title"><i class="fas fa-building"></i><h3>Company Payment Records</h3></div><a href="all-payments.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table><thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead><tbody id="companyPaymentTableBody"><tr><td colspan="6">Loading...<\/td></tr></tbody></table>
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr>
+                </thead>
+                <tbody id="companyPaymentTableBody"><tr><td colspan="6">Loading...</td></tr></tbody>
+            </table>
         </div>
     </div>
     
@@ -576,7 +586,12 @@
     <div class="data-section">
         <div class="section-header"><div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Worker Attendance Records</h3></div><a href="all-attendance.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
-            <table><thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead><tbody id="attendanceTableBody"><tr><td colspan="7">Loading...<\/td></tr></tbody></table>
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr>
+                </thead>
+                <tbody id="attendanceTableBody"><tr><td colspan="7">Loading...</td></tr></tbody>
+            </table>
         </div>
     </div>
     
@@ -599,7 +614,12 @@
                 <div class="social-icons"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-linkedin-in"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
             </div>
             <div class="footer-links"><h4>Quick Links</h4><ul><li><a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li><li><a href="attendance.html"><i class="fas fa-calendar-check"></i> Attendance</a></li><li><a href="financial-report.html"><i class="fas fa-money-bill-wave"></i> Payments</a></li><li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li><li><a href="worker-list.html"><i class="fas fa-users"></i> Workers</a></li></ul></div>
-            <div class="footer-contact"><h4>Contact Info</h4><ul><li><i class="fas fa-map-marker-alt"></i> Thane West, Mumbai, Maharashtra</li><li><i class="fas fa-phone-alt"></i> +91 98674 78423</li><li><i class="fas fa-envelope"></i> spbuild.official@gmail.com</li><li><i class="fas fa-clock"></i> Mon - Sat: 9:00 AM - 6:00 PM</li></ul></div>
+            <div class="footer-contact">
+                <h4>My Information</h4>
+                <ul id="userInfoFooter">
+                    <li><i class="fas fa-spinner fa-pulse"></i> Loading user data...</li>
+                </ul>
+            </div>
         </div>
         <div class="footer-bottom"><p>&copy; 2025 SP Construction. All rights reserved. | Developed with <i class="fas fa-heart" style="color: #ef4444;"></i> by SP Tech Team</p></div>
     </footer>
@@ -649,6 +669,28 @@
         });
     }
     
+    // ========== FOOTER USER INFO ==========
+    function updateUserInfoFooter(userData) {
+        const container = document.getElementById('userInfoFooter');
+        if (!container) return;
+        
+        const address = userData.address ? userData.address : 'Not provided';
+        const phone = userData.mobile ? userData.mobile : 'Not provided';
+        const email = userData.email ? userData.email : 'Not provided';
+        let memberSince = 'Not provided';
+        if (userData.registeredAt) {
+            const date = new Date(userData.registeredAt);
+            memberSince = date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        
+        container.innerHTML = `
+            <li><i class="fas fa-map-marker-alt"></i> ${escapeHtml(address)}</li>
+            <li><i class="fas fa-phone-alt"></i> ${escapeHtml(phone)}</li>
+            <li><i class="fas fa-envelope"></i> ${escapeHtml(email)}</li>
+            <li><i class="fas fa-calendar-alt"></i> Member since: ${escapeHtml(memberSince)}</li>
+        `;
+    }
+    
     // ========== DATA LOADING ==========
     async function loadDashboardData() {
         console.log("🔄 Loading dashboard data...");
@@ -690,8 +732,8 @@
             
             updateStats();
             updateUsersTable();
-            updateAttendanceTable();    // FIXED: now called explicitly
-            updateCompanyPaymentTable(); // FIXED
+            updateAttendanceTable();
+            updateCompanyPaymentTable();
             updateCharts();
             
         } catch(e) { 
@@ -731,7 +773,7 @@
         const tbody = document.getElementById('usersTableBody');
         if (!tbody) return;
         if (!allUsers.length) {
-            tbody.innerHTML = '<tr><td colspan="6">📭 No users registered yet<\/td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">📭 No users registered yet</td></tr>';
             return;
         }
         let sorted = [...allUsers].sort((a,b) => (b.registeredAt||0) - (a.registeredAt||0));
@@ -759,11 +801,10 @@
         console.log("updateAttendanceTable called, tbody exists:", !!tbody);
         if (!tbody) return;
         if (!allAttendanceRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="7">📭 No attendance records found<\/td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7">📭 No attendance records found</td></tr>';
             console.log("No attendance records to display");
             return;
         }
-        // sort by date descending
         let sorted = [...allAttendanceRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
         let html = '';
         for (let r of sorted.slice(0,10)) {
@@ -788,7 +829,7 @@
         console.log("updateCompanyPaymentTable called, tbody exists:", !!tbody);
         if (!tbody) return;
         if (!allPaymentRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="6">📭 No payment records found<\/td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">📭 No payment records found</td></tr>';
             console.log("No payment records to display");
             return;
         }
@@ -930,6 +971,18 @@
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
     }
     
+    // Listen for changes to current user's data to update footer in real time
+    function listenToCurrentUser(uid) {
+        if (!uid) return;
+        const userRef = window.ref(window.db, `users/${uid}`);
+        window.onValue(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                updateUserInfoFooter(userData);
+            }
+        });
+    }
+    
     // ========== AUTH INIT ==========
     window.onAuthStateChanged(window.auth, async (user) => {
         if (!user) { window.location.href = 'login.html'; return; }
@@ -942,6 +995,12 @@
                 return;
             }
             document.getElementById('welcomeName').innerHTML = userData.fullName?.split(' ')[0] || 'Admin';
+            
+            // Update footer with current user data
+            updateUserInfoFooter(userData);
+            // Listen for realtime updates on this user
+            listenToCurrentUser(user.uid);
+            
             await loadDashboardData();
             listenRealTime();
             await loadGlobalBranding();
