@@ -30,6 +30,7 @@
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
+        /* (সমস্ত CSS আগের মতো – অপরিবর্তিত) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -131,7 +132,6 @@
         .card-5 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .card-6 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
         
-        /* Banner section - exactly like dashboard */
         .banner-section {
             position: relative;
             margin-bottom: 28px;
@@ -159,14 +159,8 @@
             align-items: center;
             gap: 12px;
         }
-        .banner-placeholder i {
-            font-size: 3rem;
-            opacity: 0.5;
-        }
-        .banner-placeholder p {
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
+        .banner-placeholder i { font-size: 3rem; opacity: 0.5; }
+        .banner-placeholder p { font-size: 0.8rem; opacity: 0.7; }
         
         .data-card {
             background: #ffffff;
@@ -876,7 +870,7 @@
             currentFilteredPurchases = [...allPurchases];
             renderTable();
             if (searchInput.value.trim()) filterRecords(searchInput.value);
-        } catch (error) { tbody.innerHTML = '<tr><td colspan="10" class="no-data">Error loading data</td></table>'; }
+        } catch (error) { tbody.innerHTML = '<td><td colspan="10" class="no-data">Error loading data</td></tr>'; }
     }
     
     async function addPurchaseRecord(recordData) {
@@ -967,7 +961,7 @@
         closeModal();
     }
     
-    // --- Banner and PDF logo loading (unchanged from original) ---
+    // --- Banner and PDF logo loading ---
     async function loadBannerImage() {
         try {
             const bannersRef = window.ref(db, `companyAssets/banners`);
@@ -1007,11 +1001,23 @@
         doc.setFillColor(245,158,11); doc.circle(x+size/2, y-4+size/2, size/2, 'F');
         doc.setFontSize(11); doc.setTextColor(255,255,255); doc.text("SP", x+size/2, y+size/2-1, { align: "center" }); return true;
     }
-    function drawWatermark(doc, w, h) { if(pdfLogoBase64) try{ doc.setGState(new doc.GState({opacity:0.04})); doc.addImage(pdfLogoBase64, 'JPEG', w*0.25, h*0.25, w*0.5, h*0.5); doc.setGState(new doc.GState({opacity:1})); }catch(e){} }
+    function drawWatermarkOverlay(doc, w, h) {
+        if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+            try {
+                const maxSize = Math.min(w, h) * 0.45;
+                const x = (w - maxSize) / 2;
+                const y = (h - maxSize) / 2;
+                doc.setGState(new doc.GState({ opacity: 0.12 }));
+                doc.addImage(pdfLogoBase64, 'JPEG', x, y, maxSize, maxSize);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+            } catch(e) {}
+        }
+        return true;
+    }
     
     function showToast(msg, isErr = false) { const toast = document.createElement('div'); toast.innerText = msg; toast.style.cssText = 'position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:'+(isErr?'#dc2626':'#15803d')+'; color:white; padding:10px 24px; border-radius:40px; z-index:9999;'; document.body.appendChild(toast); setTimeout(()=>toast.remove(),3000); }
     
-    // --- Export with fixed summary positioning (unchanged) ---
+    // --- Export with PDF header image support and fixed layout ---
     function getRecordsToExport() {
         let base = (dataSourceSelect.value === 'all') ? [...allPurchases] : [...currentFilteredPurchases];
         if (limitCheckbox.checked) { let limit = parseInt(limitCountInput.value) || 10; if(limit < base.length) base = base.slice(0, limit); }
@@ -1032,43 +1038,66 @@
         if(!records.length){alert("No records to export.");return;} 
         showToast('Generating PDF...');
         try{
-            const {jsPDF} = window.jspdf; 
-            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [250, 300] });
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' }); // standard A4
             const w = doc.internal.pageSize.getWidth();
             const h = doc.internal.pageSize.getHeight();
-            const cx = w/2; 
+            const cx = w/2;
             let y = 12;
             
-            drawWatermark(doc, w, h); 
-            drawPDFLogo(doc, 12, y, 14);
+            // Try to load custom PDF header image
+            let pdfHeaderBase64 = null;
+            try {
+                const pdfHeaderSnap = await window.get(window.ref(db, `companyAssets/pdfHeaderImage`));
+                if (pdfHeaderSnap.exists() && pdfHeaderSnap.val() && pdfHeaderSnap.val().startsWith('data:image')) {
+                    pdfHeaderBase64 = pdfHeaderSnap.val();
+                }
+            } catch(e) { console.warn("Could not load PDF header image", e); }
             
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(18);
-            doc.setTextColor(245, 158, 11);
-            doc.text("SP CONSTRUCTION - PURCHASE REPORT", cx, y+8, { align: "center" });
+            if (pdfHeaderBase64) {
+                const imgWidth = w - 20;
+                let imgHeight = 25;
+                try {
+                    doc.addImage(pdfHeaderBase64, 'JPEG', 10, y, imgWidth, imgHeight, undefined, 'FAST');
+                    y += imgHeight + 5;
+                } catch(e) {
+                    drawTextHeader(doc);
+                    y += 24;
+                }
+            } else {
+                drawTextHeader(doc);
+                y += 24;
+            }
             
-            doc.setDrawColor(245,158,11);
-            doc.setLineWidth(0.5);
-            doc.line(10, y+12, w-10, y+12);
-            y += 18;
+            function drawTextHeader(doc) {
+                const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
+                const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'PURCHASE & EXPENSE';
+                drawPDFLogo(doc, 14, y, 16);
+                doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(245,158,11);
+                doc.text(`${globalTitle} - PURCHASE REPORT`, cx, y+8, { align:"center" });
+                doc.setDrawColor(245,158,11); doc.setLineWidth(0.6); doc.line(12, y+13, w-12, y+13);
+                doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text(globalSubtitle, cx, y+18, { align:"center" });
+            }
             
-            // Left side: Admin Info, Right side: Quick Stats
+            // Admin Info
             doc.setFontSize(9);
             doc.setTextColor(80,80,80);
-            doc.setFont("helvetica", "bold");
-            doc.text(`Generated By: ${currentAdminInfo.name} (${currentAdminInfo.userId})`, 10, y);
-            doc.text(`Email: ${currentAdminInfo.email}`, 10, y+5);
-            doc.text(`Mobile: ${currentAdminInfo.mobile}`, 10, y+10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, 12, y);
+            doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, 12, y+5);
+            doc.text(`Email: ${escapeHtml(currentAdminInfo.email)}`, 12, y+10);
+            doc.text(`Mobile: ${escapeHtml(currentAdminInfo.mobile)}`, 12, y+15);
+            doc.text(`Address: ${escapeHtml(currentAdminInfo.address)}`, 12, y+20);
             
             const totals = computeTotals(records);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, w-10, y, { align: "right" });
-            doc.text(`Total Records: ${totals.recordCount}`, w-10, y+5, { align: "right" });
-            doc.text(`Total Qty: ${totals.totalQty} Pcs | Total Spent: Rs. ${formatIndianNumber(totals.totalSpent)}`, w-10, y+10, { align: "right" });
-            y += 20;
+            doc.text(`Generated: ${new Date().toLocaleString()}`, w-12, y, { align:"right" });
+            doc.text(`Total Records: ${totals.recordCount}`, w-12, y+5, { align:"right" });
+            doc.text(`Total Qty: ${totals.totalQty} Pcs | Total Spent: Rs. ${formatIndianNumber(totals.totalSpent)}`, w-12, y+10, { align:"right" });
+            y += 28;
             
             doc.setDrawColor(245,158,11);
             doc.setLineWidth(0.3);
-            doc.line(10, y-2, w-10, y-2);
+            doc.line(12, y-2, w-12, y-2);
             
             // Table
             const tableData = records.map(p => [
@@ -1092,25 +1121,24 @@
                     6: { cellWidth: 18, halign: 'right' }, 7: { cellWidth: 18, halign: 'right' },
                     8: { cellWidth: 30, halign: 'left' }
                 },
-                margin: { left: 8, right: 8 },
+                margin: { left: 10, right: 10 },
                 didDrawPage: (data) => {
                     const pageCount = doc.internal.getNumberOfPages();
                     for(let i=1; i<=pageCount; i++){
                         doc.setPage(i);
-                        drawWatermark(doc, w, h);
+                        drawWatermarkOverlay(doc, w, h);
                         doc.setFontSize(7);
                         doc.setTextColor(148,163,184);
-                        doc.setFont("helvetica", "bold");
-                        doc.text(`Page ${i} of ${pageCount}`, cx, h-6, { align: "center" });
+                        doc.text(`Page ${i} of ${pageCount}`, cx, h-8, { align:"center" });
                     }
                 }
             });
             
             let finalY = doc.lastAutoTable.finalY + 8;
-            const boxHeight = 48;
-            if (finalY + boxHeight + 10 > h - 10) {
+            const boxHeight = 52;
+            if (finalY + boxHeight > h - 10) {
                 doc.addPage();
-                drawWatermark(doc, w, h);
+                drawWatermarkOverlay(doc, w, h);
                 finalY = 15;
             }
             
@@ -1121,8 +1149,8 @@
             
             doc.setFontSize(12);
             doc.setTextColor(245,158,11);
-            doc.setFont("helvetica", "bold");
-            doc.text("OVERALL SUMMARY", cx, finalY+10);
+            doc.setFont("helvetica","bold");
+            doc.text("OVERALL SUMMARY", cx, finalY+10, { align:"center" });
             
             doc.setDrawColor(245,158,11);
             doc.setLineWidth(0.2);
@@ -1131,15 +1159,14 @@
             doc.setFontSize(9);
             doc.setTextColor(51,51,51);
             doc.text(`Total Records: ${totals.recordCount} | Total Qty: ${formatIndianNumber(totals.totalQty)} Pcs`, cx, finalY+26);
-            doc.text(`Total Spent: Rs. ${formatIndianNumber(totals.totalSpent)}`, cx, finalY+35);
-            doc.text(`Total Paid by Company: Rs. ${formatIndianNumber(totals.totalPaid)} | Total Due: Rs. ${formatIndianNumber(totals.totalDue)}`, cx, finalY+44);
+            doc.text(`Total Spent: Rs. ${formatIndianNumber(totals.totalSpent)}`, cx, finalY+36);
+            doc.text(`Total Paid by Company: Rs. ${formatIndianNumber(totals.totalPaid)} | Total Due: Rs. ${formatIndianNumber(totals.totalDue)}`, cx, finalY+46);
             
-            const lastPage = doc.internal.getNumberOfPages();
-            doc.setPage(lastPage);
-            doc.setFontSize(6);
-            doc.setTextColor(148,163,184);
-            doc.setFont("helvetica", "bold");
-            doc.text("This is a system generated purchase report from SP Construction Management System.", cx, h-5, { align: "center" });
+            // Final watermark overlay on all pages (already done in didDrawPage, but repeat for safety)
+            for (let i=1; i<=doc.internal.getNumberOfPages(); i++) {
+                doc.setPage(i);
+                drawWatermarkOverlay(doc, w, h);
+            }
             
             doc.save(fileName);
             showToast('PDF Downloaded Successfully!');
