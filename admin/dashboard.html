@@ -92,7 +92,6 @@
         }
         .logout-btn:hover { background: #dc2626; }
         
-        /* Banner Section */
         .banner-section {
             position: relative;
             margin-bottom: 28px;
@@ -119,16 +118,9 @@
             align-items: center;
             gap: 12px;
         }
-        .banner-placeholder i {
-            font-size: 3rem;
-            opacity: 0.5;
-        }
-        .banner-placeholder p {
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
+        .banner-placeholder i { font-size: 3rem; opacity: 0.5; }
+        .banner-placeholder p { font-size: 0.8rem; opacity: 0.7; }
         
-        /* Section Divider Styles */
         .section-divider {
             display: flex;
             align-items: center;
@@ -181,18 +173,21 @@
         .stat-card .sub-text { font-size: 0.55rem; opacity: 0.8; margin-top: 4px; }
         .stat-icon { width: 46px; height: 46px; background: rgba(255,255,255,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         
-        /* Company Section Card Colors */
         .card-company-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
         .card-company-2 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
         .card-company-3 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .card-company-4 { background: linear-gradient(135deg, #f97316, #ea580c); }
         
-        /* Workers Section Card Colors */
         .card-worker-1 { background: linear-gradient(135deg, #10b981, #059669); }
         .card-worker-2 { background: linear-gradient(135deg, #ec489a, #db2777); }
         .card-worker-3 { background: linear-gradient(135deg, #14b8a6, #0f766e); }
         .card-worker-4 { background: linear-gradient(135deg, #f43f5e, #e11d48); }
         .card-worker-5 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        
+        .card-purchase-1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .card-purchase-2 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .card-purchase-3 { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .card-purchase-4 { background: linear-gradient(135deg, #ef4444, #dc2626); }
         
         @media (max-width: 550px) {
             .stat-card { padding: 12px 10px; }
@@ -272,10 +267,7 @@
             align-items: center;
             gap: 6px;
         }
-        .more-btn:hover {
-            background: #f59e0b;
-            color: white;
-        }
+        .more-btn:hover { background: #f59e0b; color: white; }
         .table-container { overflow-x: auto; }
         table {
             width: 100%;
@@ -335,7 +327,6 @@
         .action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
         .action-btn-secondary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
         
-        /* Footer */
         .footer {
             background: white;
             border-radius: 28px 28px 24px 24px;
@@ -481,6 +472,9 @@
         .loading.show { display: flex; }
         .spinner { width: 45px; height: 45px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .purchase-summary-row { background: #fef3c7; font-weight: 800; border-top: 2px solid #f59e0b; }
+        .purchase-summary-row td { font-weight: 800; color: #1e293b; background: #fffbeb; }
     </style>
 </head>
 <body>
@@ -509,7 +503,6 @@
         </div>
     </div>
     
-    <!-- BANNER SECTION -->
     <div class="banner-section" id="bannerSection" style="background-size: cover; background-position: center;">
         <div id="bannerContent" style="width:100%; min-height:150px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
@@ -519,7 +512,7 @@
         </div>
     </div>
     
-    <!-- ========== SECTION 1: COMPANY FINANCIAL INSIGHTS (4 cards) ========== -->
+    <!-- COMPANY FINANCIAL INSIGHTS -->
     <div class="section-divider">
         <i class="fas fa-building"></i>
         <h2>COMPANY FINANCIAL INSIGHTS</h2>
@@ -532,7 +525,7 @@
         <div class="stat-card card-company-4"><div class="stat-info"><h4><i class="fas fa-calendar-day"></i> Today's Receivable</h4><div class="value" id="todaysReceivable">₹0</div><div class="sub-text">Earned today from companies</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
     </div>
     
-    <!-- ========== SECTION 2: WORKERS & ATTENDANCE ========== -->
+    <!-- WORKERS & ATTENDANCE -->
     <div class="section-divider">
         <i class="fas fa-hard-hat"></i>
         <h2>WORKERS & ATTENDANCE</h2>
@@ -544,6 +537,19 @@
         <div class="stat-card card-worker-3"><div class="stat-info"><h4><i class="fas fa-check-circle"></i> Present Today</h4><div class="value" id="presentToday">0</div><div class="sub-text">Today's Attendance</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
         <div class="stat-card card-worker-4"><div class="stat-info"><h4><i class="fas fa-wallet"></i> Paid to Workers</h4><div class="value" id="totalPaidToUser">₹0</div><div class="sub-text">Amount Disbursed</div></div><div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div></div>
         <div class="stat-card card-worker-5"><div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Due to Workers</h4><div class="value" id="totalDueToWorkers">₹0</div><div class="sub-text">Pending salary</div></div><div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div></div>
+    </div>
+    
+    <!-- PURCHASE & EXPENSE INSIGHTS -->
+    <div class="section-divider">
+        <i class="fas fa-shopping-cart"></i>
+        <h2>PURCHASE & EXPENSE INSIGHTS</h2>
+        <span></span>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card card-purchase-1"><div class="stat-info"><h4><i class="fas fa-boxes"></i> Total Purchases</h4><div class="value" id="purchaseTotalSpent">₹0</div><div class="sub-text">Total Material Cost</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
+        <div class="stat-card card-purchase-2"><div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Company Paid</h4><div class="value" id="purchaseTotalPaid">₹0</div><div class="sub-text">Amount Paid to Suppliers</div></div><div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div></div>
+        <div class="stat-card card-purchase-3"><div class="stat-info"><h4><i class="fas fa-hourglass-half"></i> Purchase Due</h4><div class="value" id="purchaseTotalDue">₹0</div><div class="sub-text">Outstanding to Suppliers</div></div><div class="stat-icon"><i class="fas fa-clock"></i></div></div>
+        <div class="stat-card card-purchase-4"><div class="stat-info"><h4><i class="fas fa-building"></i> Unique Companies</h4><div class="value" id="purchaseUniqueCompanies">0</div><div class="sub-text">Suppliers/Vendors</div></div><div class="stat-icon"><i class="fas fa-store"></i></div></div>
     </div>
     
     <!-- CHARTS SECTION -->
@@ -561,9 +567,7 @@
         <div class="section-header"><div class="section-title"><i class="fas fa-users"></i><h3>Registered Users List</h3></div><a href="all-users.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr>
-                </thead>
+                <thead><tr><th>Photo</th><th>Name</th><th>Email</th><th>Phone</th><th>User ID</th><th>Registered On</th></tr></thead>
                 <tbody id="usersTableBody"><tr><td colspan="6">Loading...</td></tr></tbody>
             </table>
         </div>
@@ -574,9 +578,7 @@
         <div class="section-header"><div class="section-title"><i class="fas fa-building"></i><h3>Company Payment Records</h3></div><a href="all-payments.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Company Name</th><th>Workers</th><th>Earnings (₹)</th><th>Paid (₹)</th><th>Due (₹)</th></tr></thead>
                 <tbody id="companyPaymentTableBody"><tr><td colspan="6">Loading...</td></tr></tbody>
             </table>
         </div>
@@ -587,10 +589,20 @@
         <div class="section-header"><div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Worker Attendance Records</h3></div><a href="all-attendance.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Worker Name</th><th>ID</th><th>Status</th><th>Hours</th><th>Earnings (₹)</th><th>Work Desc</th></tr></thead>
                 <tbody id="attendanceTableBody"><tr><td colspan="7">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- All Purchases Record -->
+    <div class="data-section">
+        <div class="section-header"><div class="section-title"><i class="fas fa-shopping-cart"></i><h3>All Purchases Record</h3></div><a href="all-purchases.html" class="more-btn"><i class="fas fa-ellipsis-h"></i> More...</a></div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Date</th><th>Company Name</th><th>Product Name</th><th>Qty</th><th>Unit Price (₹)</th><th>Total (₹)</th><th>Paid (₹)</th><th>Due (₹)</th><th>Notes</th></tr></thead>
+                <tbody id="purchasesTableBody"><tr><td colspan="9">Loading purchases...</td></tr></tbody>
+                <tfoot id="purchasesTableFooter"></tfoot>
             </table>
         </div>
     </div>
@@ -602,7 +614,6 @@
         <a href="admin-manage.html" class="action-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"><i class="fas fa-user-shield"></i> Manage Admins</a>
     </div>
     
-    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
@@ -629,11 +640,11 @@
     let allAttendanceRecords = [];
     let allPaymentRecords = [];
     let allUsers = [];
+    let allPurchases = [];
     let attendanceRateChart = null, weeklyPaymentChart = null, paymentPieChart = null, dailyEarningChart = null;
-    let currentAuthUser = null;
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
-    // ========== GLOBAL BRANDING ==========
+    // Global Branding Functions
     async function loadGlobalBranding() {
         try {
             const brandSnap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/branding`));
@@ -643,11 +654,6 @@
                 document.getElementById('headerSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
                 document.getElementById('footerBrandTitle').textContent = brand.title || 'SP CONSTRUCTION';
                 document.getElementById('footerBrandSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
-            } else {
-                document.getElementById('headerTitle').textContent = 'SP CONSTRUCTION';
-                document.getElementById('headerSubtitle').textContent = 'ADMIN DASHBOARD';
-                document.getElementById('footerBrandTitle').textContent = 'SP CONSTRUCTION';
-                document.getElementById('footerBrandSubtitle').textContent = 'ADMIN DASHBOARD';
             }
         } catch(err) { console.warn(err); }
     }
@@ -660,20 +666,13 @@
                 document.getElementById('headerSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
                 document.getElementById('footerBrandTitle').textContent = brand.title || 'SP CONSTRUCTION';
                 document.getElementById('footerBrandSubtitle').textContent = brand.subtitle || 'ADMIN DASHBOARD';
-            } else {
-                document.getElementById('headerTitle').textContent = 'SP CONSTRUCTION';
-                document.getElementById('headerSubtitle').textContent = 'ADMIN DASHBOARD';
-                document.getElementById('footerBrandTitle').textContent = 'SP CONSTRUCTION';
-                document.getElementById('footerBrandSubtitle').textContent = 'ADMIN DASHBOARD';
             }
         });
     }
     
-    // ========== FOOTER USER INFO ==========
     function updateUserInfoFooter(userData) {
         const container = document.getElementById('userInfoFooter');
         if (!container) return;
-        
         const address = userData.address ? userData.address : 'Not provided';
         const phone = userData.mobile ? userData.mobile : 'Not provided';
         const email = userData.email ? userData.email : 'Not provided';
@@ -682,7 +681,6 @@
             const date = new Date(userData.registeredAt);
             memberSince = date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
         }
-        
         container.innerHTML = `
             <li><i class="fas fa-map-marker-alt"></i> ${escapeHtml(address)}</li>
             <li><i class="fas fa-phone-alt"></i> ${escapeHtml(phone)}</li>
@@ -691,44 +689,107 @@
         `;
     }
     
-    // ========== DATA LOADING ==========
+    // Purchase Functions
+    async function loadPurchasesData() {
+        try {
+            const purchasesSnap = await window.get(window.ref(window.db, 'purchases'));
+            if (purchasesSnap.exists()) {
+                allPurchases = Object.entries(purchasesSnap.val()).map(([id, data]) => ({ id, ...data }));
+                allPurchases.sort((a,b) => new Date(b.date) - new Date(a.date));
+            } else {
+                allPurchases = [];
+            }
+            updatePurchaseStats();
+            updatePurchasesTable();
+        } catch(e) { console.error("Error loading purchases:", e); }
+    }
+    
+    function updatePurchaseStats() {
+        let totalSpent = 0, totalPaid = 0, totalDue = 0;
+        const uniqueCompanies = new Set();
+        for (const p of allPurchases) {
+            const spent = Number(p.totalPrice) || 0;
+            const paid = Number(p.companyPaid) || 0;
+            totalSpent += spent;
+            totalPaid += paid;
+            totalDue += (spent - paid);
+            if (p.companyName) uniqueCompanies.add(p.companyName);
+        }
+        document.getElementById('purchaseTotalSpent').innerHTML = `₹${Math.round(totalSpent).toLocaleString()}`;
+        document.getElementById('purchaseTotalPaid').innerHTML = `₹${Math.round(totalPaid).toLocaleString()}`;
+        document.getElementById('purchaseTotalDue').innerHTML = `₹${Math.round(totalDue).toLocaleString()}`;
+        document.getElementById('purchaseUniqueCompanies').innerHTML = uniqueCompanies.size;
+    }
+    
+    function updatePurchasesTable() {
+        const tbody = document.getElementById('purchasesTableBody');
+        const tfoot = document.getElementById('purchasesTableFooter');
+        if (!tbody) return;
+        if (!allPurchases.length) {
+            tbody.innerHTML = '<tr><td colspan="9">📭 No purchase records found</td></tr>';
+            if(tfoot) tfoot.innerHTML = '';
+            return;
+        }
+        let html = '';
+        for (let p of allPurchases.slice(0, 10)) {
+            const due = (Number(p.totalPrice) || 0) - (Number(p.companyPaid) || 0);
+            const dueColor = due < 0 ? '#dc2626' : '#15803d';
+            html += `<tr>
+                <td>${escapeHtml(p.date || 'N/A')}</td>
+                <td><strong>${escapeHtml(p.companyName || 'N/A')}</strong></td>
+                <td>${escapeHtml(p.productName || 'N/A')}</td>
+                <td>${p.quantity || 0}</td>
+                <td>₹${(Number(p.unitPrice) || 0).toLocaleString()}</td>
+                <td class="amount-positive">₹${(Number(p.totalPrice) || 0).toLocaleString()}</td>
+                <td class="amount-positive">₹${(Number(p.companyPaid) || 0).toLocaleString()}</td>
+                <td style="color: ${dueColor};">₹${Math.abs(due).toLocaleString()}</td>
+                <td>${escapeHtml(p.notes || '-')}</td>
+            </tr>`;
+        }
+        tbody.innerHTML = html;
+        
+        let totalSpentSum = 0, totalPaidSum = 0, totalDueSum = 0;
+        for (let p of allPurchases.slice(0, 10)) {
+            totalSpentSum += Number(p.totalPrice) || 0;
+            totalPaidSum += Number(p.companyPaid) || 0;
+            totalDueSum += (Number(p.totalPrice) || 0) - (Number(p.companyPaid) || 0);
+        }
+        if(tfoot) {
+            tfoot.innerHTML = `<tr class="purchase-summary-row">
+                <td colspan="4"><strong>TOP 10 SUMMARY</strong></td>
+                <td><strong>Total</strong></td>
+                <td><strong>₹${totalSpentSum.toLocaleString()}</strong></td>
+                <td><strong>₹${totalPaidSum.toLocaleString()}</strong></td>
+                <td style="color: ${totalDueSum < 0 ? '#dc2626' : '#15803d'};"><strong>₹${Math.abs(totalDueSum).toLocaleString()}</strong></td>
+                <td>—</td>
+            </tr>`;
+        }
+    }
+    
+    // Main Data Loading
     async function loadDashboardData() {
-        console.log("🔄 Loading dashboard data...");
         showLoading(true);
         try {
-            // Load attendance
             const attSnap = await window.get(window.ref(window.db, 'attendance'));
             if (attSnap.exists()) {
                 allAttendanceRecords = Object.entries(attSnap.val()).map(([id, data]) => ({ id, ...data }));
-                console.log(`✅ Attendance records loaded: ${allAttendanceRecords.length}`);
-                if (allAttendanceRecords.length) console.log("Sample attendance:", allAttendanceRecords[0]);
-            } else {
-                allAttendanceRecords = [];
-                console.warn("⚠️ No attendance data found");
-            }
+            } else { allAttendanceRecords = []; }
             
-            // Load payments
             const paySnap = await window.get(window.ref(window.db, 'companyDailyPayments'));
             if (paySnap.exists()) {
                 allPaymentRecords = Object.entries(paySnap.val()).map(([id, data]) => ({ id, ...data }));
-                console.log(`✅ Payment records loaded: ${allPaymentRecords.length}`);
-                if (allPaymentRecords.length) console.log("Sample payment:", allPaymentRecords[0]);
-            } else {
-                allPaymentRecords = [];
-                console.warn("⚠️ No payment data found");
-            }
+            } else { allPaymentRecords = []; }
             
-            // Load users
             const usersSnap = await window.get(window.ref(window.db, 'users'));
             if (usersSnap.exists()) {
                 allUsers = Object.values(usersSnap.val());
-                console.log(`✅ Users loaded: ${allUsers.length}`);
                 document.getElementById('totalRegisteredUsers').textContent = allUsers.length;
             } else {
                 allUsers = [];
                 document.getElementById('totalRegisteredUsers').textContent = '0';
-                console.warn("⚠️ No users found");
             }
+            
+            await loadPurchasesData();
             
             updateStats();
             updateUsersTable();
@@ -736,9 +797,7 @@
             updateCompanyPaymentTable();
             updateCharts();
             
-        } catch(e) { 
-            console.error("❌ Error loading data:", e);
-        }
+        } catch(e) { console.error("Error loading data:", e); }
         showLoading(false);
     }
     
@@ -798,11 +857,9 @@
     
     function updateAttendanceTable() {
         const tbody = document.getElementById('attendanceTableBody');
-        console.log("updateAttendanceTable called, tbody exists:", !!tbody);
         if (!tbody) return;
         if (!allAttendanceRecords.length) {
             tbody.innerHTML = '<tr><td colspan="7">📭 No attendance records found</td></tr>';
-            console.log("No attendance records to display");
             return;
         }
         let sorted = [...allAttendanceRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -821,16 +878,13 @@
             </tr>`;
         }
         tbody.innerHTML = html;
-        console.log(`Rendered ${sorted.slice(0,10).length} attendance rows`);
     }
     
     function updateCompanyPaymentTable() {
         const tbody = document.getElementById('companyPaymentTableBody');
-        console.log("updateCompanyPaymentTable called, tbody exists:", !!tbody);
         if (!tbody) return;
         if (!allPaymentRecords.length) {
             tbody.innerHTML = '<tr><td colspan="6">📭 No payment records found</td></tr>';
-            console.log("No payment records to display");
             return;
         }
         let sorted = [...allPaymentRecords].sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -852,7 +906,6 @@
             </tr>`;
         }
         tbody.innerHTML = html;
-        console.log(`Rendered ${sorted.slice(0,10).length} payment rows`);
     }
     
     function updateCharts() {
@@ -860,62 +913,85 @@
             console.warn("Chart.js not loaded");
             return;
         }
+        
         let last7 = [];
+        let last7Dates = [];
         for (let i = 6; i >= 0; i--) {
             let d = new Date();
             d.setDate(d.getDate() - i);
-            last7.push(d.toISOString().split('T')[0]);
+            let dateStr = d.toISOString().split('T')[0];
+            last7.push(dateStr);
+            last7Dates.push(dateStr.slice(5));
         }
         
         let attRates = last7.map(date => {
-            let dayRec = allAttendanceRecords.filter(r => r.date === date);
+            let dayRec = allAttendanceRecords.filter(r => r && r.date === date);
             if (!dayRec.length) return 0;
-            let present = dayRec.filter(r => r.status === 'present').length;
+            let present = dayRec.filter(r => r.status === 'present' || r.status === 'Present').length;
             return (present / dayRec.length) * 100;
         });
         
-        let weekPay = last7.map(date => allPaymentRecords.filter(p => p.date === date).reduce((s,p) => s + (Number(p.companyPaid) || Number(p.paid) || 0), 0));
-        let dailyEarn = last7.map(date => allAttendanceRecords.filter(r => r.date === date).reduce((s,r) => s + (Number(r.earnings) || 0), 0));
+        let weekPay = last7.map(date => {
+            return allPaymentRecords.filter(p => p && p.date === date).reduce((s, p) => {
+                return s + (Number(p.companyPaid) || Number(p.paid) || Number(p.amountPaid) || 0);
+            }, 0);
+        });
         
-        let totalPaid = allPaymentRecords.reduce((s,p) => s + (Number(p.companyPaid) || Number(p.paid) || 0), 0);
-        let totalDue = allPaymentRecords.reduce((s,p) => s + ((Number(p.totalEarning) || Number(p.totalEarnings) || Number(p.earning) || 0) - (Number(p.companyPaid) || Number(p.paid) || 0)), 0);
+        let dailyEarn = last7.map(date => {
+            return allAttendanceRecords.filter(r => r && r.date === date).reduce((s, r) => {
+                return s + (Number(r.earnings) || 0);
+            }, 0);
+        });
+        
+        let totalPaid = 0, totalDue = 0;
+        for (let p of allPaymentRecords) {
+            let earning = Number(p.totalEarning) || Number(p.totalEarnings) || Number(p.earning) || 0;
+            let paid = Number(p.companyPaid) || Number(p.paid) || Number(p.amountPaid) || 0;
+            totalPaid += paid;
+            totalDue += (earning - paid);
+        }
+        totalDue = Math.abs(totalDue);
+        
+        if (attendanceRateChart) attendanceRateChart.destroy();
+        if (weeklyPaymentChart) weeklyPaymentChart.destroy();
+        if (paymentPieChart) paymentPieChart.destroy();
+        if (dailyEarningChart) dailyEarningChart.destroy();
         
         const ctx1 = document.getElementById('attendanceRateChart')?.getContext('2d');
-        const ctx2 = document.getElementById('weeklyPaymentChart')?.getContext('2d');
-        const ctx3 = document.getElementById('paymentPieChart')?.getContext('2d');
-        const ctx4 = document.getElementById('dailyEarningChart')?.getContext('2d');
-        
-        if (ctx1 && attendanceRateChart) attendanceRateChart.destroy();
-        if (ctx2 && weeklyPaymentChart) weeklyPaymentChart.destroy();
-        if (ctx3 && paymentPieChart) paymentPieChart.destroy();
-        if (ctx4 && dailyEarningChart) dailyEarningChart.destroy();
-        
         if (ctx1) {
             attendanceRateChart = new Chart(ctx1, {
                 type: 'line',
-                data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Attendance Rate (%)', data: attRates, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, tension: 0.4, fill: true }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + '%' } } }, scales: { y: { beginAtZero: true, max: 100 } } }
+                data: { labels: last7Dates, datasets: [{ label: 'Attendance Rate (%)', data: attRates, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#f59e0b', pointBorderColor: '#fff', pointRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.raw.toFixed(1) + '%' } } }, scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Percentage (%)' } } } }
             });
         }
+        
+        const ctx2 = document.getElementById('weeklyPaymentChart')?.getContext('2d');
         if (ctx2) {
             weeklyPaymentChart = new Chart(ctx2, {
                 type: 'bar',
-                data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Company Payment (₹)', data: weekPay, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8 }] },
-                options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + ctx.raw.toLocaleString() } } } }
+                data: { labels: last7Dates, datasets: [{ label: 'Company Payment (₹)', data: weekPay, backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 8, borderColor: '#10b981', borderWidth: 1 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + ctx.raw.toLocaleString('en-IN') } } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Amount (₹)' }, ticks: { callback: (value) => '₹' + value.toLocaleString('en-IN') } } } }
             });
         }
-        if (ctx3) {
+        
+        const ctx3 = document.getElementById('paymentPieChart')?.getContext('2d');
+        if (ctx3 && (totalPaid > 0 || totalDue > 0)) {
             paymentPieChart = new Chart(ctx3, {
                 type: 'doughnut',
-                data: { labels: ['Company Paid', 'Company Due'], datasets: [{ data: [totalPaid, Math.abs(totalDue)], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] },
-                options: { responsive: true, cutout: '55%', plugins: { tooltip: { callbacks: { label: (ctx) => ctx.label + ': ₹' + ctx.raw.toLocaleString() } } } }
+                data: { labels: ['Company Paid', 'Company Due'], datasets: [{ data: [totalPaid, totalDue], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0, hoverOffset: 8 }] },
+                options: { responsive: true, maintainAspectRatio: true, cutout: '55%', plugins: { tooltip: { callbacks: { label: (ctx) => { let total = ctx.dataset.data.reduce((a,b)=>a+b,0); let pct = ((ctx.raw/total)*100).toFixed(1); return `${ctx.label}: ₹${ctx.raw.toLocaleString('en-IN')} (${pct}%)`; } } }, legend: { position: 'bottom' } } }
             });
+        } else if (ctx3) {
+            ctx3.canvas.parentElement.innerHTML = '<div style="text-align:center;padding:50px;color:#94a3b8;"><i class="fas fa-chart-pie fa-3x"></i><p style="margin-top:10px;">No payment data available</p></div>';
         }
+        
+        const ctx4 = document.getElementById('dailyEarningChart')?.getContext('2d');
         if (ctx4) {
             dailyEarningChart = new Chart(ctx4, {
                 type: 'line',
-                data: { labels: last7.map(d => d.slice(5)), datasets: [{ label: 'Daily Earnings (₹)', data: dailyEarn, borderColor: '#ec489a', backgroundColor: 'rgba(236,72,153,0.1)', borderWidth: 3, tension: 0.3, fill: true }] },
-                options: { responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + ctx.raw.toLocaleString() } } } }
+                data: { labels: last7Dates, datasets: [{ label: 'Daily Earnings (₹)', data: dailyEarn, borderColor: '#ec489a', backgroundColor: 'rgba(236,72,153,0.1)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#ec489a', pointBorderColor: '#fff', pointRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { tooltip: { callbacks: { label: (ctx) => '₹' + ctx.raw.toLocaleString('en-IN') } } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Amount (₹)' }, ticks: { callback: (value) => '₹' + value.toLocaleString('en-IN') } } } }
             });
         }
     }
@@ -967,23 +1043,20 @@
         window.onValue(window.ref(window.db, 'attendance'), () => loadDashboardData());
         window.onValue(window.ref(window.db, 'companyDailyPayments'), () => loadDashboardData());
         window.onValue(window.ref(window.db, 'users'), () => loadDashboardData());
+        window.onValue(window.ref(window.db, 'purchases'), () => { loadPurchasesData(); });
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`), () => loadCompanyLogo());
         window.onValue(window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`), () => loadBannerImage());
     }
     
-    // Listen for changes to current user's data to update footer in real time
     function listenToCurrentUser(uid) {
         if (!uid) return;
         const userRef = window.ref(window.db, `users/${uid}`);
         window.onValue(userRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                updateUserInfoFooter(userData);
-            }
+            if (snapshot.exists()) updateUserInfoFooter(snapshot.val());
         });
     }
     
-    // ========== AUTH INIT ==========
+    // Auth Initialization
     window.onAuthStateChanged(window.auth, async (user) => {
         if (!user) { window.location.href = 'login.html'; return; }
         try {
@@ -995,12 +1068,8 @@
                 return;
             }
             document.getElementById('welcomeName').innerHTML = userData.fullName?.split(' ')[0] || 'Admin';
-            
-            // Update footer with current user data
             updateUserInfoFooter(userData);
-            // Listen for realtime updates on this user
             listenToCurrentUser(user.uid);
-            
             await loadDashboardData();
             listenRealTime();
             await loadGlobalBranding();
