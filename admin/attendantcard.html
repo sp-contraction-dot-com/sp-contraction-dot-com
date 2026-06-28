@@ -672,6 +672,8 @@
             justify-content: center;
             align-items: center;
             border-top: 1px solid #e2e8f0;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         .download-btn {
             background: linear-gradient(135deg, #22c55e, #16a34a);
@@ -687,12 +689,54 @@
             transition: all 0.2s ease;
             border: none;
             font-family: 'Inter', sans-serif;
-            width: 100%;
+            flex: 1;
             justify-content: center;
         }
         .download-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+        }
+        .share-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            flex: 1;
+            justify-content: center;
+        }
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+        }
+        .view-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            flex: 1;
+            justify-content: center;
+        }
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139,92,246,0.4);
         }
         
         .banner-section {
@@ -973,6 +1017,93 @@
         .btn-save { background: #22c55e; color: white; }
         .btn-cancel { background: #e2e8f0; color: #475569; }
         
+        /* PDF Viewer Modal */
+        .pdf-viewer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1300;
+            justify-content: center;
+            align-items: center;
+        }
+        .pdf-viewer-modal.show {
+            display: flex;
+        }
+        .pdf-viewer-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .pdf-viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #1e293b;
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .pdf-viewer-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .pdf-viewer-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .pdf-viewer-body {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+            text-align: center;
+        }
+        .pdf-viewer-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .pdf-viewer-footer {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .pdf-viewer-footer button {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .pdf-viewer-footer .save-pdf-btn {
+            background: #22c55e;
+            color: white;
+        }
+        .pdf-viewer-footer .share-pdf-btn {
+            background: #3b82f6;
+            color: white;
+        }
+        .pdf-viewer-footer .close-pdf-btn {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
         @media (max-width: 550px) {
             body { padding: 12px; }
             .header { padding: 15px 20px; }
@@ -989,7 +1120,7 @@
             .user-section { padding: 18px; gap: 12px; }
             .avatar-frame { width: 65px; height: 65px; }
             .user-details h2 { font-size: 1rem; }
-            .download-btn { padding: 10px 20px; font-size: 0.75rem; }
+            .download-btn, .share-btn, .view-btn { padding: 10px 15px; font-size: 0.7rem; }
             .toast-message { white-space: normal; text-align: center; max-width: 85%; }
             .date-select { min-width: 100%; }
             .year-input-wrapper { flex-direction: column; }
@@ -1148,6 +1279,24 @@
     </div>
 </div>
 
+<!-- PDF Viewer Modal -->
+<div class="pdf-viewer-modal" id="pdfViewerModal">
+    <div class="pdf-viewer-content">
+        <div class="pdf-viewer-header">
+            <h3><i class="fas fa-file-pdf"></i> Attendance Card PDF</h3>
+            <button onclick="closePdfViewer()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="pdf-viewer-body" id="pdfViewerBody">
+            <p style="color: #94a3b8;">Generating preview...</p>
+        </div>
+        <div class="pdf-viewer-footer">
+            <button class="save-pdf-btn" id="savePdfBtn"><i class="fas fa-download"></i> Save</button>
+            <button class="share-pdf-btn" id="sharePdfBtn"><i class="fas fa-share-alt"></i> Share</button>
+            <button class="close-pdf-btn" onclick="closePdfViewer()">Close</button>
+        </div>
+    </div>
+</div>
+
 <div id="toastMsg" class="toast-message">📄 Generating PDF...</div>
 
 <script type="module">
@@ -1175,12 +1324,13 @@
     let currentAttendanceRecords = [];
     let editingRecordId = null;
     let filteredRecords = [];
+    let currentPdfDataUrl = null;
+    let watermarkLogoBase64 = null;
     
     const headerTitleSpan = document.getElementById('headerTitle');
     const headerSubtitleSpan = document.getElementById('headerSubtitle');
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
-    // ========== GLOBAL BRANDING FUNCTIONS ==========
     async function loadGlobalBranding() {
         try {
             const brandSnap = await window.get(window.ref(db, `${COMPANY_ASSETS_PATH}/branding`));
@@ -1214,7 +1364,6 @@
             }
         });
     }
-    // ========== END GLOBAL BRANDING ==========
     
     function showToast(message, isError = false) {
         const toast = document.getElementById('toastMsg');
@@ -1564,6 +1713,9 @@
             const snapshot = await window.get(pdfLogoRef);
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 pdfLogoBase64 = snapshot.val();
+                watermarkLogoBase64 = snapshot.val();
+            } else if (companyLogoBase64) {
+                watermarkLogoBase64 = companyLogoBase64;
             }
         } catch(e) { console.warn("Error loading PDF logo:", e); }
     }
@@ -1673,9 +1825,10 @@
         });
     }
     
-    async function downloadCardAsPDF(cardElement, employeeName, employeeId) {
-        if (!cardElement) { showToast('❌ Card not found', true); return; }
-        showToast('📄 Generating PDF...');
+    // ========== PDF FUNCTIONS - WATERMARK ON CARD CENTER ==========
+    
+    async function generatePdfDataUrl(cardElement, employeeName, employeeId) {
+        if (!cardElement) { showToast('❌ Card not found', true); return null; }
         try {
             const cloneCard = cardElement.cloneNode(true);
             cloneCard.style.position = 'absolute';
@@ -1702,21 +1855,138 @@
             const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
-                try { pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); } catch(e) { console.warn(e); }
-            }
+            
+            // Calculate card position on PDF
             const imgWidth = 90;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const xPosition = (210 - imgWidth) / 2;
-            const yPosition = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
-            pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
-            const safeName = employeeName.replace(/[^a-zA-Z0-9]/g, '_');
-            pdf.save(`${safeName}_${employeeId}_attencard.pdf`);
-            showToast('✅ PDF downloaded successfully!');
+            const cardX = (210 - imgWidth) / 2;
+            const cardY = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
+            
+            // ========== STEP 1: ADD CARD CONTENT FIRST (Bottom layer) ==========
+            pdf.addImage(imgData, 'PNG', cardX, cardY, imgWidth, imgHeight);
+            
+            // ========== STEP 2: ADD WATERMARK ON CARD CENTER (Top layer) ==========
+            if (watermarkLogoBase64 && watermarkLogoBase64.startsWith('data:image')) {
+                try {
+                    // Watermark size - relative to card (50% of card width)
+                    const wmWidth = imgWidth * 0.5; // 45mm
+                    const wmHeight = wmWidth; // Square
+                    
+                    // Position: Center of the card
+                    const wmX = cardX + (imgWidth - wmWidth) / 2;
+                    const wmY = cardY + (imgHeight - wmHeight) / 2;
+                    
+                    pdf.setGState(new pdf.GState({ opacity: 0.25 }));
+                    pdf.addImage(watermarkLogoBase64, 'JPEG', wmX, wmY, wmWidth, wmHeight);
+                    pdf.setGState(new pdf.GState({ opacity: 1 }));
+                } catch(e) { 
+                    console.warn("Watermark add error:", e); 
+                }
+            }
+            
+            // ========== STEP 3: ADD PDF LOGO AT TOP (Optional) ==========
+            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+                try { 
+                    pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); 
+                } catch(e) { console.warn(e); }
+            }
+            
+            const pdfData = pdf.output('datauristring');
+            return pdfData;
         } catch (error) {
-            console.error('PDF error:', error);
+            console.error('PDF generation error:', error);
+            return null;
+        }
+    }
+    
+    async function showPdfViewer(cardElement, employeeName, employeeId) {
+        if (!cardElement) { showToast('❌ Card not found', true); return; }
+        showToast('📄 Generating PDF preview...');
+        const viewerModal = document.getElementById('pdfViewerModal');
+        const viewerBody = document.getElementById('pdfViewerBody');
+        
+        try {
+            viewerBody.innerHTML = '<p style="color: #94a3b8;"><i class="fas fa-spinner fa-spin"></i> Generating PDF...</p>';
+            viewerModal.classList.add('show');
+            
+            const pdfDataUrl = await generatePdfDataUrl(cardElement, employeeName, employeeId);
+            if (!pdfDataUrl) {
+                viewerBody.innerHTML = '<p style="color: #ef4444;">❌ Failed to generate PDF</p>';
+                return;
+            }
+            currentPdfDataUrl = pdfDataUrl;
+            
+            viewerBody.innerHTML = `
+                <iframe src="${pdfDataUrl}" style="width:100%; height:500px; border:none; border-radius:8px;"></iframe>
+                <div style="margin-top:10px; font-size:0.8rem; color:#64748b;">
+                    <i class="fas fa-info-circle"></i> Watermark on card center - Use Save button to download
+                </div>
+            `;
+            
+            document.getElementById('savePdfBtn').onclick = function() {
+                savePdfToDevice(pdfDataUrl, employeeName, employeeId);
+            };
+            document.getElementById('sharePdfBtn').onclick = function() {
+                sharePdf(pdfDataUrl, employeeName);
+            };
+            
+            showToast('✅ PDF ready! Tap Save to download.');
+        } catch (error) {
+            console.error('PDF viewer error:', error);
+            viewerBody.innerHTML = '<p style="color: #ef4444;">❌ Failed to generate PDF preview</p>';
             showToast('❌ Failed to generate PDF', true);
         }
+    }
+    
+    function savePdfToDevice(pdfDataUrl, employeeName, employeeId) {
+        try {
+            const link = document.createElement('a');
+            link.href = pdfDataUrl;
+            const safeName = employeeName.replace(/[^a-zA-Z0-9]/g, '_');
+            link.download = `${safeName}_${employeeId}_attencard.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('✅ PDF download started! Check your downloads.');
+            closePdfViewer();
+        } catch (error) {
+            console.error('Save PDF error:', error);
+            showToast('❌ Failed to save PDF', true);
+        }
+    }
+    
+    async function sharePdf(pdfDataUrl, employeeName) {
+        try {
+            const response = await fetch(pdfDataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `${employeeName}_attencard.pdf`, { type: 'application/pdf' });
+            
+            if (navigator.share) {
+                await navigator.share({
+                    title: `Attendance Card - ${employeeName}`,
+                    files: [file]
+                });
+                showToast('✅ Shared successfully!');
+            } else {
+                const link = document.createElement('a');
+                link.href = pdfDataUrl;
+                link.download = `${employeeName}_attencard.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('📄 Download started (Share not supported)');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Share error:', error);
+                showToast('❌ Failed to share', true);
+            }
+        }
+    }
+    
+    function closePdfViewer() {
+        document.getElementById('pdfViewerModal').classList.remove('show');
+        currentPdfDataUrl = null;
     }
     
     // ========== AMOUNT PAID MODAL FUNCTIONS ==========
@@ -1858,7 +2128,6 @@
         document.getElementById('editAmount').value = '';
     }
     
-    // ========== FIXED renderCard function ==========
     function renderCard(stats, userInfo, profilePic, companyLogo) {
         const container = document.getElementById('cardContainer');
         const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -1871,7 +2140,6 @@
             ? `<img src="${companyLogo}" alt="Company Logo">`
             : `<span>🏗️</span>`;
         
-        // Read the current global branding from the header elements
         const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
         const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'BUILDING DREAMS';
         
@@ -1937,7 +2205,9 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF</button>
+                    <button class="view-btn" id="viewPdfBtn"><i class="fas fa-eye"></i> Preview PDF</button>
+                    <button class="share-btn" id="sharePdfBtn"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Save</button>
                 </div>
             </div>
         `;
@@ -1951,11 +2221,39 @@
             });
         }
         
+        const viewBtn = document.getElementById('viewPdfBtn');
+        if (viewBtn) {
+            viewBtn.addEventListener('click', async () => {
+                const cardElement = document.getElementById('mainCard');
+                await showPdfViewer(cardElement, userInfo.name, userInfo.id);
+            });
+        }
+        
+        const shareBtn = document.getElementById('sharePdfBtn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                const cardElement = document.getElementById('mainCard');
+                showToast('📄 Generating PDF for sharing...');
+                const pdfDataUrl = await generatePdfDataUrl(cardElement, userInfo.name, userInfo.id);
+                if (pdfDataUrl) {
+                    await sharePdf(pdfDataUrl, userInfo.name);
+                } else {
+                    showToast('❌ Failed to generate PDF', true);
+                }
+            });
+        }
+        
         const downloadBtn = document.getElementById('downloadPdfBtn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', async () => {
                 const cardElement = document.getElementById('mainCard');
-                await downloadCardAsPDF(cardElement, userInfo.name, userInfo.id);
+                showToast('📄 Generating PDF for download...');
+                const pdfDataUrl = await generatePdfDataUrl(cardElement, userInfo.name, userInfo.id);
+                if (pdfDataUrl) {
+                    savePdfToDevice(pdfDataUrl, userInfo.name, userInfo.id);
+                } else {
+                    showToast('❌ Failed to generate PDF', true);
+                }
             });
         }
     }
@@ -1968,6 +2266,7 @@
                 companyLogoBase64 = val;
                 const headerLogo = document.getElementById('headerLogo');
                 if (headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Company Logo">`;
+                if (!pdfLogoBase64) watermarkLogoBase64 = val;
             }
         });
         const bannerRef = window.ref(db, `${COMPANY_ASSETS_PATH}/banners`);
@@ -1975,8 +2274,15 @@
         const pdfLogoRef = window.ref(db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
         window.onValue(pdfLogoRef, (snapshot) => {
             const val = snapshot.val();
-            if (val && val.startsWith('data:image')) pdfLogoBase64 = val;
-            else pdfLogoBase64 = null;
+            if (val && val.startsWith('data:image')) {
+                pdfLogoBase64 = val;
+                watermarkLogoBase64 = val;
+            } else if (companyLogoBase64) {
+                watermarkLogoBase64 = companyLogoBase64;
+            } else {
+                pdfLogoBase64 = null;
+                watermarkLogoBase64 = null;
+            }
         });
         const attendanceRef = window.ref(db, 'attendance');
         window.onValue(attendanceRef, () => {
@@ -2029,6 +2335,7 @@
     
     window.closeModal = closeModal;
     window.closeEditModal = closeEditModal;
+    window.closePdfViewer = closePdfViewer;
     window.openEditPaymentModal = window.openEditPaymentModal;
     window.deletePaymentRecord = window.deletePaymentRecord;
 </script>
