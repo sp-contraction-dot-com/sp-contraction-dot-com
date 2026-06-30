@@ -11,20 +11,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
     <!-- Firebase SDK -->
     <script type="module">
+        import { firebaseConfig } from './admin/js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -43,47 +33,135 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%);
+            background: #f0f2f5;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 30px 20px;
         }
-        .auth-container { max-width: 500px; width: 100%; }
-        .logo-section { text-align: center; margin-bottom: 30px; }
+        .auth-container { 
+            max-width: 540px; 
+            width: 100%; 
+            margin-top: 10px;
+        }
+        
+        /* ===== LOGO SECTION ===== */
+        .logo-section { 
+            text-align: center; 
+            margin-bottom: 28px; 
+        }
         .logo-wrapper {
-            display: inline-flex; align-items: center; gap: 12px;
-            background: rgba(255,255,255,0.05); padding: 10px 24px; border-radius: 60px;
+            display: inline-flex; 
+            align-items: center; 
+            gap: 14px;
+            background: white;
+            padding: 12px 28px; 
+            border-radius: 60px;
+            border: 1px solid #e8ecf1;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
-        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .logo-icon span { font-size: 1.4rem; font-weight: 800; color: white; }
-        .logo-text h1 { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #fcd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .logo-text p { font-size: 0.6rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
-        .auth-card { background: rgba(255,255,255,0.98); border-radius: 32px; padding: 32px 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        .auth-header { text-align: center; margin-bottom: 28px; }
-        .auth-header h2 { font-size: 1.6rem; font-weight: 700; color: #1e293b; }
-        .auth-header p { font-size: 0.8rem; color: #64748b; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
-        .input-field { position: relative; display: flex; align-items: center; }
+        .logo-icon { 
+            width: 48px; 
+            height: 48px; 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .logo-icon span { 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            color: white; 
+        }
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-text h1 { 
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            color: #0f172a;
+            line-height: 1.2;
+        }
+        .logo-text p { 
+            font-size: 0.55rem; 
+            color: #f59e0b;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* ===== AUTH CARD ===== */
+        .auth-card { 
+            background: white; 
+            border-radius: 32px; 
+            padding: 36px 32px; 
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            border: 1px solid #e8ecf1;
+        }
+        .auth-header { 
+            text-align: center; 
+            margin-bottom: 28px; 
+        }
+        .auth-header h2 { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            color: #1e293b; 
+        }
+        .auth-header p { 
+            font-size: 0.85rem; 
+            color: #64748b; 
+            margin-top: 4px; 
+        }
+        
+        /* ===== INPUT ===== */
+        .input-group { 
+            margin-bottom: 18px; 
+        }
+        .input-group label { 
+            display: block; 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            color: #334155; 
+            margin-bottom: 6px; 
+        }
+        .input-group label i { color: #f59e0b; margin-right: 6px; }
+        .input-field { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+        }
         .input-field i:not(.toggle-password) { 
             position: absolute; 
             left: 16px; 
             color: #94a3b8; 
-            font-size: 1rem;
+            font-size: 0.95rem;
             z-index: 2;
         }
         .input-field input { 
             width: 100%; 
-            padding: 14px 50px 14px 45px;
-            border: 2px solid #e2e8f0; 
-            border-radius: 20px;
+            padding: 14px 50px 14px 46px;
+            border: 2px solid #e8ecf1; 
+            border-radius: 18px;
             font-size: 0.95rem; 
             background: #f8fafc;
             transition: all 0.3s;
         }
-        .input-field input:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+        .input-field input:focus { 
+            outline: none; 
+            border-color: #f59e0b; 
+            box-shadow: 0 0 0 4px rgba(245,158,11,0.08);
+            background: white;
+        }
+        .input-field input::placeholder {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
         
         .toggle-password {
             position: absolute;
@@ -101,83 +179,266 @@
         }
         .toggle-password:hover { color: #f59e0b; }
         
+        /* ===== PHONE INPUT ===== */
         .iti { width: 100%; display: block; }
-        .iti__flag-container { padding-left: 10px; }
-        .iti__selected-flag { background: transparent !important; border-radius: 20px 0 0 20px; padding-left: 12px; }
-        .phone-input { padding-left: 80px !important; }
-        
-        .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 40px;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer;
-            background: linear-gradient(135deg, #f59e0b, #d97706); color: white;
-            transition: all 0.3s;
+        .iti__flag-container { 
+            padding-left: 8px;
+            z-index: 2;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
-        .btn-secondary { background: transparent; border: 2px solid #e2e8f0; color: #334155; margin-top: 12px; }
-        .btn-secondary:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: none; }
-        .auth-links { text-align: center; margin-top: 20px; }
-        .auth-links a { color: #f59e0b; text-decoration: none; font-size: 0.8rem; }
-        .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
-        .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .iti__selected-flag { 
+            background: transparent !important; 
+            border-radius: 18px 0 0 18px; 
+            padding-left: 12px;
+            height: 100%;
+        }
+        .iti__selected-flag:hover { background: transparent !important; }
+        .phone-input { 
+            padding-left: 90px !important;
+            width: 100% !important;
+        }
+        .iti__country-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .iti__country {
+            padding: 8px 12px;
+        }
+        .iti__country.iti__highlight {
+            background: #fef3c7;
+        }
         
+        /* ===== ROW 2 ===== */
+        .row-2 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 14px; 
+        }
+        @media (max-width: 480px) {
+            .row-2 { grid-template-columns: 1fr; }
+        }
+        
+        /* ===== BUTTONS ===== */
+        .btn {
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 40px;
+            font-size: 1rem; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(245,158,11,0.3);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(245,158,11,0.35); 
+        }
+        .btn-secondary { 
+            background: transparent; 
+            border: 2px solid #e8ecf1; 
+            color: #334155; 
+            margin-top: 12px; 
+        }
+        .btn-secondary:hover { 
+            background: #f8fafc; 
+            transform: translateY(-2px); 
+        }
+        
+        /* ===== LINKS ===== */
+        .auth-links { text-align: center; margin-top: 18px; }
+        .auth-links a { color: #f59e0b; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .auth-links a:hover { text-decoration: underline; }
+        
+        .divider { 
+            display: flex; 
+            align-items: center; 
+            gap: 14px; 
+            margin: 22px 0; 
+        }
+        .divider-line { 
+            flex: 1; 
+            height: 1px; 
+            background: #e8ecf1; 
+        }
+        .divider-text { 
+            font-size: 0.8rem; 
+            color: #94a3b8; 
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        /* ===== PASSWORD STRENGTH ===== */
+        .password-strength { 
+            margin-top: 6px; 
+            font-size: 0.75rem; 
+        }
+        .strength-weak { color: #ef4444; }
+        .strength-medium { color: #f59e0b; }
+        .strength-strong { color: #22c55e; }
+        
+        /* ===== ALERT ===== */
+        .alert { 
+            padding: 14px 18px; 
+            border-radius: 18px; 
+            font-size: 0.85rem; 
+            margin-bottom: 22px; 
+            display: none; 
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        .alert-error { 
+            background: #fef2f2; 
+            color: #dc2626; 
+            border: 1px solid #fecaca; 
+        }
+        .alert-success { 
+            background: #f0fdf4; 
+            color: #16a34a; 
+            border: 1px solid #bbf7d0; 
+        }
+        .alert.show { 
+            display: block; 
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         .modal.show { display: flex; }
         .modal-content {
             background: white;
             border-radius: 32px;
-            padding: 32px;
-            max-width: 400px;
-            width: 90%;
+            padding: 36px 32px;
+            max-width: 420px;
+            width: 100%;
             text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        .modal-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e, #15803d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .modal-icon { 
+            width: 80px; 
+            height: 80px; 
+            background: linear-gradient(135deg, #22c55e, #15803d); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto 20px; 
+        }
         .modal-icon i { font-size: 2.5rem; color: white; }
-        .user-id-box { background: #f1f5f9; padding: 15px; border-radius: 16px; margin: 15px 0; }
-        .user-id-box span { font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: #f59e0b; }
-        .copy-btn { background: #e2e8f0; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; margin-top: 5px; }
-        
-        .loading {
-            display: none;
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            justify-content: center;
-            align-items: center;
+        .modal-content h3 { 
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            color: #0f172a; 
+            margin-bottom: 8px;
         }
-        .loading.show { display: flex; }
-        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .alert { padding: 12px 16px; border-radius: 16px; font-size: 0.8rem; margin-bottom: 20px; display: none; }
-        .alert-error { background: #ef444415; color: #b91c1c; border: 1px solid #ef444430; }
-        .alert-success { background: #22c55e15; color: #15803d; border: 1px solid #22c55e30; }
-        .alert.show { display: block; }
-        
-        .password-strength { margin-top: 8px; font-size: 0.7rem; }
-        .strength-weak { color: #ef4444; }
-        .strength-medium { color: #f59e0b; }
-        .strength-strong { color: #22c55e; }
-        
-        /* Resend email button */
+        .modal-content p { 
+            color: #64748b; 
+            font-size: 0.85rem; 
+            line-height: 1.5;
+        }
+        .user-id-box { 
+            background: #fef3c7; 
+            padding: 15px; 
+            border-radius: 16px; 
+            margin: 15px 0; 
+            border: 1px solid #fde68a;
+        }
+        .user-id-box p { 
+            font-size: 0.7rem; 
+            color: #92400e; 
+            font-weight: 600;
+        }
+        .user-id-box span { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            letter-spacing: 2px; 
+            color: #d97706; 
+        }
+        .copy-btn { 
+            background: #f1f5f9; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 40px; 
+            cursor: pointer; 
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #475569;
+            transition: 0.2s;
+        }
+        .copy-btn:hover { background: #f59e0b; color: white; }
         .resend-info {
-            margin-top: 10px;
-            font-size: 0.75rem;
+            margin-top: 12px;
+            font-size: 0.8rem;
             color: #64748b;
         }
         .resend-link {
             color: #f59e0b;
             cursor: pointer;
+            font-weight: 600;
             text-decoration: underline;
+        }
+        .resend-link:hover { color: #d97706; }
+        
+        /* ===== LOADING ===== */
+        .loading {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading.show { display: flex; }
+        .spinner { 
+            width: 48px; 
+            height: 48px; 
+            border: 4px solid rgba(255,255,255,0.2); 
+            border-top: 4px solid #f59e0b; 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 16px; }
+            .auth-card { padding: 24px 18px; }
+            .logo-wrapper { padding: 10px 18px; gap: 10px; }
+            .logo-icon { width: 40px; height: 40px; }
+            .logo-icon span { font-size: 1.1rem; }
+            .logo-text h1 { font-size: 1rem; }
+            .auth-header h2 { font-size: 1.3rem; }
+            .btn { padding: 13px; font-size: 0.9rem; }
+            .input-field input { padding: 12px 46px 12px 42px; font-size: 0.9rem; }
+            .modal-content { padding: 28px 20px; }
+            .row-2 { gap: 10px; }
         }
     </style>
 </head>
@@ -185,72 +446,93 @@
 
 <div class="loading" id="loading"><div class="spinner"></div></div>
 
+<!-- Success Modal -->
 <div class="modal" id="successModal">
     <div class="modal-content">
         <div class="modal-icon"><i class="fas fa-envelope-open-text"></i></div>
         <h3>Verification Email Sent! 📧</h3>
+        <p>Please check your inbox and click the verification link to activate your account.</p>
         <div class="user-id-box">
-            <p style="color:#475569;">Your User ID:</p>
+            <p>Your User ID:</p>
             <span id="displayUserId">********</span>
         </div>
-        <button class="copy-btn" onclick="copyUserId()"><i class="fas fa-copy"></i> Copy</button>
-        <p style="margin: 15px 0; color: #64748b; font-size: 0.8rem;">
-            ✅ A <strong>verification link</strong> has been sent to your email address.<br>
-            Please check your inbox and click the link to activate your account.
-        </p>
+        <button class="copy-btn" onclick="copyUserId()"><i class="fas fa-copy"></i> Copy User ID</button>
         <div class="resend-info">
             <span>Didn't receive the email? </span>
             <span class="resend-link" onclick="resendVerificationEmail()">Click here to resend</span>
         </div>
-        <button class="btn" onclick="window.location.href='login.html'" style="margin-top: 15px;">Go to Login</button>
+        <button class="btn btn-primary" onclick="window.location.href='login.html'" style="margin-top: 18px;">
+            <i class="fas fa-sign-in-alt"></i> Go to Login
+        </button>
     </div>
 </div>
 
 <div class="auth-container">
+    <!-- Logo Section -->
     <div class="logo-section">
         <div class="logo-wrapper">
-            <div class="logo-icon"><span>SP</span></div>
-            <div class="logo-text"><h1>SP CONSTRUCTION</h1><p>BUILDING DREAMS</p></div>
+            <div class="logo-icon" id="logoIcon"><span>SP</span></div>
+            <div class="logo-text">
+                <h1 id="brandTitle">SP CONSTRUCTION</h1>
+                <p id="brandSubtitle">BUILDING DREAMS</p>
+            </div>
         </div>
     </div>
+    
+    <!-- Auth Card -->
     <div class="auth-card">
-        <div class="auth-header"><h2>Create Account ✨</h2><p>Please fill in your information</p></div>
+        <div class="auth-header">
+            <h2>Create Account ✨</h2>
+            <p>Please fill in your information</p>
+        </div>
         <div id="alertBox" class="alert"></div>
         
         <div class="row-2">
             <div class="input-group">
-                <label>First Name</label>
-                <div class="input-field"><i class="fas fa-user"></i><input type="text" id="firstName" placeholder="John"></div>
+                <label><i class="fas fa-user"></i> First Name</label>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="firstName" placeholder="John">
+                </div>
             </div>
             <div class="input-group">
-                <label>Last Name</label>
-                <div class="input-field"><i class="fas fa-user"></i><input type="text" id="lastName" placeholder="Doe"></div>
+                <label><i class="fas fa-user"></i> Last Name</label>
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="lastName" placeholder="Doe">
+                </div>
             </div>
         </div>
         
         <div class="input-group">
-            <label>Email Address</label>
-            <div class="input-field"><i class="fas fa-envelope"></i><input type="email" id="email" placeholder="example@email.com"></div>
+            <label><i class="fas fa-envelope"></i> Email Address</label>
+            <div class="input-field">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+            </div>
         </div>
         
         <div class="input-group">
-            <label>Phone Number</label>
+            <label><i class="fas fa-phone"></i> Phone Number</label>
             <div class="input-field">
                 <i class="fas fa-phone"></i>
-                <input type="tel" id="mobile" class="phone-input" placeholder="+1234567890">
+                <input type="tel" id="mobile" class="phone-input" placeholder="+91 98765 43210">
             </div>
         </div>
         
         <div class="input-group">
-            <label>Date of Birth</label>
-            <div class="input-field"><i class="fas fa-calendar"></i><input type="date" id="dob"></div>
+            <label><i class="fas fa-calendar"></i> Date of Birth</label>
+            <div class="input-field">
+                <i class="fas fa-calendar"></i>
+                <input type="date" id="dob">
+            </div>
         </div>
         
         <div class="input-group">
-            <label>Password</label>
+            <label><i class="fas fa-lock"></i> Password</label>
             <div class="input-field">
                 <i class="fas fa-lock"></i>
-                <input type="password" id="password" placeholder="Enter password">
+                <input type="password" id="password" placeholder="Min 6 characters">
                 <button type="button" class="toggle-password" onclick="togglePassword('password')">
                     <i class="far fa-eye-slash"></i>
                 </button>
@@ -259,20 +541,29 @@
         </div>
         
         <div class="input-group">
-            <label>Confirm Password</label>
+            <label><i class="fas fa-check-circle"></i> Confirm Password</label>
             <div class="input-field">
                 <i class="fas fa-check-circle"></i>
-                <input type="password" id="confirmPassword" placeholder="Confirm password">
+                <input type="password" id="confirmPassword" placeholder="Confirm your password">
                 <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
                     <i class="far fa-eye-slash"></i>
                 </button>
             </div>
         </div>
         
-        <button class="btn" onclick="handleRegister()">Register Now</button>
+        <button class="btn btn-primary" onclick="handleRegister()">
+            <i class="fas fa-user-plus"></i> Register Now
+        </button>
         
-        <div class="divider"><div class="divider-line"></div><div class="divider-text">Already have an account?</div><div class="divider-line"></div></div>
-        <button class="btn btn-secondary" onclick="window.location.href='login.html'">Sign In</button>
+        <div class="divider">
+            <div class="divider-line"></div>
+            <div class="divider-text">Already have an account?</div>
+            <div class="divider-line"></div>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="window.location.href='login.html'">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
     </div>
 </div>
 
@@ -282,11 +573,41 @@
     let iti = null;
     let createdUser = null;
     
+    // ===== LOAD BRANDING =====
+    async function loadBranding() {
+        try {
+            const { ref, get } = await import("https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js");
+            const db = window.db;
+            const brandSnap = await get(ref(db, 'companyAssets/branding'));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                document.getElementById('brandTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('brandSubtitle').textContent = brand.subtitle || 'BUILDING DREAMS';
+            }
+        } catch(e) { console.warn("Error loading branding:", e); }
+    }
+    
+    // ===== LOAD LOGO =====
+    async function loadCompanyLogo() {
+        try {
+            const { ref, get } = await import("https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js");
+            const db = window.db;
+            const logoRef = ref(db, 'companyAssets/footerLogo');
+            const logoSnap = await get(logoRef);
+            const logoIcon = document.getElementById('logoIcon');
+            if (logoSnap.exists() && logoSnap.val()?.startsWith('data:image')) {
+                logoIcon.innerHTML = `<img src="${logoSnap.val()}" alt="Logo">`;
+            } else {
+                logoIcon.innerHTML = `<span>SP</span>`;
+            }
+        } catch(e) { console.warn("Error loading logo:", e); }
+    }
+    
     function showAlert(message, type) {
         const alert = document.getElementById('alertBox');
         alert.textContent = message;
         alert.className = `alert alert-${type} show`;
-        setTimeout(() => alert.classList.remove('show'), 5000);
+        setTimeout(() => alert.classList.remove('show'), 6000);
     }
     
     function showLoading(show) {
@@ -338,8 +659,12 @@
     };
     
     window.copyUserId = function() {
-        navigator.clipboard.writeText(tempUserId);
-        alert('User ID copied!');
+        navigator.clipboard.writeText(tempUserId).then(() => {
+            showAlert('User ID copied to clipboard!', 'success');
+        }).catch(() => {
+            // Fallback
+            document.getElementById('displayUserId').select?.();
+        });
     };
     
     window.resendVerificationEmail = async function() {
@@ -348,22 +673,22 @@
             try {
                 await window.sendEmailVerification(createdUser);
                 showLoading(false);
-                alert('Verification email resent! Please check your inbox.');
+                showAlert('✅ Verification email resent! Please check your inbox.', 'success');
             } catch (error) {
                 showLoading(false);
-                alert('Failed to resend email. Please try again later.');
+                showAlert('❌ Failed to resend email. Please try again later.', 'error');
             }
         }
     };
     
-    // Initialize international phone input
+    // ===== INITIALIZE PHONE INPUT =====
     document.addEventListener('DOMContentLoaded', function() {
         const phoneInput = document.querySelector('#mobile');
         if (phoneInput && typeof intlTelInput !== 'undefined') {
             iti = window.intlTelInput(phoneInput, {
-                initialCountry: "bd",
+                initialCountry: "in",
                 separateDialCode: true,
-                preferredCountries: ["bd", "us", "gb", "in", "ae", "sa", "my", "sg"],
+                preferredCountries: ["in", "us", "gb", "ae", "sa", "my", "sg", "bd"],
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
             });
         }
@@ -373,7 +698,7 @@
         checkPasswordStrength(e.target.value);
     });
     
-    // Check if email already exists before registration
+    // ===== CHECK EMAIL EXISTS =====
     async function checkEmailExists(email) {
         try {
             const methods = await window.fetchSignInMethodsForEmail(window.auth, email);
@@ -384,6 +709,7 @@
         }
     }
     
+    // ===== HANDLE REGISTER =====
     window.handleRegister = async function() {
         const firstName = document.getElementById('firstName').value.trim();
         const lastName = document.getElementById('lastName').value.trim();
@@ -454,11 +780,11 @@
             
             await window.updateProfile(user, { displayName: fullName });
             
-            // Send email verification - THIS IS THE KEY PART
+            // Send email verification
             await window.sendEmailVerification(user);
             console.log("✅ Verification email sent to:", email);
             
-            // Try to save to database
+            // Save to database
             try {
                 await window.set(window.ref(window.db, `users/${user.uid}`), {
                     userId: tempUserId,
@@ -493,11 +819,17 @@
                 message = 'Password is too weak';
             } else if (error.code === 'auth/network-request-failed') {
                 message = 'Network error. Please check your connection.';
+            } else {
+                message = error.message || 'Registration failed. Please try again.';
             }
-            showAlert(message, 'error');
+            showAlert('❌ ' + message, 'error');
             console.error("Registration error:", error);
         }
     };
+    
+    // ===== LOAD BRANDING & LOGO =====
+    loadBranding();
+    loadCompanyLogo();
 </script>
 </body>
 </html>
