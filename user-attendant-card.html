@@ -408,10 +408,137 @@
         }
         .btn-download:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(34,197,94,0.4); }
         
+        /* ===== SHARE LINK SECTION ===== */
+        .share-link-section {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-top: 28px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(245,158,11,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .share-link-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .share-link-header i {
+            font-size: 1.1rem;
+            color: #f59e0b;
+            background: #fef3c7;
+            padding: 6px 8px;
+            border-radius: 10px;
+        }
+        .share-link-header h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .share-link-header span {
+            margin-left: auto;
+            font-size: 0.6rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .share-link-box {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .share-link-box:focus-within {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.15);
+        }
+        .share-link-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            outline: none;
+            min-width: 0;
+        }
+        .share-link-box input::placeholder {
+            color: #94a3b8;
+        }
+        .share-link-box .copy-btn {
+            background: #f59e0b;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .share-link-box .copy-btn:hover {
+            background: #d97706;
+        }
+        .share-link-box .copy-btn.copied {
+            background: #22c55e;
+        }
+        .share-link-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .share-link-actions button {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .share-link-actions .whatsapp-btn {
+            background: #25D366;
+            color: white;
+        }
+        .share-link-actions .whatsapp-btn:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+        }
+        .share-link-actions .email-btn {
+            background: #ea4335;
+            color: white;
+        }
+        .share-link-actions .email-btn:hover {
+            background: #d33426;
+            transform: translateY(-2px);
+        }
+        .share-link-actions .native-share-btn {
+            background: #3b82f6;
+            color: white;
+        }
+        .share-link-actions .native-share-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
         .banner-section {
             position: relative;
+            margin-top: 28px;
             margin-bottom: 24px;
-            margin-top: 24px;
             border-radius: 24px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
@@ -551,6 +678,11 @@
             .card-footer .btn { padding: 10px 12px; font-size: 0.7rem; min-width: 80px; }
             .toast-message { white-space: normal; text-align: center; max-width: 85%; }
             .pdf-viewer-body iframe { height: 300px; }
+            .share-link-section { padding: 16px 18px; margin-top: 20px; margin-bottom: 20px; }
+            .share-link-box input { font-size: 0.65rem; padding: 10px 12px; }
+            .share-link-box .copy-btn { padding: 8px 14px; font-size: 0.65rem; }
+            .share-link-actions button { font-size: 0.7rem; padding: 8px 12px; }
+            .banner-section { margin-top: 20px; }
         }
     </style>
 </head>
@@ -639,6 +771,24 @@
         <div class="no-result">
             <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
             <p style="margin-top: 15px;">Loading...</p>
+        </div>
+    </div>
+    
+    <!-- ===== SHARE LINK SECTION ===== -->
+    <div class="share-link-section" id="shareLinkSection">
+        <div class="share-link-header">
+            <i class="fas fa-link"></i>
+            <h4>Share This Card</h4>
+            <span><i class="fas fa-globe"></i> Public Link</span>
+        </div>
+        <div class="share-link-box">
+            <input type="text" id="shareLinkInput" readonly placeholder="Loading link..." value="https://sp-contraction-dot-com.github.io/sp-contraction-dot-com/user-attendant-card.html">
+            <button class="copy-btn" id="copyLinkBtn"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+        <div class="share-link-actions">
+            <button class="whatsapp-btn" id="whatsappShareBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button class="email-btn" id="emailShareBtn"><i class="fas fa-envelope"></i> Email</button>
+            <button class="native-share-btn" id="nativeShareBtn"><i class="fas fa-share-alt"></i> Share</button>
         </div>
     </div>
     
@@ -827,10 +977,8 @@
             const cardX = (210 - imgWidth) / 2;
             const cardY = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
             
-            // Add card content
             pdf.addImage(imgData, 'PNG', cardX, cardY, imgWidth, imgHeight);
             
-            // Add watermark (if available) - CENTER OF CARD
             if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
                 try {
                     const wmWidth = imgWidth * 0.45;
@@ -843,7 +991,6 @@
                 } catch(e) { console.warn("Watermark error:", e); }
             }
             
-            // Add logo at top
             if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
                 try { pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); } catch(e) {}
             }
@@ -929,7 +1076,6 @@
                 showToast('✅ Shared successfully!');
                 closePdfViewer();
             } else {
-                // Fallback: download
                 const link = document.createElement('a');
                 link.href = pdfDataUrl;
                 link.download = `${employeeName}_attencard.pdf`;
@@ -1154,13 +1300,11 @@
         `;
         container.innerHTML = html;
         
-        // ===== PREVIEW BUTTON =====
         document.getElementById('previewPdfBtn').addEventListener('click', async () => {
             const cardElement = document.getElementById('mainCard');
             await showPdfViewer(cardElement, userInfo.name, userInfo.id);
         });
         
-        // ===== SHARE BUTTON =====
         document.getElementById('sharePdfBtn').addEventListener('click', async () => {
             const cardElement = document.getElementById('mainCard');
             showToast('📄 Generating PDF for sharing...');
@@ -1172,7 +1316,6 @@
             }
         });
         
-        // ===== DOWNLOAD BUTTON =====
         document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
             const cardElement = document.getElementById('mainCard');
             showToast('📄 Generating PDF for download...');
@@ -1181,6 +1324,79 @@
                 savePdfToDevice(pdfDataUrl, userInfo.name, userInfo.id);
             } else {
                 showToast('❌ Failed to generate PDF', true);
+            }
+        });
+    }
+    
+    // ===== SHARE LINK FUNCTIONS =====
+    function getShareableLink() {
+        // Your website link
+        return 'https://sp-contraction-dot-com.github.io/sp-contraction-dot-com/user-attendant-card.html';
+    }
+    
+    function setupShareLink() {
+        const linkInput = document.getElementById('shareLinkInput');
+        const copyBtn = document.getElementById('copyLinkBtn');
+        const shareableUrl = getShareableLink();
+        linkInput.value = shareableUrl;
+        
+        // Copy functionality
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(shareableUrl);
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.classList.add('copied');
+                showToast('✅ Link copied to clipboard!');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2500);
+            } catch (err) {
+                linkInput.select();
+                document.execCommand('copy');
+                showToast('✅ Link copied!');
+            }
+        });
+        
+        // WhatsApp Share
+        document.getElementById('whatsappShareBtn').addEventListener('click', () => {
+            const text = `🏗️ SP Construction - Attendance Card\n\nCheck your attendance card here:\n${shareableUrl}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl, '_blank');
+        });
+        
+        // Email Share
+        document.getElementById('emailShareBtn').addEventListener('click', () => {
+            const subject = 'SP Construction - Attendance Card';
+            const body = `Check your attendance card here:\n\n${shareableUrl}`;
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoUrl, '_blank');
+        });
+        
+        // Native Share
+        document.getElementById('nativeShareBtn').addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'SP Construction - Attendance Card',
+                        text: 'Check your attendance card here:',
+                        url: shareableUrl
+                    });
+                    showToast('✅ Shared successfully!');
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        showToast('❌ Share failed', true);
+                    }
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(shareableUrl);
+                    showToast('✅ Link copied! Share it manually.');
+                } catch {
+                    linkInput.select();
+                    document.execCommand('copy');
+                    showToast('✅ Link copied!');
+                }
             }
         });
     }
@@ -1268,6 +1484,7 @@
             mobile: userMobile,
             email: userEmail
         }, userProfilePic, companyLogoBase64);
+        setupShareLink();
         listenForUpdates();
         showLoading(false);
     });
