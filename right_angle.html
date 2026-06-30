@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Right Triangle Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+            background: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 12px;
+            overflow-y: auto;
+        }
+        .card {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 18px 16px 24px;
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            margin: 10px auto;
+            max-height: 98vh;
+            overflow-y: auto;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        h1 {
+            text-align: center;
+            color: #0b3b5c;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin: 0 0 2px 0;
+            border-bottom: 3px solid #2a9d8f;
+            padding-bottom: 6px;
+        }
+        .sub-head {
+            text-align: center;
+            color: #2a5f7a;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .triangle-diagram {
+            text-align: center;
+            margin: 2px 0 10px;
+            background: #f7fbfc;
+            border-radius: 18px;
+            padding: 6px 2px;
+            transition: all 0.3s ease;
+        }
+        .triangle-diagram svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0 12px;
+        }
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px 10px;
+            background: #f8fafc;
+            padding: 5px 12px 5px 16px;
+            border-radius: 40px;
+            border: 1px solid #dce5ed;
+            transition: all 0.3s ease;
+        }
+        .input-row:focus-within {
+            border-color: #2a9d8f;
+            box-shadow: 0 0 0 3px rgba(42,157,143,0.15);
+        }
+        .input-row label {
+            font-weight: 700;
+            color: #1e3b4f;
+            min-width: 24px;
+            font-size: 1.05rem;
+        }
+        .input-row input {
+            flex: 1;
+            min-width: 60px;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            background: white;
+            outline: none;
+            transition: 0.3s ease;
+        }
+        .input-row input:focus {
+            border-color: #2a9d8f;
+            box-shadow: 0 0 0 3px rgba(42,157,143,0.25);
+        }
+        .input-row span {
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 4px 0 10px;
+        }
+        .button-group button {
+            background: #2a9d8f;
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1 1 auto;
+            min-width: 90px;
+            box-shadow: 0 4px 10px rgba(42,157,143,0.3);
+        }
+        .button-group button:hover {
+            background: #21867a;
+            transform: scale(1.04) translateY(-2px);
+            box-shadow: 0 8px 20px rgba(42,157,143,0.4);
+        }
+        .button-group button.clear-btn {
+            background: #e2e8f0;
+            color: #1e3b4f;
+            box-shadow: none;
+        }
+        .button-group button.clear-btn:hover {
+            background: #cbd5e1;
+        }
+        .result-box {
+            background: #eef6f9;
+            border-radius: 18px;
+            padding: 12px 14px;
+            margin-top: 10px;
+            border-left: 5px solid #2a9d8f;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        .result-box p {
+            margin: 3px 0;
+            font-size: 0.92rem;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #bdd3df;
+            padding: 3px 0;
+        }
+        .result-box p:last-child {
+            border-bottom: none;
+        }
+        .result-box .label {
+            font-weight: 600;
+            color: #1a3a4b;
+        }
+        .result-box .value {
+            font-weight: 700;
+            color: #0b4f44;
+            transition: all 0.4s ease;
+        }
+        .result-box .value.pop {
+            animation: popValue 0.4s ease;
+        }
+        @keyframes popValue {
+            0% { transform: scale(0.8); opacity: 0.3; }
+            50% { transform: scale(1.2); color: #e76f51; }
+            100% { transform: scale(1); opacity: 1; color: #0b4f44; }
+        }
+
+        .history-section {
+            margin-top: 16px;
+            border-top: 2px solid #dce5ed;
+            padding-top: 14px;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-header h3 {
+            color: #0b3b5c;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .history-header .badge {
+            background: #2a9d8f;
+            color: white;
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .history-header .clear-history-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .history-header .clear-history-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        .history-list {
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .history-item {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e8edf2;
+            animation: fadeInUp 0.3s ease;
+            transition: all 0.3s ease;
+        }
+        .history-item:hover {
+            background: #f0f4f8;
+            transform: translateX(4px);
+        }
+        .history-item .data {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            font-size: 0.82rem;
+        }
+        .history-item .data span {
+            font-weight: 600;
+            color: #1a3a4b;
+        }
+        .history-item .data .val {
+            color: #0b4f44;
+            font-weight: 700;
+        }
+        .history-item .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            transition: 0.3s ease;
+        }
+        .history-item .delete-btn:hover {
+            background: #fde8e5;
+            transform: scale(1.2);
+        }
+        .empty-history {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            padding: 20px 0;
+        }
+        .note {
+            font-size: 0.78rem;
+            color: #3d5a6d;
+            background: #f1f9fa;
+            padding: 8px 12px;
+            border-radius: 30px;
+            margin-top: 10px;
+            text-align: center;
+            border: 1px solid #d4e8ed;
+        }
+        .error-msg {
+            color: #c0392b;
+            background: #fde8e5;
+            padding: 6px 12px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 600;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        @media (max-width: 480px) {
+            .card { padding: 12px 8px 16px; max-height: 97vh; }
+            h1 { font-size: 1.1rem; }
+            .input-row { padding: 4px 8px 4px 12px; }
+            .input-row input { min-width: 50px; padding: 6px 8px; font-size: 0.85rem; }
+            .button-group button { padding: 8px 12px; font-size: 0.8rem; min-width: 65px; }
+            .result-box p { font-size: 0.8rem; }
+            .history-item .data { font-size: 0.7rem; gap: 4px 8px; }
+            .history-item { padding: 6px 10px; flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="app">
+    <h1>📐 Right Triangle</h1>
+    <div class="sub-head">Calculate sides & angles</div>
+
+    <!-- Diagram -->
+    <div class="triangle-diagram">
+        <svg width="300" height="200" viewBox="0 0 300 200">
+            <polygon points="30,165 250,165 30,30" fill="#d4edf0" stroke="#0b3b5c" stroke-width="2.5" />
+            <rect x="26" y="161" width="10" height="10" fill="#2a9d8f" stroke="#0b3b5c" stroke-width="1.5" />
+            
+            <line x1="30" y1="30" x2="30" y2="165" stroke="#e76f51" stroke-width="3" />
+            <text x="38" y="102" font-size="14" fill="#e76f51" font-weight="700">
+                a=<tspan id="svgA">?</tspan>
+            </text>
+            
+            <line x1="30" y1="165" x2="250" y2="165" stroke="#2a9d8f" stroke-width="3" />
+            <text x="140" y="159" font-size="14" fill="#2a9d8f" font-weight="700" text-anchor="middle">
+                b=<tspan id="svgB">?</tspan>
+            </text>
+            
+            <line x1="30" y1="30" x2="250" y2="165" stroke="#8e44ad" stroke-width="3" />
+            <text x="130" y="86" font-size="14" fill="#8e44ad" font-weight="700" transform="rotate(33,130,86)" text-anchor="middle">
+                c=<tspan id="svgC">?</tspan>
+            </text>
+            
+            <path d="M 46,151 A 16,16 0 0,1 58,139" fill="none" stroke="#2a9d8f" stroke-width="2" />
+            <text x="50" y="143" font-size="12" fill="#2a9d8f" font-weight="bold">
+                α=<tspan id="svgAngleA">?</tspan>
+            </text>
+            
+            <path d="M 234,151 A 16,16 0 0,0 222,139" fill="none" stroke="#2a9d8f" stroke-width="2" />
+            <text x="212" y="175" font-size="12" fill="#2a9d8f" font-weight="bold">
+                β=<tspan id="svgAngleB">?</tspan>
+            </text>
+            
+            <text x="14" y="24" font-size="14" fill="#0b3b5c" font-weight="bold">A</text>
+            <text x="252" y="170" font-size="14" fill="#0b3b5c" font-weight="bold">B</text>
+            <text x="14" y="180" font-size="14" fill="#0b3b5c" font-weight="bold">C</text>
+        </svg>
+    </div>
+
+    <!-- Input Fields -->
+    <div class="input-group">
+        <div class="input-row">
+            <label>a</label>
+            <input type="number" id="sideA" step="any" placeholder="Height" />
+            <span>unit</span>
+        </div>
+        <div class="input-row">
+            <label>b</label>
+            <input type="number" id="sideB" step="any" placeholder="Base" />
+            <span>unit</span>
+        </div>
+        <div class="input-row">
+            <label>c</label>
+            <input type="number" id="sideC" step="any" placeholder="Hypotenuse" />
+            <span>unit</span>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group">
+        <button id="calcBtn">Calculate</button>
+        <button id="clearBtn" class="clear-btn">Clear All</button>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="result-box">
+        <p><span class="label">✅ Height (a)</span> <span class="value" id="outA">—</span></p>
+        <p><span class="label">✅ Base (b)</span> <span class="value" id="outB">—</span></p>
+        <p><span class="label">✅ Hypotenuse (c)</span> <span class="value" id="outC">—</span></p>
+        <p><span class="label">📐 Angle α (A)</span> <span class="value" id="outAngleA">—</span></p>
+        <p><span class="label">📐 Angle β (B)</span> <span class="value" id="outAngleB">—</span></p>
+        <p><span class="label">📐 Angle C</span> <span class="value">90°</span></p>
+    </div>
+
+    <div id="errorDisplay" class="error-msg" style="display:none;"></div>
+
+    <!-- History Section -->
+    <div class="history-section">
+        <div class="history-header">
+            <h3>📜 History <span class="badge" id="historyCount">0</span></h3>
+            <button class="clear-history-btn" id="clearHistoryBtn">🗑️ Clear All</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <div class="empty-history">📭 No data saved yet</div>
+        </div>
+    </div>
+
+    <div class="note">
+        ⚡ Enter any <strong>two</strong> values (a,b or a,c or b,c) — the rest will be calculated.
+    </div>
+</div>
+
+<script>
+    (function() {
+        const inputA = document.getElementById('sideA');
+        const inputB = document.getElementById('sideB');
+        const inputC = document.getElementById('sideC');
+
+        const outA = document.getElementById('outA');
+        const outB = document.getElementById('outB');
+        const outC = document.getElementById('outC');
+        const outAngleA = document.getElementById('outAngleA');
+        const outAngleB = document.getElementById('outAngleB');
+
+        const svgA = document.getElementById('svgA');
+        const svgB = document.getElementById('svgB');
+        const svgC = document.getElementById('svgC');
+        const svgAngleA = document.getElementById('svgAngleA');
+        const svgAngleB = document.getElementById('svgAngleB');
+
+        const errorDiv = document.getElementById('errorDisplay');
+        const historyList = document.getElementById('historyList');
+        const historyCount = document.getElementById('historyCount');
+
+        const STORAGE_KEY = 'right_triangle_history';
+
+        function toDegrees(rad) {
+            return rad * (180 / Math.PI);
+        }
+
+        // ===== History Functions =====
+        function getHistory() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    if (Array.isArray(data)) return data;
+                }
+            } catch (e) {
+                console.warn('History load failed:', e);
+            }
+            return [];
+        }
+
+        function saveHistory(history) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+            } catch (e) {
+                console.warn('History save failed:', e);
+            }
+        }
+
+        function addToHistory(entry) {
+            const history = getHistory();
+            history.unshift({
+                ...entry,
+                id: Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                timestamp: new Date().toLocaleString('en-US')
+            });
+            if (history.length > 50) {
+                history.length = 50;
+            }
+            saveHistory(history);
+            renderHistory();
+        }
+
+        function deleteHistoryItem(id) {
+            let history = getHistory();
+            history = history.filter(item => item.id !== id);
+            saveHistory(history);
+            renderHistory();
+        }
+
+        function clearAllHistory() {
+            if (confirm('Delete all history?')) {
+                saveHistory([]);
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            historyCount.textContent = history.length;
+
+            if (history.length === 0) {
+                historyList.innerHTML = `<div class="empty-history">📭 No data saved yet</div>`;
+                return;
+            }
+
+            let html = '';
+            history.forEach((item, index) => {
+                html += `
+                    <div class="history-item">
+                        <div class="data">
+                            <span>#${index + 1}</span>
+                            <span>a: <span class="val">${item.a ? item.a.toFixed(2) : '—'}</span></span>
+                            <span>b: <span class="val">${item.b ? item.b.toFixed(2) : '—'}</span></span>
+                            <span>c: <span class="val">${item.c ? item.c.toFixed(2) : '—'}</span></span>
+                            <span>α: <span class="val">${item.angleA ? item.angleA.toFixed(1) + '°' : '—'}</span></span>
+                            <span>β: <span class="val">${item.angleB ? item.angleB.toFixed(1) + '°' : '—'}</span></span>
+                            <span style="color:#94a3b8;font-weight:400;font-size:0.7rem;">${item.timestamp || ''}</span>
+                        </div>
+                        <button class="delete-btn" data-id="${item.id}" title="Delete">✕</button>
+                    </div>
+                `;
+            });
+            historyList.innerHTML = html;
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteHistoryItem(id);
+                });
+            });
+        }
+
+        // ===== Animation =====
+        function animateValue(element) {
+            element.classList.remove('pop');
+            void element.offsetWidth;
+            element.classList.add('pop');
+        }
+
+        // ===== SVG Update =====
+        function updateSVG(a, b, c, angleA, angleB) {
+            svgA.textContent = a !== null && a !== undefined ? a.toFixed(2) : '?';
+            svgB.textContent = b !== null && b !== undefined ? b.toFixed(2) : '?';
+            svgC.textContent = c !== null && c !== undefined ? c.toFixed(2) : '?';
+            svgAngleA.textContent = angleA !== null && angleA !== undefined ? angleA.toFixed(1) + '°' : '?';
+            svgAngleB.textContent = angleB !== null && angleB !== undefined ? angleB.toFixed(1) + '°' : '?';
+        }
+
+        function resetSVG() {
+            svgA.textContent = '?';
+            svgB.textContent = '?';
+            svgC.textContent = '?';
+            svgAngleA.textContent = '?';
+            svgAngleB.textContent = '?';
+        }
+
+        // ===== Calculate =====
+        function calculate() {
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+
+            const a = parseFloat(inputA.value);
+            const b = parseFloat(inputB.value);
+            const c = parseFloat(inputC.value);
+
+            const hasA = !isNaN(a) && a > 0;
+            const hasB = !isNaN(b) && b > 0;
+            const hasC = !isNaN(c) && c > 0;
+
+            const count = (hasA ? 1 : 0) + (hasB ? 1 : 0) + (hasC ? 1 : 0);
+
+            if (count < 2) {
+                errorDiv.textContent = '⚠️ Please enter at least two side values (a,b or a,c or b,c)';
+                errorDiv.style.display = 'block';
+                ['outA','outB','outC','outAngleA','outAngleB'].forEach(id => {
+                    document.getElementById(id).textContent = '—';
+                });
+                resetSVG();
+                return;
+            }
+
+            let result = { a: null, b: null, c: null };
+
+            if (hasA && hasB && !hasC) {
+                result.a = a;
+                result.b = b;
+                result.c = Math.sqrt(a * a + b * b);
+            }
+            else if (hasA && hasC && !hasB) {
+                if (c <= a) {
+                    errorDiv.textContent = '⚠️ Hypotenuse (c) must be greater than height (a)';
+                    errorDiv.style.display = 'block';
+                    resetSVG();
+                    return;
+                }
+                result.a = a;
+                result.c = c;
+                result.b = Math.sqrt(c * c - a * a);
+            }
+            else if (hasB && hasC && !hasA) {
+                if (c <= b) {
+                    errorDiv.textContent = '⚠️ Hypotenuse (c) must be greater than base (b)';
+                    errorDiv.style.display = 'block';
+                    resetSVG();
+                    return;
+                }
+                result.b = b;
+                result.c = c;
+                result.a = Math.sqrt(c * c - b * b);
+            }
+            else if (hasA && hasB && hasC) {
+                const lhs = a * a + b * b;
+                const rhs = c * c;
+                if (Math.abs(lhs - rhs) > 0.001) {
+                    errorDiv.textContent = '⚠️ Values do not satisfy Pythagorean theorem (a²+b²≠c²). Calculation continues.';
+                    errorDiv.style.display = 'block';
+                }
+                result.a = a;
+                result.b = b;
+                result.c = c;
+            }
+            else {
+                errorDiv.textContent = '⚠️ Please check input. Enter positive numbers only.';
+                errorDiv.style.display = 'block';
+                resetSVG();
+                return;
+            }
+
+            if (result.a <= 0 || result.b <= 0 || result.c <= 0) {
+                errorDiv.textContent = '⚠️ All side values must be positive';
+                errorDiv.style.display = 'block';
+                resetSVG();
+                return;
+            }
+
+            const angleARad = Math.asin(Math.min(result.a / result.c, 1));
+            const angleBRad = Math.asin(Math.min(result.b / result.c, 1));
+            const angleADeg = toDegrees(angleARad);
+            const angleBDeg = toDegrees(angleBRad);
+
+            outA.textContent = result.a.toFixed(2);
+            outB.textContent = result.b.toFixed(2);
+            outC.textContent = result.c.toFixed(2);
+            outAngleA.textContent = angleADeg.toFixed(2) + '°';
+            outAngleB.textContent = angleBDeg.toFixed(2) + '°';
+
+            animateValue(outA);
+            animateValue(outB);
+            animateValue(outC);
+            animateValue(outAngleA);
+            animateValue(outAngleB);
+
+            inputA.value = result.a.toFixed(2);
+            inputB.value = result.b.toFixed(2);
+            inputC.value = result.c.toFixed(2);
+
+            updateSVG(result.a, result.b, result.c, angleADeg, angleBDeg);
+
+            addToHistory({
+                a: result.a,
+                b: result.b,
+                c: result.c,
+                angleA: angleADeg,
+                angleB: angleBDeg
+            });
+        }
+
+        function clearAll() {
+            inputA.value = '';
+            inputB.value = '';
+            inputC.value = '';
+            outA.textContent = '—';
+            outB.textContent = '—';
+            outC.textContent = '—';
+            outAngleA.textContent = '—';
+            outAngleB.textContent = '—';
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            resetSVG();
+        }
+
+        // ===== Event Listeners =====
+        document.getElementById('calcBtn').addEventListener('click', calculate);
+        document.getElementById('clearBtn').addEventListener('click', clearAll);
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearAllHistory);
+
+        document.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') calculate();
+            });
+        });
+
+        // ===== Page Load =====
+        window.addEventListener('load', function() {
+            renderHistory();
+            inputA.value = 3;
+            inputB.value = 4;
+            calculate();
+        });
+    })();
+</script>
+
+</body>
+</html>
