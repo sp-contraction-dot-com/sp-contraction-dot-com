@@ -3,35 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>SP Construction | Employee Portal</title>
+    <title>SP Construction | Premium Contractor App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Firebase SDKs -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="module">
+        import { firebaseConfig } from './admin/js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
+        import { getDatabase, ref, get, onValue, set, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
         
+        // Make Firebase services available globally
         window.auth = auth;
         window.db = database;
         window.signOut = signOut;
         window.ref = ref;
         window.get = get;
         window.set = set;
+        window.onValue = onValue;
+        window.update = update;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
@@ -568,6 +561,9 @@
     <div class="menu-item" onclick="loadPageInIframe('work_calendar.html'); closeLeftMenu();">
         <i class="fas fa-calendar-alt"></i> <span>Work Calendar</span>
     </div>
+    <div class="menu-item" onclick="loadPageInIframe('right_angle.html'); closeLeftMenu();">
+    <i class="fas fa-draw-polygon"></i> <span>Right Angle Calculator</span>
+</div>
 </div>
 
 <!-- RIGHT SIDE MENU (Profile & Account) -->
