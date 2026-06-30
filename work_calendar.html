@@ -7,20 +7,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="module">
+        import { firebaseConfig } from './admin/js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -407,10 +397,11 @@
         .modal-card {
             background: white;
             border-radius: 28px;
-            max-width: 380px;
+            max-width: 400px;
             width: 90%;
-            padding: 24px;
+            padding: 28px 24px;
             animation: fadeUp 0.2s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -424,23 +415,58 @@
             border-bottom: 2px solid #fef3c7;
             padding-bottom: 10px;
         }
-        .modal-header h3 { font-size: 1.2rem; font-weight: 800; color: #f59e0b; }
+        .modal-header h3 { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            color: #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .close-modal {
             background: none;
             border: none;
             font-size: 1.2rem;
             cursor: pointer;
             color: #94a3b8;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.2s;
         }
+        .close-modal:hover { background: #f1f5f9; }
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f0f2f5;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
-        .detail-label { font-weight: 600; color: #475569; }
-        .detail-value { font-weight: 700; color: #1e293b; }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label { 
+            font-weight: 600; 
+            color: #475569; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .detail-label i { color: #f59e0b; width: 18px; }
+        .detail-value { 
+            font-weight: 700; 
+            color: #1e293b;
+            text-align: right;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-present { background: #dcfce7; color: #15803d; }
+        .status-halfday { background: #fef3c7; color: #d97706; }
+        .status-absent { background: #fee2e2; color: #b91c1c; }
         
         .loading {
             display: none;
@@ -478,6 +504,8 @@
             .hero-text h2 { font-size: 1rem; }
             .month-selector span { min-width: 110px; font-size: 0.8rem; }
             .month-selector button { padding: 4px 10px; }
+            .modal-card { padding: 20px 16px; }
+            .detail-row { font-size: 0.8rem; padding: 8px 0; }
         }
     </style>
 </head>
@@ -491,8 +519,8 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1>SP CONSTRUCTION</h1>
-                <p>EMPLOYEE PORTAL</p>
+                <h1 id="brandTitle">SP CONSTRUCTION</h1>
+                <p id="brandSubtitle">EMPLOYEE PORTAL</p>
             </div>
         </div>
         <div class="user-info-section">
@@ -500,7 +528,6 @@
                 <i class="fas fa-user-circle"></i>
                 <span id="userNameDisplay">Loading...</span>
             </div>
-            <!-- FIXED: Back button now uses parent navigation instead of reloading index.html inside iframe -->
             <button class="back-btn" onclick="goBackToDashboard()">
                 <i class="fas fa-arrow-left"></i> Back
             </button>
@@ -613,46 +640,19 @@
 </div>
 
 <script type="module">
-    let currentUserData = null;
-    let attendanceRecords = [];
-    let currentDateObj = new Date();
-    let currentYear = currentDateObj.getFullYear();
-    let currentMonth = currentDateObj.getMonth();
-    
-    function formatIndianNumber(num) {
-        if (num === null || num === undefined || isNaN(num)) return '0';
-        let n = Math.round(parseFloat(num));
-        if (n < 1000) return n.toString();
-        let str = n.toString();
-        let lastThree = str.slice(-3);
-        let other = str.slice(0, -3);
-        if (other !== '') lastThree = ',' + lastThree;
-        let result = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-        return result;
-    }
-    
-    function showLoading(show) {
-        document.getElementById('loading').classList.toggle('show', show);
-    }
-    
-    // Go back function - checks if in iframe and navigates parent
-    window.goBackToDashboard = function() {
-        // Check if we are inside an iframe
-        if (window.self !== window.top) {
-            // We are in an iframe - communicate with parent to load dashboard
-            if (window.parent && window.parent.loadPageInIframe) {
-                window.parent.loadPageInIframe('dashboard.html');
-            } else {
-                // Fallback: redirect top window
-                window.top.location.href = 'index.html';
+    // ===== LOAD BRANDING =====
+    async function loadBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(window.db, 'companyAssets/branding'));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                document.getElementById('brandTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('brandSubtitle').textContent = brand.subtitle || 'EMPLOYEE PORTAL';
             }
-        } else {
-            // Not in iframe, just go to index
-            window.location.href = 'index.html';
-        }
-    };
+        } catch(e) { console.warn("Error loading branding:", e); }
+    }
     
-    // Load Company Logo
+    // ===== LOAD LOGO =====
     async function loadCompanyLogo() {
         try {
             const logoRef = window.ref(window.db, 'companyAssets/footerLogo');
@@ -663,7 +663,7 @@
         } catch(e) { console.warn("Error loading logo:", e); }
     }
     
-    // Load Banner
+    // ===== LOAD BANNER =====
     async function loadBannerImage() {
         try {
             const bannersRef = window.ref(window.db, 'companyAssets/banners');
@@ -688,6 +688,40 @@
             if (placeholder) placeholder.style.display = 'flex';
         } catch(e) { console.warn("Error loading banner:", e); }
     }
+    
+    let currentUserData = null;
+    let attendanceRecords = [];
+    let currentDateObj = new Date();
+    let currentYear = currentDateObj.getFullYear();
+    let currentMonth = currentDateObj.getMonth();
+    
+    function formatIndianNumber(num) {
+        if (num === null || num === undefined || isNaN(num)) return '0';
+        let n = Math.round(parseFloat(num));
+        if (n < 1000) return n.toString();
+        let str = n.toString();
+        let lastThree = str.slice(-3);
+        let other = str.slice(0, -3);
+        if (other !== '') lastThree = ',' + lastThree;
+        let result = other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return result;
+    }
+    
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('show', show);
+    }
+    
+    window.goBackToDashboard = function() {
+        if (window.self !== window.top) {
+            if (window.parent && window.parent.loadPageInIframe) {
+                window.parent.loadPageInIframe('dashboard.html');
+            } else {
+                window.top.location.href = 'index.html';
+            }
+        } else {
+            window.location.href = 'index.html';
+        }
+    };
     
     async function loadCurrentUser(user) {
         if (!user) return null;
@@ -727,11 +761,10 @@
             attendanceRecords = [];
             if (snapshot.exists()) {
                 const allData = snapshot.val();
+                const workerId = currentUserData.userId || currentUserData.uid;
                 for (let key in allData) {
                     const record = allData[key];
-                    if (record.workerId === currentUserData.userId || 
-                        record.workerId === currentUserData.uid ||
-                        (currentUserData.userId && record.workerId === currentUserData.userId)) {
+                    if (record.workerId === workerId || record.userId === workerId) {
                         attendanceRecords.push(record);
                     }
                 }
@@ -748,13 +781,11 @@
         return attendanceRecords.find(r => r.date === dateStr);
     }
     
-    // Check if date is today
     function checkIsToday(year, month, day) {
         const today = new Date();
         return year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
     }
     
-    // Check if date is in the future
     function checkIsFuture(year, month, day) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -771,7 +802,6 @@
         const calendarGrid = document.getElementById('calendarGrid');
         calendarGrid.innerHTML = '';
         
-        // Empty cells for days before month start
         for (let i = 0; i < startDayOfWeek; i++) {
             const emptyDiv = document.createElement('div');
             emptyDiv.className = 'cal-day empty';
@@ -788,35 +818,29 @@
             const dayDiv = document.createElement('div');
             let baseClass = 'cal-day';
             
-            // Color Logic
             if (isToday) {
-                // TODAY - White background with orange border
                 baseClass += ' today-day';
             } 
             else if (record) {
-                // Has record - check status and due
                 const due = (record.earnings || 0) - (record.paid || 0);
-                
-                if (record.status === 'present') {
+                if (record.status === 'present' || record.status === 'Present') {
                     if (due === 0) {
-                        baseClass += ' present-clear';  // GREEN
+                        baseClass += ' present-clear';
                     } else {
-                        baseClass += ' present-due';    // ORANGE
+                        baseClass += ' present-due';
                     }
                 } 
-                else if (record.status === 'halfday') {
-                    baseClass += ' present-due';        // ORANGE
+                else if (record.status === 'halfday' || record.status === 'Half Day') {
+                    baseClass += ' present-due';
                 }
-                else if (record.status === 'absent') {
-                    baseClass += ' absent-day';         // RED
+                else if (record.status === 'absent' || record.status === 'Absent') {
+                    baseClass += ' absent-day';
                 }
             }
             else if (isFuture) {
-                // Future date - default color (no red)
                 baseClass += ' future-day';
             }
             else {
-                // Past date + No Entry = ABSENT (RED)
                 baseClass += ' absent-day';
             }
             
@@ -825,11 +849,7 @@
             
             dayDiv.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (record) {
-                    showDetailModal(record, dateStr);
-                } else {
-                    showDetailModal(null, dateStr);
-                }
+                showDetailModal(record, dateStr);
             });
             
             calendarGrid.appendChild(dayDiv);
@@ -852,11 +872,12 @@
         attendanceRecords.forEach(record => {
             if (record.date && record.date.startsWith(monthStr)) {
                 recordedDates.add(record.date);
-                if (record.status === 'present') {
+                const status = (record.status || '').toLowerCase();
+                if (status === 'present') {
                     presentCount++;
-                } else if (record.status === 'halfday') {
+                } else if (status === 'halfday') {
                     presentCount += 0.5;
-                } else if (record.status === 'absent') {
+                } else if (status === 'absent') {
                     absentCount++;
                 }
                 totalHours += record.hours || 0;
@@ -864,7 +885,6 @@
             }
         });
         
-        // Count past dates with no record as absent (but NOT future dates)
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const isFuture = checkIsFuture(currentYear, currentMonth, day);
@@ -901,10 +921,19 @@
     };
     
     function getStatusText(status) {
-        if (status === 'present') return 'Present';
-        if (status === 'halfday') return 'Half Day';
-        if (status === 'absent') return 'Absent';
+        const s = (status || '').toLowerCase();
+        if (s === 'present') return 'Present';
+        if (s === 'halfday') return 'Half Day';
+        if (s === 'absent') return 'Absent';
         return '—';
+    }
+    
+    function getStatusClass(status) {
+        const s = (status || '').toLowerCase();
+        if (s === 'present') return 'status-present';
+        if (s === 'halfday') return 'status-halfday';
+        if (s === 'absent') return 'status-absent';
+        return '';
     }
     
     function showDetailModal(record, dateStr) {
@@ -913,29 +942,71 @@
         
         if (!record) {
             modalContent.innerHTML = `
-                <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${dateStr}</span></div>
-                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" style="color:#dc2626;">❌ Absent (No Entry)</span></div>
-                <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-value">—</span></div>
-                <div class="detail-row"><span class="detail-label">Earnings</span><span class="detail-value">₹0</span></div>
-                <div class="detail-row"><span class="detail-label">Paid</span><span class="detail-value">₹0</span></div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-calendar-day"></i> Date</span>
+                    <span class="detail-value">${dateStr}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-circle"></i> Status</span>
+                    <span class="detail-value"><span class="status-badge status-absent">❌ Absent (No Entry)</span></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-clock"></i> Hours</span>
+                    <span class="detail-value">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-coins"></i> Earnings</span>
+                    <span class="detail-value">₹0</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-hand-holding-usd"></i> Paid</span>
+                    <span class="detail-value">₹0</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-exclamation-triangle"></i> Due</span>
+                    <span class="detail-value">₹0</span>
+                </div>
             `;
         } else {
             const due = (record.earnings || 0) - (record.paid || 0);
             const dueColor = due < 0 ? '#dc2626' : (due > 0 ? '#d97706' : '#15803d');
-            let statusStyle = '';
-            if (record.status === 'present') statusStyle = 'color:#15803d; background:#22c55e15; padding:4px 12px; border-radius:30px;';
-            else if (record.status === 'halfday') statusStyle = 'color:#d97706; background:#f59e0b15; padding:4px 12px; border-radius:30px;';
-            else if (record.status === 'absent') statusStyle = 'color:#b91c1c; background:#ef444415; padding:4px 12px; border-radius:30px;';
+            const statusText = getStatusText(record.status);
+            const statusClass = getStatusClass(record.status);
+            const dueDisplay = due < 0 ? `-₹${formatIndianNumber(Math.abs(due))}` : `₹${formatIndianNumber(due)}`;
             
             modalContent.innerHTML = `
-                <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${record.date || dateStr}</span></div>
-                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span style="${statusStyle}">${getStatusText(record.status)}</span></span></div>
-                <div class="detail-row"><span class="detail-label">Hours</span><span class="detail-value">${record.hours || 0} hrs</span></div>
-                <div class="detail-row"><span class="detail-label">Rate</span><span class="detail-value">₹${formatIndianNumber(record.rate || 0)}</span></div>
-                <div class="detail-row"><span class="detail-label">Earnings</span><span class="detail-value">₹${formatIndianNumber(record.earnings || 0)}</span></div>
-                <div class="detail-row"><span class="detail-label">Paid</span><span class="detail-value">₹${formatIndianNumber(record.paid || 0)}</span></div>
-                <div class="detail-row"><span class="detail-label">Due</span><span class="detail-value" style="color:${dueColor};">₹${formatIndianNumber(due)}</span></div>
-                <div class="detail-row"><span class="detail-label">Work Desc</span><span class="detail-value">${record.workDesc || '—'}</span></div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-calendar-day"></i> Date</span>
+                    <span class="detail-value">${record.date || dateStr}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-circle"></i> Status</span>
+                    <span class="detail-value"><span class="status-badge ${statusClass}">${statusText}</span></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-clock"></i> Hours</span>
+                    <span class="detail-value">${record.hours || 0} hrs</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-tag"></i> Rate</span>
+                    <span class="detail-value">₹${formatIndianNumber(record.rate || 0)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-coins"></i> Earnings</span>
+                    <span class="detail-value">₹${formatIndianNumber(record.earnings || 0)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-hand-holding-usd"></i> Paid</span>
+                    <span class="detail-value">₹${formatIndianNumber(record.paid || 0)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-exclamation-triangle"></i> Due</span>
+                    <span class="detail-value" style="color:${dueColor}; font-weight:800;">${dueDisplay}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label"><i class="fas fa-briefcase"></i> Work Desc</span>
+                    <span class="detail-value">${record.workDesc || record.description || '—'}</span>
+                </div>
             `;
         }
         modal.classList.add('show');
@@ -948,9 +1019,12 @@
     function listenForUpdates() {
         if (!currentUserData) return;
         const attendanceRef = window.ref(window.db, 'attendance');
-        window.onValue(attendanceRef, async () => { await loadAttendance(); });
+        window.onValue(attendanceRef, async () => { 
+            await loadAttendance(); 
+        });
         window.onValue(window.ref(window.db, 'companyAssets/banners'), () => { loadBannerImage(); });
         window.onValue(window.ref(window.db, 'companyAssets/footerLogo'), () => { loadCompanyLogo(); });
+        window.onValue(window.ref(window.db, 'companyAssets/branding'), () => { loadBranding(); });
     }
     
     window.onAuthStateChanged(window.auth, async (user) => {
@@ -959,6 +1033,7 @@
         } else {
             showLoading(true);
             try {
+                await loadBranding();
                 await loadCompanyLogo();
                 await loadBannerImage();
                 await loadCurrentUser(user);
