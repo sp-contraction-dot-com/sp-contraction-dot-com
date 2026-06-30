@@ -531,8 +531,10 @@
             
             setTimeout(() => {
                 if (isAdmin) {
-                    window.location.href = 'dashboard.html';
+                    // Admin goes to admin dashboard (inside admin folder)
+                    window.location.href = './admin/index.html';
                 } else {
+                    // Normal user goes to user dashboard (root folder)
                     window.location.href = 'index.html';
                 }
             }, 1200);
