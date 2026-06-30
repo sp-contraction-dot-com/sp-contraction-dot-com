@@ -104,15 +104,15 @@
             background: transparent;
         }
 
-        /* ========== Front Page Styles ========== */
+        /* ========== Front Page Styles – matching Back Page text colors ========== */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
             padding: 6px 10px;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 12px;
+            background: transparent !important;
+            border: none !important;
         }
 
         .logo {
@@ -142,26 +142,30 @@
             object-fit: cover;
         }
 
+        /* Front: Title now white, subtitle golden – exactly like back page */
         .logo-text h1 {
             font-size: 15px;
-            background: linear-gradient(120deg, #2563eb, #1e40af);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         .logo-text p {
             font-size: 5.5px;
-            color: #475569;
+            color: #fbbf24;
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         .badge {
-            background: linear-gradient(145deg, #fbbf24, #f59e0b);
+            background: transparent !important;
             padding: 3px 8px;
             border-radius: 30px;
             font-size: 6px;
             font-weight: bold;
-            color: #1e293b;
+            color: #ffffff;
+            border: none;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         .main-row {
@@ -179,7 +183,7 @@
         .photo-box {
             width: 52px;
             height: 60px;
-            background: #e2e8f0;
+            background: transparent !important;
             border-radius: 8px;
             border: 2px solid #fbbf24;
             overflow: hidden;
@@ -192,24 +196,28 @@
 
         .info-col {
             flex: 1;
-            background: rgba(255, 255, 255, 0.85);
+            background: transparent !important;
             padding: 6px 10px;
             border-radius: 12px;
+            border: none !important;
         }
         .name {
             font-size: 9.5px;
             font-weight: 800;
-            color: #0f172a;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         .designation {
-            background: #dbeafe;
-            color: #1e40af;
+            background: transparent !important;
+            color: #ffffff;
             padding: 2px 6px;
             border-radius: 8px;
             font-size: 6px;
             display: inline-block;
             font-weight: 600;
             margin-top: 3px;
+            border: none;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         .info-list {
             margin-top: 5px;
@@ -222,12 +230,14 @@
         .info-label {
             width: 40px;
             font-weight: 700;
-            color: #475569;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         .info-value {
             flex: 1;
             font-weight: 600;
-            color: #0f172a;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         .qrcode-col {
@@ -238,16 +248,16 @@
         }
         .qrcode-box {
             background: white;
-            padding: 5px;
+            padding: 3px;
             border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: inline-block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            line-height: 0;
         }
         #qrcode canvas, #qrcode img {
             width: 55px !important;
             height: 55px !important;
+            display: block;
         }
         .qr-text {
             font-size: 5px;
@@ -263,19 +273,22 @@
         .address-row {
             margin-top: 4px;
             padding: 6px 10px;
-            background: rgba(255, 255, 255, 0.85);
+            background: transparent !important;
             border-radius: 12px;
+            border: none !important;
         }
         .address-label {
             font-size: 5.5px;
             font-weight: 700;
-            color: #475569;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
             margin-bottom: 2px;
         }
         .address-value {
             font-size: 6px;
             font-weight: 500;
-            color: #0f172a;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
             line-height: 1.2;
         }
 
@@ -285,33 +298,39 @@
             align-items: center;
             margin-top: 4px;
             padding: 6px 10px;
-            background: rgba(255, 255, 255, 0.85);
+            background: transparent !important;
             border-radius: 12px;
+            border: none !important;
         }
 
         .sign-area {
             font-family: 'Brush Script MT', cursive;
             font-size: 8px;
-            color: #334155;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         .hologram {
-            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            background: transparent !important;
             padding: 2px 6px;
             border-radius: 20px;
             font-size: 5px;
             font-weight: bold;
+            color: #ffffff;
+            border: none;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
-        /* ========== Back Page Styles ========== */
+        /* ========== Back Page Styles – already perfect ========== */
         .back-top-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
             padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: transparent !important;
             border-radius: 12px;
+            border: none !important;
         }
         
         .back-logo-area {
@@ -347,11 +366,13 @@
             font-size: 10px;
             font-weight: 800;
             color: white;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-company p {
             font-size: 5px;
             color: #fbbf24;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-help {
@@ -363,11 +384,13 @@
             font-weight: 700;
             color: white;
             display: block;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-help small {
             font-size: 5px;
             color: #fbbf24;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-middle-section {
@@ -377,8 +400,9 @@
             gap: 10px;
             margin: 8px 0;
             padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: transparent !important;
             border-radius: 12px;
+            border: none !important;
         }
         
         .barcode-area {
@@ -405,24 +429,28 @@
             border-radius: 8px;
             display: inline-block;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            line-height: 0;
         }
         
         #backQrcode canvas, #backQrcode img {
             width: 40px !important;
             height: 40px !important;
+            display: block;
         }
         
         .back-qr-text {
             font-size: 4px;
             color: #fbbf24;
             margin-top: 2px;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-details {
             margin-bottom: 6px;
             padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: transparent !important;
             border-radius: 12px;
+            border: none !important;
         }
         
         .back-row {
@@ -430,7 +458,7 @@
             justify-content: space-between;
             padding: 2px 0;
             font-size: 6px;
-            border-bottom: 0.5px dashed rgba(255,255,255,0.2);
+            border-bottom: 0.5px dashed rgba(255,255,255,0.15);
         }
         
         .back-row:last-child {
@@ -440,32 +468,37 @@
         .back-label {
             color: #fbbf24;
             font-weight: 700;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-value {
             color: white;
             font-weight: 600;
             font-family: monospace;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-address-section {
             margin-bottom: 6px;
             padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: transparent !important;
             border-radius: 12px;
             text-align: center;
+            border: none !important;
         }
         
         .back-address-section .company-name {
             font-size: 7px;
             font-weight: 800;
             color: #fbbf24;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-address-section .company-address {
             font-size: 5px;
             color: white;
             margin-top: 2px;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-footer {
@@ -473,25 +506,29 @@
             justify-content: space-between;
             align-items: center;
             padding: 6px 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: transparent !important;
             border-radius: 12px;
             margin-top: auto;
+            border: none !important;
         }
         
         .back-auth-signature {
             font-family: 'Brush Script MT', cursive;
             font-size: 8px;
             color: #fbbf24;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-website {
             font-size: 5px;
             color: white;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-valid-date {
             font-size: 5px;
             color: #fbbf24;
+            text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         /* Flip Button - positioned below card */
@@ -587,8 +624,8 @@
                     <div class="logo">
                         <div class="logo-icon" id="companyLogo"><span>🏗️</span></div>
                         <div class="logo-text">
-                            <h1>SP BUILD</h1>
-                            <p>CONSTRUCTION & ENGINEERING</p>
+                            <h1 id="frontBrandTitle">SP BUILD</h1>
+                            <p id="frontBrandSubtitle">CONSTRUCTION & ENGINEERING</p>
                         </div>
                     </div>
                     <div class="badge" id="memberBadge">⭐ PLATINUM</div>
@@ -634,12 +671,12 @@
                     <div class="back-logo-area">
                         <div class="back-logo-icon" id="backCompanyLogo"><span>🏗️</span></div>
                         <div class="back-company">
-                            <h5>SP BUILD</h5>
-                            <p>CONSTRUCTION & ENGINEERING</p>
+                            <h5 id="backBrandTitle">SP BUILD</h5>
+                            <p id="backBrandSubtitle">CONSTRUCTION & ENGINEERING</p>
                         </div>
                     </div>
                     <div class="back-help">
-                        <span><i class="fas fa-phone-alt"></i> 1800-202-4321</span>
+                        <span><i class="fas fa-phone-alt"></i> 98674-78423</span>
                         <small>24/7 Helpline</small>
                     </div>
                 </div>
@@ -699,6 +736,20 @@
     let companyLogoImage = '';
     let cardData = {};
     const COMPANY_ASSETS_PATH = 'companyAssets';
+    
+    // ===== LOAD BRANDING =====
+    async function loadBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                document.getElementById('frontBrandTitle').textContent = brand.title || 'SP BUILD';
+                document.getElementById('frontBrandSubtitle').textContent = brand.subtitle || 'CONSTRUCTION & ENGINEERING';
+                document.getElementById('backBrandTitle').textContent = brand.title || 'SP BUILD';
+                document.getElementById('backBrandSubtitle').textContent = brand.subtitle || 'CONSTRUCTION & ENGINEERING';
+            }
+        } catch(error) { console.error("Branding error:", error); }
+    }
     
     function formatDate(dateStr) {
         if(!dateStr) return 'Not set';
@@ -789,6 +840,7 @@
         currentAuthUser = user;
         
         try {
+            await loadBranding();
             await loadCompanyLogo();
             await loadCardBackgrounds();
             
@@ -919,6 +971,9 @@
         const companyLogoHtml = companyLogoImage ? `<img src="${companyLogoImage}" style="width:100%; height:100%; object-fit:cover;">` : '<span>🏗️</span>';
         const verifyUrl = `https://sp-build-official.web.app/verify.html?id=${cardData.userId}`;
         
+        const brandTitle = document.getElementById('frontBrandTitle')?.textContent || 'SP BUILD';
+        const brandSubtitle = document.getElementById('frontBrandSubtitle')?.textContent || 'CONSTRUCTION & ENGINEERING';
+        
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
@@ -945,60 +1000,63 @@
                         height: 100%;
                         display: flex;
                         flex-direction: column;
+                        background: transparent;
                     }
-                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: rgba(255,255,255,0.85); border-radius: 12px; }
+                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: transparent !important; border: none !important; }
                     .logo { display: flex; align-items: center; gap: 8px; }
                     .logo-icon { width: 36px; height: 36px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                    .logo-text h1 { font-size: 15px; background: linear-gradient(120deg, #2563eb, #1e40af); -webkit-background-clip: text; background-clip: text; color: transparent; }
-                    .logo-text p { font-size: 5.5px; color: #475569; }
-                    .badge { background: linear-gradient(145deg, #fbbf24, #f59e0b); padding: 3px 8px; border-radius: 30px; font-size: 6px; font-weight: bold; color: #1e293b; }
+                    .logo-text h1 { font-size: 15px; font-weight: 800; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .logo-text p { font-size: 5.5px; color: #fbbf24; font-weight: 600; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .badge { background: transparent !important; padding: 3px 8px; border-radius: 30px; font-size: 6px; font-weight: bold; color: #ffffff; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     .main-row { display: flex; gap: 10px; margin-bottom: 8px; flex: 1; align-items: center; }
                     .photo-col { width: 52px; }
-                    .photo-box { width: 52px; height: 60px; background: #e2e8f0; border-radius: 8px; border: 2px solid #fbbf24; overflow: hidden; }
+                    .photo-box { width: 52px; height: 60px; background: transparent !important; border-radius: 8px; border: 2px solid #fbbf24; overflow: hidden; }
                     .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-                    .info-col { flex: 1; background: rgba(255,255,255,0.85); padding: 6px 10px; border-radius: 12px; }
-                    .name { font-size: 9.5px; font-weight: 800; color: #0f172a; }
-                    .designation { background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 8px; font-size: 6px; display: inline-block; font-weight: 600; margin-top: 3px; }
+                    .info-col { flex: 1; background: transparent !important; padding: 6px 10px; border-radius: 12px; border: none !important; }
+                    .name { font-size: 9.5px; font-weight: 800; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .designation { background: transparent !important; color: #ffffff; padding: 2px 6px; border-radius: 8px; font-size: 6px; display: inline-block; font-weight: 600; margin-top: 3px; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     .info-list { margin-top: 5px; }
                     .info-row { display: flex; margin-bottom: 3px; font-size: 6.5px; }
-                    .info-label { width: 40px; font-weight: 700; color: #475569; }
-                    .info-value { flex: 1; font-weight: 600; color: #0f172a; }
+                    .info-label { width: 40px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .info-value { flex: 1; font-weight: 600; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     .qrcode-col { width: 75px; text-align: center; margin-left: 15px; }
-                    .qrcode-box { background: white; padding: 5px; border-radius: 8px; display: inline-block; }
-                    .qrcode-box canvas, .qrcode-box img { width: 55px !important; height: 55px !important; }
-                    .qr-text { font-size: 5px; margin-top: 4px; background: rgba(255,255,255,0.7); padding: 2px 4px; border-radius: 8px; display: inline-block; }
-                    .address-row { margin-top: 4px; padding: 6px 10px; background: rgba(255,255,255,0.85); border-radius: 12px; }
-                    .address-label { font-size: 5.5px; font-weight: 700; color: #475569; margin-bottom: 2px; }
-                    .address-value { font-size: 6px; font-weight: 500; color: #0f172a; }
-                    .footer-stamp { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding: 6px 10px; background: rgba(255,255,255,0.85); border-radius: 12px; }
-                    .sign-area { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #334155; }
-                    .hologram { background: linear-gradient(145deg, #f1f5f9, #e2e8f0); padding: 2px 6px; border-radius: 20px; font-size: 5px; font-weight: bold; }
+                    .qrcode-box { background: white; padding: 3px; border-radius: 8px; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 0; }
+                    .qrcode-box canvas, .qrcode-box img { width: 55px !important; height: 55px !important; display: block; }
+                    .qr-text { font-size: 5px; margin-top: 4px; color: #1e293b; font-weight: 600; background: rgba(255,255,255,0.7); padding: 2px 4px; border-radius: 8px; display: inline-block; }
+                    .address-row { margin-top: 4px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
+                    .address-label { font-size: 5.5px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); margin-bottom: 2px; }
+                    .address-value { font-size: 6px; font-weight: 500; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.2; }
+                    .footer-stamp { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
+                    .sign-area { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .hologram { background: transparent !important; padding: 2px 6px; border-radius: 20px; font-size: 5px; font-weight: bold; color: #ffffff; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     
-                    .back-top-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; }
+                    .back-top-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
                     .back-logo-area { display: flex; align-items: center; gap: 8px; }
                     .back-logo-icon { width: 32px; height: 32px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                    .back-company h5 { font-size: 10px; font-weight: 800; color: white; }
-                    .back-company p { font-size: 5px; color: #fbbf24; }
+                    .back-company h5 { font-size: 10px; font-weight: 800; color: white; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-company p { font-size: 5px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     .back-help { text-align: right; }
-                    .back-help span { font-size: 7px; font-weight: 700; color: white; display: block; }
-                    .back-help small { font-size: 5px; color: #fbbf24; }
-                    .back-middle-section { display: flex; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; }
+                    .back-help span { font-size: 7px; font-weight: 700; color: white; display: block; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-help small { font-size: 5px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-middle-section { display: flex; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
                     .barcode-area { flex: 1; text-align: center; }
                     .barcode { height: 30px; background: repeating-linear-gradient(90deg, #fff 0px, #fff 2px, #000 2px, #000 6px); width: 100%; border-radius: 5px; }
                     .back-qrcode-area { text-align: center; }
-                    .back-qrcode-box { background: white; padding: 3px; border-radius: 8px; display: inline-block; }
-                    .back-qr-text { font-size: 4px; color: #fbbf24; margin-top: 2px; }
-                    .back-details { margin-bottom: 6px; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; }
-                    .back-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 6px; border-bottom: 0.5px dashed rgba(255,255,255,0.2); }
-                    .back-label { color: #fbbf24; font-weight: 700; }
-                    .back-value { color: white; font-weight: 600; font-family: monospace; }
-                    .back-address-section { margin-bottom: 6px; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; text-align: center; }
-                    .back-address-section .company-name { font-size: 7px; font-weight: 800; color: #fbbf24; }
-                    .back-address-section .company-address { font-size: 5px; color: white; margin-top: 2px; }
-                    .back-footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(0,0,0,0.7); border-radius: 12px; margin-top: auto; }
-                    .back-auth-signature { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #fbbf24; }
-                    .back-website { font-size: 5px; color: white; }
-                    .back-valid-date { font-size: 5px; color: #fbbf24; }
+                    .back-qrcode-box { background: white; padding: 3px; border-radius: 8px; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 0; }
+                    .back-qrcode-box canvas, .back-qrcode-box img { width: 40px !important; height: 40px !important; display: block; }
+                    .back-qr-text { font-size: 4px; color: #fbbf24; margin-top: 2px; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-details { margin-bottom: 6px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
+                    .back-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 6px; border-bottom: 0.5px dashed rgba(255,255,255,0.15); }
+                    .back-row:last-child { border-bottom: none; }
+                    .back-label { color: #fbbf24; font-weight: 700; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-value { color: white; font-weight: 600; font-family: monospace; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-address-section { margin-bottom: 6px; padding: 6px 10px; background: transparent !important; border-radius: 12px; text-align: center; border: none !important; }
+                    .back-address-section .company-name { font-size: 7px; font-weight: 800; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-address-section .company-address { font-size: 5px; color: white; margin-top: 2px; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: transparent !important; border-radius: 12px; margin-top: auto; border: none !important; }
+                    .back-auth-signature { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-website { font-size: 5px; color: white; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-valid-date { font-size: 5px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     
                     @media print {
                         body { margin: 0; padding: 0; }
@@ -1013,7 +1071,7 @@
                         <div class="header">
                             <div class="logo">
                                 <div class="logo-icon">${companyLogoHtml}</div>
-                                <div class="logo-text"><h1>SP BUILD</h1><p>CONSTRUCTION & ENGINEERING</p></div>
+                                <div class="logo-text"><h1>${brandTitle}</h1><p>${brandSubtitle}</p></div>
                             </div>
                             <div class="badge">${cardData.badge || '⭐ PLATINUM'}</div>
                         </div>
@@ -1050,9 +1108,9 @@
                         <div class="back-top-section">
                             <div class="back-logo-area">
                                 <div class="back-logo-icon">${companyLogoHtml}</div>
-                                <div class="back-company"><h5>SP BUILD</h5><p>CONSTRUCTION & ENGINEERING</p></div>
+                                <div class="back-company"><h5>${brandTitle}</h5><p>${brandSubtitle}</p></div>
                             </div>
-                            <div class="back-help"><span><i class="fas fa-phone-alt"></i> 1800-202-4321</span><small>24/7 Helpline</small></div>
+                            <div class="back-help"><span><i class="fas fa-phone-alt"></i> 98674-78423</span><small>24/7 Helpline</small></div>
                         </div>
                         <div class="back-middle-section">
                             <div class="barcode-area"><div class="barcode"></div><div style="font-size:4px; color:#fbbf24; margin-top:3px;">SCAN TO VERIFY</div></div>
