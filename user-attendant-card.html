@@ -10,20 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <script type="module">
+        import { firebaseConfig } from './admin/js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -42,21 +32,14 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             min-height: 100vh;
             padding: 20px;
         }
+        .container { max-width: 600px; width: 100%; margin: 0 auto; }
         
-        .container {
-            max-width: 550px;
-            width: 100%;
-            margin: 0 auto;
-        }
-        
-        /* Header Section */
         .header {
             background: #ffffff;
             border-radius: 28px;
@@ -86,28 +69,10 @@
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(245,158,11,0.3);
         }
-        .logo-icon span {
-            font-size: 1.7rem;
-            font-weight: 800;
-            color: white;
-        }
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .logo-text h1 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-        .logo-text p {
-            font-size: 0.6rem;
-            color: #f59e0b;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
+        .logo-icon span { font-size: 1.7rem; font-weight: 800; color: white; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-text h1 { font-size: 1.5rem; font-weight: 800; color: #1e293b; letter-spacing: -0.3px; }
+        .logo-text p { font-size: 0.6rem; color: #f59e0b; letter-spacing: 1px; font-weight: 600; }
         .back-btn {
             background: #f1f5f9;
             border: none;
@@ -123,13 +88,8 @@
             align-items: center;
             gap: 8px;
         }
-        .back-btn:hover {
-            background: #f59e0b;
-            color: white;
-            transform: translateY(-2px);
-        }
+        .back-btn:hover { background: #f59e0b; color: white; transform: translateY(-2px); }
         
-        /* Month Filter Section */
         .filter-section {
             background: #ffffff;
             border-radius: 24px;
@@ -151,10 +111,7 @@
             color: #1e293b;
             font-size: 0.85rem;
         }
-        .filter-label i {
-            color: #f59e0b;
-            font-size: 1rem;
-        }
+        .filter-label i { color: #f59e0b; font-size: 1rem; }
         .filter-controls {
             display: flex;
             gap: 10px;
@@ -208,10 +165,7 @@
             align-items: center;
             gap: 6px;
         }
-        .reset-filter-btn-sm:hover {
-            background: #475569;
-            transform: translateY(-2px);
-        }
+        .reset-filter-btn-sm:hover { background: #475569; transform: translateY(-2px); }
         .selected-month-badge {
             background: #fef3c7;
             padding: 5px 14px;
@@ -222,7 +176,6 @@
             display: inline-block;
         }
         
-        /* Hero Section */
         .hero-section {
             background: linear-gradient(115deg, #ffffff 0%, #fef7e0 100%);
             border-radius: 32px;
@@ -236,16 +189,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.06);
             border: 1px solid rgba(245,158,11,0.15);
         }
-        .hero-text h1 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #0f172a;
-        }
-        .hero-text p {
-            font-size: 0.7rem;
-            color: #475569;
-            margin-top: 4px;
-        }
+        .hero-text h1 { font-size: 1.3rem; font-weight: 800; color: #0f172a; }
+        .hero-text p { font-size: 0.7rem; color: #475569; margin-top: 4px; }
         .date-badge {
             background: white;
             padding: 8px 18px;
@@ -256,7 +201,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        /* Loading */
         .loading {
             display: none;
             position: fixed;
@@ -277,7 +221,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Toast Message */
         .toast-message {
             position: fixed;
             bottom: 30px;
@@ -296,7 +239,6 @@
         }
         .toast-message.show { transform: translateX(-50%) translateY(0); }
         
-        /* Premium Card */
         .premium-card {
             background: #ffffff;
             border-radius: 28px;
@@ -308,7 +250,6 @@
         }
         .premium-card:hover { transform: translateY(-5px); box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
         
-        /* Card Header */
         .card-header {
             background: linear-gradient(145deg, #1e293b, #0f172a);
             padding: 20px 22px;
@@ -334,16 +275,8 @@
             width: fit-content;
         }
         .month-badge i { margin-right: 6px; }
-        .attendance-title {
-            font-size: 1rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-        .member-id-text {
-            font-size: 0.7rem;
-            font-weight: 600;
-            opacity: 0.8;
-        }
+        .attendance-title { font-size: 1rem; font-weight: 800; letter-spacing: 0.5px; }
+        .member-id-text { font-size: 0.7rem; font-weight: 600; opacity: 0.8; }
         
         .header-right {
             display: flex;
@@ -371,31 +304,12 @@
             font-weight: bold;
             overflow: hidden;
         }
-        .card-company-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .card-company-info {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-        .card-company-name {
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .card-company-tagline {
-            font-size: 7px;
-            opacity: 0.7;
-        }
-        .premium-version {
-            font-size: 0.55rem;
-            opacity: 0.7;
-            font-weight: 500;
-        }
+        .card-company-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .card-company-info { display: flex; flex-direction: column; line-height: 1.2; }
+        .card-company-name { font-size: 11px; font-weight: 700; }
+        .card-company-tagline { font-size: 7px; opacity: 0.7; }
+        .premium-version { font-size: 0.55rem; opacity: 0.7; font-weight: 500; }
         
-        /* User Section */
         .user-section {
             display: flex;
             align-items: center;
@@ -417,37 +331,13 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .avatar-frame .default-avatar {
-            font-size: 3rem;
-        }
-        .avatar-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .user-details {
-            flex: 1;
-        }
-        .user-details h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #0b1a2e;
-            margin-bottom: 8px;
-        }
-        .user-details p {
-            font-size: 0.75rem;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .user-details p i {
-            width: 20px;
-            color: #f59e0b;
-        }
+        .avatar-frame .default-avatar { font-size: 3rem; }
+        .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .user-details { flex: 1; }
+        .user-details h2 { font-size: 1.3rem; font-weight: 700; color: #0b1a2e; margin-bottom: 8px; }
+        .user-details p { font-size: 0.75rem; color: #475569; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .user-details p i { width: 20px; color: #f59e0b; }
         
-        /* Stats Grid - 8 items (2x4) */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -468,66 +358,56 @@
             transform: scale(1.02);
             border-color: #f59e0b;
         }
-        .stat-label {
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #4b5563;
-        }
-        .stat-label i {
-            font-size: 0.65rem;
-            margin-right: 4px;
-            color: #f59e0b;
-        }
-        .stat-value {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #0f2b3d;
-            line-height: 1.2;
-            margin-top: 6px;
-        }
-        .stat-value small {
-            font-size: 0.65rem;
-            font-weight: 500;
-        }
+        .stat-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; color: #4b5563; }
+        .stat-label i { font-size: 0.65rem; margin-right: 4px; color: #f59e0b; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: #0f2b3d; line-height: 1.2; margin-top: 6px; }
+        .stat-value small { font-size: 0.65rem; font-weight: 500; }
         .due-value { color: #b91c1c; }
         .paid-value { color: #0f6e3f; }
         .earning-value { color: #1e4a76; }
         .hours-value { color: #6b21a5; }
         .dailyrate-value { color: #c2410c; }
         
-        /* Card Footer */
         .card-footer {
             background: #f8fafc;
             padding: 16px 22px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
             border-top: 1px solid #e2e8f0;
         }
-        .download-btn {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
+        .card-footer .btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 16px;
             border-radius: 50px;
-            padding: 12px 28px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 700;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
             font-family: 'Inter', sans-serif;
-            width: 100%;
-            justify-content: center;
         }
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+        .btn-preview {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
         }
+        .btn-preview:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(139,92,246,0.4); }
+        .btn-share {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        .btn-share:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
+        .btn-download {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(34,197,94,0.4); }
         
-        /* Banner Section */
         .banner-section {
             position: relative;
             margin-bottom: 24px;
@@ -555,16 +435,9 @@
             align-items: center;
             gap: 12px;
         }
-        .banner-placeholder i {
-            font-size: 2.5rem;
-            opacity: 0.5;
-        }
-        .banner-placeholder p {
-            font-size: 0.75rem;
-            opacity: 0.7;
-        }
+        .banner-placeholder i { font-size: 2.5rem; opacity: 0.5; }
+        .banner-placeholder p { font-size: 0.75rem; opacity: 0.7; }
         
-        /* Footer Section */
         .footer-section {
             background: rgba(255,255,255,0.5);
             backdrop-filter: blur(8px);
@@ -575,8 +448,6 @@
             color: #475569;
             border: 1px solid rgba(245,158,11,0.2);
         }
-        
-        /* No Result */
         .no-result {
             text-align: center;
             padding: 50px;
@@ -584,14 +455,85 @@
             border-radius: 32px;
             color: #64748b;
         }
+        .filter-display { text-align: center; margin-bottom: 15px; }
         
-        /* Filter Display */
-        .filter-display {
-            text-align: center;
-            margin-bottom: 15px;
+        /* ===== PDF VIEWER MODAL ===== */
+        .pdf-viewer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1300;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
+        .pdf-viewer-modal.show { display: flex; }
+        .pdf-viewer-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .pdf-viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #1e293b;
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .pdf-viewer-header h3 { font-size: 0.9rem; font-weight: 600; }
+        .pdf-viewer-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .pdf-viewer-body {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+            text-align: center;
+            min-height: 300px;
+        }
+        .pdf-viewer-body iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+        }
+        .pdf-viewer-body p { color: #94a3b8; padding: 40px 0; }
+        .pdf-viewer-footer {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .pdf-viewer-footer button {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .pdf-viewer-footer .save-pdf-btn { background: #22c55e; color: white; }
+        .pdf-viewer-footer .share-pdf-btn { background: #3b82f6; color: white; }
+        .pdf-viewer-footer .close-pdf-btn { background: #e2e8f0; color: #475569; }
         
-        @media (max-width: 500px) {
+        @media (max-width: 550px) {
             body { padding: 12px; }
             .header { padding: 15px 20px; }
             .logo-text h1 { font-size: 1.1rem; }
@@ -606,8 +548,9 @@
             .user-section { padding: 18px; gap: 12px; }
             .avatar-frame { width: 65px; height: 65px; }
             .user-details h2 { font-size: 1rem; }
-            .download-btn { padding: 10px 20px; font-size: 0.75rem; }
+            .card-footer .btn { padding: 10px 12px; font-size: 0.7rem; min-width: 80px; }
             .toast-message { white-space: normal; text-align: center; max-width: 85%; }
+            .pdf-viewer-body iframe { height: 300px; }
         }
     </style>
 </head>
@@ -615,17 +558,35 @@
 
 <div class="loading" id="loading"><div class="spinner"></div></div>
 
+<!-- PDF Viewer Modal -->
+<div class="pdf-viewer-modal" id="pdfViewerModal">
+    <div class="pdf-viewer-content">
+        <div class="pdf-viewer-header">
+            <h3><i class="fas fa-file-pdf"></i> Attendance Card PDF</h3>
+            <button onclick="closePdfViewer()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="pdf-viewer-body" id="pdfViewerBody">
+            <p><i class="fas fa-spinner fa-spin"></i> Generating preview...</p>
+        </div>
+        <div class="pdf-viewer-footer">
+            <button class="save-pdf-btn" id="savePdfBtn"><i class="fas fa-download"></i> Save</button>
+            <button class="share-pdf-btn" id="sharePdfBtn"><i class="fas fa-share-alt"></i> Share</button>
+            <button class="close-pdf-btn" onclick="closePdfViewer()">Close</button>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <!-- Header Section -->
     <div class="header">
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1>SP CONSTRUCTION</h1>
-                <p>ATTENDANCE CARD</p>
+                <h1 id="brandTitle">SP CONSTRUCTION</h1>
+                <p id="brandSubtitle">ATTENDANCE CARD</p>
             </div>
         </div>
-        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
     </div>
     
     <!-- Month Filter Section -->
@@ -668,7 +629,7 @@
     <div class="hero-section">
         <div class="hero-text">
             <h1><i class="fas fa-id-card" style="color: #f59e0b;"></i> My ID Card</h1>
-            <p>Download your attendance card</p>
+            <p>View, share & download your attendance card</p>
         </div>
         <div class="date-badge" id="currentDate"></div>
     </div>
@@ -700,6 +661,55 @@
 <div id="toastMsg" class="toast-message">📄 Generating PDF...</div>
 
 <script type="module">
+    // ===== LOAD BRANDING =====
+    async function loadBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(window.db, 'companyAssets/branding'));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                document.getElementById('brandTitle').textContent = brand.title || 'SP CONSTRUCTION';
+                document.getElementById('brandSubtitle').textContent = brand.subtitle || 'ATTENDANCE CARD';
+            }
+        } catch(e) { console.warn("Error loading branding:", e); }
+    }
+    
+    // ===== LOAD LOGO =====
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(window.db, 'companyAssets/footerLogo');
+            const logoSnap = await window.get(logoRef);
+            const headerLogo = document.getElementById('headerLogo');
+            if (logoSnap.exists() && logoSnap.val()?.startsWith('data:image')) {
+                headerLogo.innerHTML = `<img src="${logoSnap.val()}" alt="Logo">`;
+            } else {
+                headerLogo.innerHTML = `<span>SP</span>`;
+            }
+        } catch(e) { console.warn("Error loading logo:", e); }
+    }
+    
+    // ===== LOAD BANNER =====
+    async function loadBannerImage() {
+        try {
+            const bannersRef = window.ref(window.db, 'companyAssets/banners');
+            const snapshot = await window.get(bannersRef);
+            const bannerSection = document.getElementById('bannerSection');
+            const placeholder = document.getElementById('bannerPlaceholder');
+            
+            if (snapshot.exists()) {
+                const banners = Object.values(snapshot.val());
+                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                    bannerSection.style.backgroundImage = `url(${banners[0].image})`;
+                    bannerSection.style.backgroundSize = 'cover';
+                    bannerSection.style.backgroundPosition = 'center';
+                    if (placeholder) placeholder.style.display = 'none';
+                    return;
+                }
+            }
+            bannerSection.style.backgroundImage = '';
+            if (placeholder) placeholder.style.display = 'flex';
+        } catch(e) { console.warn("Error loading banner:", e); }
+    }
+    
     let currentUserData = null;
     let allAttendanceRecords = [];
     let filteredAttendanceRecords = [];
@@ -712,8 +722,7 @@
     let pdfLogoBase64 = null;
     let currentFilterMonth = null;
     let currentFilterYear = null;
-    
-    const COMPANY_ASSETS_PATH = 'companyAssets';
+    let currentPdfDataUrl = null;
     
     function showToast(message, isError = false) {
         const toast = document.getElementById('toastMsg');
@@ -764,59 +773,177 @@
         currentFilterYear = currentYear;
     }
     
-    // Load company logo from companyAssets
-    async function loadCompanyLogo() {
-        try {
-            const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
-            const snapshot = await window.get(logoRef);
-            const headerLogo = document.getElementById('headerLogo');
-            
-            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                companyLogoBase64 = snapshot.val();
-                if (headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Company Logo">`;
-            } else {
-                if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
-            }
-        } catch(err) {
-            console.warn("Error loading company logo:", err);
-        }
-    }
-    
-    // Load banner image from companyAssets
-    async function loadBannerImage() {
-        try {
-            const bannersRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
-            const snapshot = await window.get(bannersRef);
-            const bannerSection = document.getElementById('bannerSection');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            
-            if (snapshot.exists()) {
-                const banners = Object.values(snapshot.val());
-                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
-                    bannerSection.style.backgroundImage = `url(${banners[0].image})`;
-                    bannerSection.style.backgroundSize = 'cover';
-                    bannerSection.style.backgroundPosition = 'center';
-                    if (placeholder) placeholder.style.display = 'none';
-                    return;
-                }
-            }
-            bannerSection.style.backgroundImage = '';
-            if (placeholder) placeholder.style.display = 'flex';
-        } catch(e) {
-            console.warn("Error loading banner:", e);
-        }
-    }
-    
-    // Load PDF logo
+    // ===== LOAD PDF LOGO =====
     async function loadPdfLogo() {
         try {
-            const pdfLogoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
+            const pdfLogoRef = window.ref(window.db, 'companyAssets/pdfLogo');
             const snapshot = await window.get(pdfLogoRef);
             if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
                 pdfLogoBase64 = snapshot.val();
+            } else if (companyLogoBase64) {
+                pdfLogoBase64 = companyLogoBase64;
             }
-        } catch(e) {
-            console.warn("Error loading PDF logo:", e);
+        } catch(e) { console.warn("Error loading PDF logo:", e); }
+    }
+    
+    // ===== CLOSE PDF VIEWER =====
+    window.closePdfViewer = function() {
+        document.getElementById('pdfViewerModal').classList.remove('show');
+        currentPdfDataUrl = null;
+    };
+    
+    // ===== GENERATE PDF DATA URL =====
+    async function generatePdfDataUrl(cardElement, employeeName, employeeId) {
+        if (!cardElement) { showToast('❌ Card not found', true); return null; }
+        try {
+            const cloneCard = cardElement.cloneNode(true);
+            cloneCard.style.position = 'absolute';
+            cloneCard.style.top = '-9999px';
+            cloneCard.style.left = '-9999px';
+            cloneCard.style.width = '450px';
+            cloneCard.style.margin = '0';
+            cloneCard.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+            cloneCard.style.border = '2px solid #f59e0b';
+            cloneCard.style.borderRadius = '28px';
+            cloneCard.style.background = '#ffffff';
+            document.body.appendChild(cloneCard);
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const canvas = await html2canvas(cloneCard, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: true,
+                allowTaint: false,
+                windowWidth: 450,
+                imageTimeout: 0
+            });
+            document.body.removeChild(cloneCard);
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            
+            const imgWidth = 90;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            const cardX = (210 - imgWidth) / 2;
+            const cardY = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
+            
+            // Add card content
+            pdf.addImage(imgData, 'PNG', cardX, cardY, imgWidth, imgHeight);
+            
+            // Add watermark (if available) - CENTER OF CARD
+            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+                try {
+                    const wmWidth = imgWidth * 0.45;
+                    const wmHeight = wmWidth;
+                    const wmX = cardX + (imgWidth - wmWidth) / 2;
+                    const wmY = cardY + (imgHeight - wmHeight) / 2;
+                    pdf.setGState(new pdf.GState({ opacity: 0.2 }));
+                    pdf.addImage(pdfLogoBase64, 'JPEG', wmX, wmY, wmWidth, wmHeight);
+                    pdf.setGState(new pdf.GState({ opacity: 1 }));
+                } catch(e) { console.warn("Watermark error:", e); }
+            }
+            
+            // Add logo at top
+            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+                try { pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); } catch(e) {}
+            }
+            
+            const pdfData = pdf.output('datauristring');
+            return pdfData;
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            return null;
+        }
+    }
+    
+    // ===== SHOW PDF VIEWER =====
+    async function showPdfViewer(cardElement, employeeName, employeeId) {
+        if (!cardElement) { showToast('❌ Card not found', true); return; }
+        showToast('📄 Generating PDF preview...');
+        const viewerModal = document.getElementById('pdfViewerModal');
+        const viewerBody = document.getElementById('pdfViewerBody');
+        
+        try {
+            viewerBody.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Generating PDF...</p>';
+            viewerModal.classList.add('show');
+            
+            const pdfDataUrl = await generatePdfDataUrl(cardElement, employeeName, employeeId);
+            if (!pdfDataUrl) {
+                viewerBody.innerHTML = '<p style="color: #ef4444;">❌ Failed to generate PDF</p>';
+                return;
+            }
+            currentPdfDataUrl = pdfDataUrl;
+            
+            viewerBody.innerHTML = `
+                <iframe src="${pdfDataUrl}" style="width:100%; height:400px; border:none; border-radius:8px;"></iframe>
+                <div style="margin-top:10px; font-size:0.75rem; color:#64748b;">
+                    <i class="fas fa-info-circle"></i> Watermark on card center
+                </div>
+            `;
+            
+            document.getElementById('savePdfBtn').onclick = function() {
+                savePdfToDevice(pdfDataUrl, employeeName, employeeId);
+            };
+            document.getElementById('sharePdfBtn').onclick = function() {
+                sharePdf(pdfDataUrl, employeeName);
+            };
+            
+            showToast('✅ PDF ready! Use Save or Share.');
+        } catch (error) {
+            console.error('PDF viewer error:', error);
+            viewerBody.innerHTML = '<p style="color: #ef4444;">❌ Failed to generate PDF preview</p>';
+            showToast('❌ Failed to generate PDF', true);
+        }
+    }
+    
+    // ===== SAVE PDF =====
+    function savePdfToDevice(pdfDataUrl, employeeName, employeeId) {
+        try {
+            const link = document.createElement('a');
+            link.href = pdfDataUrl;
+            const safeName = employeeName.replace(/[^a-zA-Z0-9]/g, '_');
+            link.download = `${safeName}_${employeeId}_attencard.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('✅ PDF downloaded!');
+            closePdfViewer();
+        } catch (error) {
+            console.error('Save PDF error:', error);
+            showToast('❌ Failed to save PDF', true);
+        }
+    }
+    
+    // ===== SHARE PDF =====
+    async function sharePdf(pdfDataUrl, employeeName) {
+        try {
+            const response = await fetch(pdfDataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `${employeeName}_attencard.pdf`, { type: 'application/pdf' });
+            
+            if (navigator.share) {
+                await navigator.share({
+                    title: `Attendance Card - ${employeeName}`,
+                    files: [file]
+                });
+                showToast('✅ Shared successfully!');
+                closePdfViewer();
+            } else {
+                // Fallback: download
+                const link = document.createElement('a');
+                link.href = pdfDataUrl;
+                link.download = `${employeeName}_attencard.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('📄 Download started (Share not supported)');
+                closePdfViewer();
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Share error:', error);
+                showToast('❌ Failed to share', true);
+            }
         }
     }
     
@@ -825,16 +952,13 @@
         const year = parseInt(document.getElementById('yearSelect').value);
         currentFilterMonth = month;
         currentFilterYear = year;
-        
         const monthName = getMonthName(month);
         document.getElementById('monthDisplayBadge').innerHTML = `<i class="fas fa-filter"></i> ${monthName} ${year} · Filtered`;
-        
         filteredAttendanceRecords = allAttendanceRecords.filter(record => {
             if (!record.date) return false;
             const [recordYear, recordMonth] = record.date.split('-');
             return parseInt(recordYear) === year && parseInt(recordMonth) === month;
         });
-        
         const stats = calculateStats(filteredAttendanceRecords);
         renderCard(stats, {
             name: userFullName,
@@ -849,11 +973,9 @@
         currentFilterYear = null;
         filteredAttendanceRecords = [...allAttendanceRecords];
         document.getElementById('monthDisplayBadge').innerHTML = `<i class="fas fa-globe"></i> Showing all records`;
-        
         const now = new Date();
         document.getElementById('monthSelect').value = now.getMonth() + 1;
         document.getElementById('yearSelect').value = now.getFullYear();
-        
         const stats = calculateStats(filteredAttendanceRecords);
         renderCard(stats, {
             name: userFullName,
@@ -870,11 +992,10 @@
         filterRecordsByMonthYear();
     }
     
-    // Load current user data
+    // ===== LOAD CURRENT USER =====
     async function loadCurrentUser() {
         const user = window.auth.currentUser;
         if (!user) return null;
-        
         try {
             const usersRef = window.ref(window.db, 'users');
             const snapshot = await window.get(usersRef);
@@ -892,14 +1013,12 @@
                     }
                 }
             }
-            
             if (!currentUserData) {
                 userFullName = user.email?.split('@')[0] || 'Worker';
                 userId = user.uid?.substring(0, 8) || 'EMP001';
                 userMobile = 'N/A';
                 userEmail = user.email || 'N/A';
             }
-            
             return currentUserData;
         } catch (error) {
             console.error("Error loading user:", error);
@@ -907,10 +1026,9 @@
         }
     }
     
-    // Load user's attendance records
+    // ===== LOAD MY ATTENDANCE =====
     async function loadMyAttendance() {
         if (!userId) return [];
-        
         try {
             const attendanceQuery = window.query(
                 window.ref(window.db, 'attendance'),
@@ -931,30 +1049,22 @@
         }
     }
     
-    // Calculate stats from records - includes all 7 metrics
     function calculateStats(records) {
         let totalPresent = 0;
         let totalHours = 0;
         let totalEarnings = 0;
         let totalPaid = 0;
         let currentMonthPresent = 0;
-        
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth() + 1;
         
         records.forEach(record => {
-            if (record.status === 'present') {
-                totalPresent++;
-            } else if (record.status === 'halfday') {
-                totalPresent += 0.5;
-            }
-            
+            if (record.status === 'present') totalPresent++;
+            else if (record.status === 'halfday') totalPresent += 0.5;
             totalHours += record.hours || 0;
             totalEarnings += record.earnings || 0;
             totalPaid += record.paid || 0;
-            
-            // Calculate current month presence
             if (record.date && record.status !== 'absent') {
                 const [year, month] = record.date.split('-');
                 if (parseInt(year) === currentYear && parseInt(month) === currentMonth) {
@@ -963,10 +1073,8 @@
                 }
             }
         });
-        
         const totalDue = totalEarnings - totalPaid;
         const avgDailyEarning = totalPresent > 0 ? totalEarnings / totalPresent : 0;
-        
         return {
             totalPresent: totalPresent,
             totalHours: totalHours,
@@ -979,100 +1087,26 @@
         };
     }
     
-    // PDF Download
-    async function downloadCardAsPDF(cardElement, employeeName, employeeId, month, year) {
-        if (!cardElement) {
-            showToast('❌ Card not found', true);
-            return;
-        }
-        
-        const monthName = month ? getMonthName(month) : 'All';
-        const yearText = year || 'All';
-        const fileNameSuffix = month ? `${monthName}_${yearText}` : 'All_Records';
-        
-        showToast('📄 Generating PDF...');
-        
-        try {
-            const cloneCard = cardElement.cloneNode(true);
-            cloneCard.style.position = 'absolute';
-            cloneCard.style.top = '-9999px';
-            cloneCard.style.left = '-9999px';
-            cloneCard.style.width = '450px';
-            cloneCard.style.margin = '0';
-            cloneCard.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
-            cloneCard.style.border = '2px solid #f59e0b';
-            cloneCard.style.borderRadius = '28px';
-            cloneCard.style.background = '#ffffff';
-            
-            document.body.appendChild(cloneCard);
-            await new Promise(resolve => setTimeout(resolve, 200));
-            
-            const canvas = await html2canvas(cloneCard, {
-                scale: 3,
-                backgroundColor: '#ffffff',
-                logging: false,
-                useCORS: true,
-                allowTaint: false,
-                windowWidth: 450,
-                imageTimeout: 0
-            });
-            
-            document.body.removeChild(cloneCard);
-            
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-            
-            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
-                try {
-                    pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25);
-                } catch(e) { console.warn(e); }
-            }
-            
-            const imgWidth = 90;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            const xPosition = (210 - imgWidth) / 2;
-            const yPosition = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
-            
-            pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
-            
-            const safeName = employeeName.replace(/[^a-zA-Z0-9]/g, '_');
-            pdf.save(`${safeName}_${employeeId}_${fileNameSuffix}_attencard.pdf`);
-            
-            showToast('✅ PDF downloaded successfully!');
-        } catch (error) {
-            console.error('PDF error:', error);
-            showToast('❌ Failed to generate PDF', true);
-        }
-    }
-    
-    // Render the card with 8 stat items (2x4 grid)
     function renderCard(stats, userInfo, profilePic, companyLogo) {
         const container = document.getElementById('cardContainer');
         const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         const dueAmount = stats.totalDue;
         const dueClass = dueAmount < 0 ? 'due-value' : (dueAmount > 0 ? 'due-value' : 'paid-value');
-        
         const avatarHtml = profilePic && profilePic.startsWith('data:image') 
             ? `<img src="${profilePic}" alt="Profile">` 
             : `<div class="default-avatar">👷</div>`;
-        
         const logoHtml = (companyLogo && companyLogo.startsWith('data:image'))
             ? `<img src="${companyLogo}" alt="Company Logo">`
             : `<span>🏗️</span>`;
+        
+        const globalTitle = document.getElementById('brandTitle')?.textContent || 'SP CONSTRUCTION';
+        const globalSubtitle = document.getElementById('brandSubtitle')?.textContent || 'ATTENDANCE CARD';
         
         const html = `
             <div class="premium-card" id="mainCard">
                 <div class="card-header">
                     <div class="header-left">
-                        <div class="month-badge">
-                            <i class="far fa-calendar-alt"></i> ${monthYear}
-                        </div>
+                        <div class="month-badge"><i class="far fa-calendar-alt"></i> ${monthYear}</div>
                         <div class="attendance-title">📋 Attendance Card</div>
                         <div class="member-id-text">🆔 Member ID : ${escapeHtml(userInfo.id)}</div>
                     </div>
@@ -1080,17 +1114,15 @@
                         <div class="card-company-brand">
                             <div class="card-company-logo">${logoHtml}</div>
                             <div class="card-company-info">
-                                <div class="card-company-name">SP CONSTRUCTION</div>
-                                <div class="card-company-tagline">BUILDING DREAMS</div>
+                                <div class="card-company-name">${escapeHtml(globalTitle)}</div>
+                                <div class="card-company-tagline">${escapeHtml(globalSubtitle)}</div>
                             </div>
                         </div>
                         <div class="premium-version">✨ Premium Version</div>
                     </div>
                 </div>
                 <div class="user-section">
-                    <div class="avatar-frame">
-                        ${avatarHtml}
-                    </div>
+                    <div class="avatar-frame">${avatarHtml}</div>
                     <div class="user-details">
                         <h2>${escapeHtml(userInfo.name)}</h2>
                         <p><i class="fas fa-phone-alt"></i> ${escapeHtml(userInfo.mobile)}</p>
@@ -1098,68 +1130,70 @@
                     </div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-user-check"></i> Total Present</div>
-                        <div class="stat-value">${stats.totalPresent} <small>days</small></div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-coins"></i> Total Earnings</div>
-                        <div class="stat-value earning-value">₹ ${formatNumber(stats.totalEarnings)}</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-hand-holding-usd"></i> Amount Paid</div>
-                        <div class="stat-value paid-value">₹ ${formatNumber(stats.totalPaid)}</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Due Amount</div>
-                        <div class="stat-value ${dueClass}">₹ ${formatNumber(dueAmount)}</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-clock"></i> Total Hours</div>
-                        <div class="stat-value hours-value">${formatNumber(stats.totalHours)} <small>hours</small></div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-charging-station"></i> Avg Daily Earning</div>
-                        <div class="stat-value dailyrate-value">₹ ${formatNumber(stats.avgDailyEarning)} <small>/day</small></div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-calendar-week"></i> This Month Work</div>
-                        <div class="stat-value">${stats.currentMonthPresent} <small>days</small></div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label"><i class="fas fa-database"></i> Total Records</div>
-                        <div class="stat-value">${stats.totalRecords} <small>entries</small></div>
-                    </div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-user-check"></i> Total Present</div><div class="stat-value">${stats.totalPresent} <small>days</small></div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-coins"></i> Total Earnings</div><div class="stat-value earning-value">₹ ${formatNumber(stats.totalEarnings)}</div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-hand-holding-usd"></i> Amount Paid</div><div class="stat-value paid-value">₹ ${formatNumber(stats.totalPaid)}</div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Due Amount</div><div class="stat-value ${dueClass}">₹ ${formatNumber(dueAmount)}</div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-clock"></i> Total Hours</div><div class="stat-value hours-value">${formatNumber(stats.totalHours)} <small>hours</small></div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-charging-station"></i> Avg Daily Earning</div><div class="stat-value dailyrate-value">₹ ${formatNumber(stats.avgDailyEarning)} <small>/day</small></div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-calendar-week"></i> This Month Work</div><div class="stat-value">${stats.currentMonthPresent} <small>days</small></div></div>
+                    <div class="stat-item"><div class="stat-label"><i class="fas fa-database"></i> Total Records</div><div class="stat-value">${stats.totalRecords} <small>entries</small></div></div>
                 </div>
                 <div class="card-footer">
-                    <button class="download-btn" id="downloadPdfBtn">
-                        <i class="fas fa-download"></i> Download PDF
+                    <button class="btn btn-preview" id="previewPdfBtn">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button class="btn btn-share" id="sharePdfBtn">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                    <button class="btn btn-download" id="downloadPdfBtn">
+                        <i class="fas fa-download"></i> Save
                     </button>
                 </div>
             </div>
         `;
-        
         container.innerHTML = html;
         
-        const downloadBtn = document.getElementById('downloadPdfBtn');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', async () => {
-                const cardElement = document.getElementById('mainCard');
-                await downloadCardAsPDF(cardElement, userInfo.name, userInfo.id, currentFilterMonth, currentFilterYear);
-            });
-        }
+        // ===== PREVIEW BUTTON =====
+        document.getElementById('previewPdfBtn').addEventListener('click', async () => {
+            const cardElement = document.getElementById('mainCard');
+            await showPdfViewer(cardElement, userInfo.name, userInfo.id);
+        });
+        
+        // ===== SHARE BUTTON =====
+        document.getElementById('sharePdfBtn').addEventListener('click', async () => {
+            const cardElement = document.getElementById('mainCard');
+            showToast('📄 Generating PDF for sharing...');
+            const pdfDataUrl = await generatePdfDataUrl(cardElement, userInfo.name, userInfo.id);
+            if (pdfDataUrl) {
+                await sharePdf(pdfDataUrl, userInfo.name);
+            } else {
+                showToast('❌ Failed to generate PDF', true);
+            }
+        });
+        
+        // ===== DOWNLOAD BUTTON =====
+        document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+            const cardElement = document.getElementById('mainCard');
+            showToast('📄 Generating PDF for download...');
+            const pdfDataUrl = await generatePdfDataUrl(cardElement, userInfo.name, userInfo.id);
+            if (pdfDataUrl) {
+                savePdfToDevice(pdfDataUrl, userInfo.name, userInfo.id);
+            } else {
+                showToast('❌ Failed to generate PDF', true);
+            }
+        });
     }
     
-    // Listen for real-time updates
+    // ===== REAL-TIME UPDATES =====
     function listenForUpdates() {
-        const logoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/footerLogo`);
+        const logoRef = window.ref(window.db, 'companyAssets/footerLogo');
         window.onValue(logoRef, (snapshot) => {
             const val = snapshot.val();
             if (val && val.startsWith('data:image')) {
                 companyLogoBase64 = val;
                 const headerLogo = document.getElementById('headerLogo');
                 if (headerLogo) headerLogo.innerHTML = `<img src="${companyLogoBase64}" alt="Company Logo">`;
-                
                 if (userFullName) {
                     const stats = calculateStats(filteredAttendanceRecords);
                     renderCard(stats, {
@@ -1172,17 +1206,12 @@
             }
         });
         
-        const bannerRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/banners`);
-        window.onValue(bannerRef, () => loadBannerImage());
-        
-        const pdfLogoRef = window.ref(window.db, `${COMPANY_ASSETS_PATH}/pdfLogo`);
-        window.onValue(pdfLogoRef, (snapshot) => {
+        window.onValue(window.ref(window.db, 'companyAssets/banners'), () => loadBannerImage());
+        window.onValue(window.ref(window.db, 'companyAssets/pdfLogo'), (snapshot) => {
             const val = snapshot.val();
-            if (val && val.startsWith('data:image')) {
-                pdfLogoBase64 = val;
-            } else {
-                pdfLogoBase64 = null;
-            }
+            if (val && val.startsWith('data:image')) pdfLogoBase64 = val;
+            else if (companyLogoBase64) pdfLogoBase64 = companyLogoBase64;
+            else pdfLogoBase64 = null;
         });
         
         if (!userId) return;
@@ -1194,7 +1223,6 @@
         window.onValue(attendanceQuery, async () => {
             const records = await loadMyAttendance();
             allAttendanceRecords = records;
-            
             if (currentFilterMonth && currentFilterYear) {
                 filteredAttendanceRecords = allAttendanceRecords.filter(record => {
                     if (!record.date) return false;
@@ -1204,7 +1232,6 @@
             } else {
                 filteredAttendanceRecords = [...allAttendanceRecords];
             }
-            
             const stats = calculateStats(filteredAttendanceRecords);
             if (userFullName) {
                 renderCard(stats, {
@@ -1217,31 +1244,23 @@
         });
     }
     
-    // Main function
+    // ===== INIT =====
     window.onAuthStateChanged(window.auth, async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
+        if (!user) { window.location.href = 'login.html'; return; }
         showLoading(true);
-        
-        initYearSelect();
-        
-        document.getElementById('monthSelect').addEventListener('change', filterRecordsByMonthYear);
-        document.getElementById('yearSelect').addEventListener('change', filterRecordsByMonthYear);
-        document.getElementById('currentMonthBtn').addEventListener('click', setCurrentMonth);
-        document.getElementById('resetFilterBtn').addEventListener('click', resetFilter);
-        
+        await loadBranding();
         await loadCompanyLogo();
         await loadBannerImage();
         await loadPdfLogo();
         await loadCurrentUser();
-        
+        initYearSelect();
+        document.getElementById('monthSelect').addEventListener('change', filterRecordsByMonthYear);
+        document.getElementById('yearSelect').addEventListener('change', filterRecordsByMonthYear);
+        document.getElementById('currentMonthBtn').addEventListener('click', setCurrentMonth);
+        document.getElementById('resetFilterBtn').addEventListener('click', resetFilter);
         const records = await loadMyAttendance();
         allAttendanceRecords = records;
         filteredAttendanceRecords = [...records];
-        
         const stats = calculateStats(filteredAttendanceRecords);
         renderCard(stats, {
             name: userFullName,
@@ -1249,9 +1268,7 @@
             mobile: userMobile,
             email: userEmail
         }, userProfilePic, companyLogoBase64);
-        
         listenForUpdates();
-        
         showLoading(false);
     });
 </script>
