@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>Signature &amp; Contact Settings | SP Construction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* ---------- RESET & BASE ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #eef2f6, #f8fafc);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* ---------- CARD ---------- */
+        .card {
+            max-width: 540px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 1.5rem 1.5rem 1.2rem;
+            text-align: center;
+            color: #fff;
+        }
+        .card-header .icon-wrap {
+            display: inline-block;
+            background: #f59e0b;
+            padding: 0.7rem;
+            border-radius: 1.2rem;
+            font-size: 1.8rem;
+            line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .card-header p {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+        .card-body {
+            padding: 1.8rem 1.8rem 1.5rem;
+        }
+
+        /* ---------- SIGNATURE PREVIEW ---------- */
+        .sig-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .sig-wrapper {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            border: 2px dashed #d1d9e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .sig-wrapper.has-image {
+            border-color: #f59e0b;
+            border-style: solid;
+        }
+        .sig-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+            display: none;
+        }
+        .sig-wrapper img.show {
+            display: block;
+        }
+        .sig-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+            padding: 0.5rem;
+        }
+        .sig-placeholder i {
+            font-size: 2.2rem;
+            color: #cbd5e1;
+        }
+        .sig-placeholder span {
+            background: #f1f5f9;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.6rem;
+            color: #64748b;
+        }
+
+        /* action buttons */
+        .sig-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.7rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .sig-actions .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: #f1f5f9;
+            color: #334155;
+            transition: 0.15s;
+        }
+        .sig-actions .action-btn i {
+            font-size: 0.75rem;
+        }
+        .sig-actions .action-btn.upload-btn {
+            background: #f59e0b;
+            color: #fff;
+        }
+        .sig-actions .action-btn.upload-btn:hover {
+            background: #d97706;
+        }
+        .sig-actions .action-btn.remove-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .sig-actions .action-btn.remove-btn:hover {
+            background: #fecaca;
+        }
+
+        /* ---------- INFO BOX ---------- */
+        .info-box {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            margin: 1.2rem 0 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.7rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+        .info-box i {
+            color: #f59e0b;
+            font-size: 0.9rem;
+            margin-top: 1px;
+        }
+        .info-box strong {
+            color: #1e293b;
+        }
+
+        /* ---------- FORM FIELDS ---------- */
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #475569;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.3px;
+        }
+        .form-group label i {
+            color: #f59e0b;
+            margin-right: 4px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            background: #fafcfc;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+            background: #fff;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 56px;
+            line-height: 1.5;
+        }
+
+        /* ---------- DIVIDER ---------- */
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 1.4rem 0 1rem;
+        }
+        .section-divider hr {
+            flex: 1;
+            border: none;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .section-divider i {
+            color: #f59e0b;
+            font-size: 0.8rem;
+        }
+        .section-divider span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.3px;
+        }
+
+        /* ---------- BUTTONS ---------- */
+        .button-group {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1.5rem 0 1rem;
+        }
+        .button-group button {
+            flex: 1;
+            padding: 0.7rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: 0.15s;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+        }
+        .btn-save:hover {
+            transform: scale(1.02);
+        }
+        .btn-reset {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .btn-reset:hover {
+            background: #e2e8f0;
+        }
+
+        /* ---------- BACK LINK ---------- */
+        .back-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .back-link a {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.15s;
+        }
+        .back-link a:hover {
+            color: #f59e0b;
+        }
+
+        /* ---------- TOAST ---------- */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #fff;
+            padding: 0.6rem 1.4rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .toast.success {
+            background: #059669;
+        }
+        .toast.error {
+            background: #dc2626;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 480px) {
+            .card-body {
+                padding: 1.2rem;
+            }
+            .sig-wrapper {
+                width: 160px;
+                height: 80px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            .toast {
+                white-space: normal;
+                text-align: center;
+                width: 80%;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- HEADER -->
+        <div class="card-header">
+            <div class="icon-wrap"><i class="fas fa-pen-fancy"></i></div>
+            <h2>Signature &amp; Contact</h2>
+            <p>Upload signature &amp; manage company contact details</p>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+
+            <!-- ===== SIGNATURE ===== -->
+            <div class="sig-section">
+                <div class="sig-wrapper" id="sigWrapper">
+                    <img id="sigImg" alt="Signature" />
+                    <div id="sigPlaceholder" class="sig-placeholder">
+                        <i class="fas fa-pen-nib"></i>
+                        <span>No signature</span>
+                        <span style="font-size:0.6rem;color:#94a3b8;">PNG with transparent bg</span>
+                    </div>
+                </div>
+                <div class="sig-actions">
+                    <button class="action-btn upload-btn" id="uploadSigBtn">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload
+                    </button>
+                    <button class="action-btn remove-btn" id="removeSigBtn">
+                        <i class="fas fa-trash-alt"></i> Remove
+                    </button>
+                </div>
+                <input type="file" id="sigUpload" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none;" />
+            </div>
+
+            <!-- Info tip -->
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Tip:</strong> Use a <strong>PNG</strong> with transparent background.
+                    Recommended size: <strong>400 × 150</strong> px.
+                </div>
+            </div>
+
+            <!-- ===== DIVIDER ===== -->
+            <div class="section-divider">
+                <i class="fas fa-address-card"></i>
+                <hr />
+                <span>Contact Details</span>
+            </div>
+
+            <!-- ===== HELPLINE ===== -->
+            <div class="form-group">
+                <label><i class="fas fa-phone-alt"></i> Helpline Number</label>
+                <input type="text" id="helplineInput" placeholder="e.g., +1 800 123 4567" />
+            </div>
+
+            <!-- ===== ADDRESS ===== -->
+            <div class="form-group">
+                <label><i class="fas fa-map-pin"></i> Company Address</label>
+                <textarea id="addressInput" rows="2" placeholder="e.g., 123 Construction Ave, Suite 100, City, State 12345"></textarea>
+            </div>
+
+            <!-- ===== SAVE / RESET ===== -->
+            <div class="button-group">
+                <button class="btn-save" id="saveContactBtn"><i class="fas fa-save"></i> Save</button>
+                <button class="btn-reset" id="resetContactBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+            </div>
+
+            <!-- ===== GLOBAL NOTE ===== -->
+            <p style="font-size:0.7rem;color:#64748b;text-align:center;margin:0.2rem 0 0.6rem;">
+                <i class="fas fa-database" style="margin-right:4px;"></i>
+                Stored in Firebase — visible to all admins
+            </p>
+
+            <!-- ===== BACK ===== -->
+            <div class="back-link">
+                <a href="dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ============================================================ -->
+    <!-- FIREBASE MODULE -->
+    <!-- ============================================================ -->
+    <script type="module">
+        // ----- imports -----
+        import { firebaseConfig } from './js/firebase-config.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js';
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js';
+        import {
+            getDatabase,
+            ref,
+            get,
+            set
+        } from 'https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js';
+
+        // ----- init -----
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // ----- DOM refs -----
+        const sigImg = document.getElementById('sigImg');
+        const sigPlaceholder = document.getElementById('sigPlaceholder');
+        const sigWrapper = document.getElementById('sigWrapper');
+        const uploadBtn = document.getElementById('uploadSigBtn');
+        const removeBtn = document.getElementById('removeSigBtn');
+        const fileInput = document.getElementById('sigUpload');
+
+        const helplineInput = document.getElementById('helplineInput');
+        const addressInput = document.getElementById('addressInput');
+        const saveBtn = document.getElementById('saveContactBtn');
+        const resetBtn = document.getElementById('resetContactBtn');
+
+        const toastEl = document.getElementById('toast');
+
+        // ----- Firebase paths -----
+        const SIG_PATH = 'companyAssets/signature';
+        const CONTACT_PATH = 'companyAssets/contact';
+
+        let currentUser = null;
+
+        // ----- helpers -----
+        function showToast(msg, isError = false) {
+            toastEl.textContent = msg;
+            toastEl.className = `toast ${isError ? 'error' : 'success'} show`;
+            clearTimeout(toastEl._timer);
+            toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+        }
+
+        // ----- signature UI -----
+        function setSignature(src) {
+            if (src && typeof src === 'string' && src.startsWith('data:image')) {
+                sigImg.src = src;
+                sigImg.classList.add('show');
+                sigPlaceholder.style.display = 'none';
+                sigWrapper.classList.add('has-image');
+            } else {
+                sigImg.classList.remove('show');
+                sigImg.src = '';
+                sigPlaceholder.style.display = 'flex';
+                sigWrapper.classList.remove('has-image');
+            }
+        }
+
+        // ----- load signature -----
+        async function loadSignature() {
+            try {
+                const snap = await get(ref(db, SIG_PATH));
+                if (snap.exists() && typeof snap.val() === 'string' && snap.val().startsWith('data:image')) {
+                    setSignature(snap.val());
+                } else {
+                    setSignature(null);
+                }
+            } catch (err) {
+                console.warn('Load signature error:', err);
+                setSignature(null);
+            }
+        }
+
+        // ----- load contact fields -----
+        async function loadContact() {
+            try {
+                const snap = await get(ref(db, CONTACT_PATH));
+                if (snap.exists()) {
+                    const data = snap.val();
+                    helplineInput.value = data.helpline || '';
+                    addressInput.value = data.address || '';
+                } else {
+                    helplineInput.value = '';
+                    addressInput.value = '';
+                }
+            } catch (err) {
+                console.warn('Load contact error:', err);
+                helplineInput.value = '';
+                addressInput.value = '';
+            }
+        }
+
+        // ----- save contact -----
+        async function saveContact() {
+            if (!currentUser) {
+                showToast('You must be logged in', true);
+                return;
+            }
+            const helpline = helplineInput.value.trim();
+            const address = addressInput.value.trim();
+            if (!helpline && !address) {
+                showToast('Please enter at least one field', true);
+                return;
+            }
+            try {
+                await set(ref(db, CONTACT_PATH), {
+                    helpline,
+                    address,
+                    updatedAt: Date.now()
+                });
+                showToast('✓ Contact details saved for all admins');
+            } catch (err) {
+                showToast('Error: ' + err.message, true);
+            }
+        }
+
+        // ----- reset contact (clear fields) -----
+        async function resetContact() {
+            if (!currentUser) {
+                showToast('You must be logged in', true);
+                return;
+            }
+            if (!confirm('Clear helpline and address fields?')) return;
+            try {
+                await set(ref(db, CONTACT_PATH), null);
+                helplineInput.value = '';
+                addressInput.value = '';
+                showToast('Contact fields reset');
+            } catch (err) {
+                showToast('Error: ' + err.message, true);
+            }
+        }
+
+        // ----- upload signature -----
+        async function uploadSignature(base64) {
+            if (!currentUser) {
+                showToast('You must be logged in', true);
+                return;
+            }
+            try {
+                await set(ref(db, SIG_PATH), base64);
+                setSignature(base64);
+                showToast('✓ Signature uploaded successfully');
+            } catch (err) {
+                showToast('Upload failed: ' + err.message, true);
+            }
+        }
+
+        // ----- remove signature -----
+        async function removeSignature() {
+            if (!currentUser) {
+                showToast('You must be logged in', true);
+                return;
+            }
+            if (!confirm('Remove the signature image?')) return;
+            try {
+                await set(ref(db, SIG_PATH), null);
+                setSignature(null);
+                showToast('Signature removed');
+            } catch (err) {
+                showToast('Error: ' + err.message, true);
+            }
+        }
+
+        // ----- file input handler -----
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                showToast('Only image files are allowed', true);
+                fileInput.value = '';
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Image must be under 2MB', true);
+                fileInput.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                uploadSignature(ev.target.result);
+                fileInput.value = '';
+            };
+            reader.onerror = () => {
+                showToast('Failed to read file', true);
+                fileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // ----- button events -----
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        removeBtn.addEventListener('click', removeSignature);
+        saveBtn.addEventListener('click', saveContact);
+        resetBtn.addEventListener('click', resetContact);
+
+        // ----- auth guard -----
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const userSnap = await get(ref(db, `users/${user.uid}`));
+                const data = userSnap.val();
+                if (!data || (data.role !== 'admin' && data.isAdmin !== true)) {
+                    alert('Access Denied');
+                    window.location.href = 'index-user.html';
+                    return;
+                }
+                currentUser = user;
+                await Promise.all([loadSignature(), loadContact()]);
+            } catch (err) {
+                console.error(err);
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>
