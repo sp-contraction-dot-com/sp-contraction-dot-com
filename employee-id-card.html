@@ -97,20 +97,20 @@
         .front-content, .back-content {
             position: relative;
             z-index: 1;
-            padding: 8px 12px;
+            padding: 6px 10px;
             height: 100%;
             display: flex;
             flex-direction: column;
             background: transparent;
         }
 
-        /* ========== Front Page Styles – matching Back Page text colors ========== */
+        /* ========== Front Page Styles ========== */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            padding: 6px 10px;
+            margin-bottom: 6px;
+            padding: 4px 8px;
             background: transparent !important;
             border: none !important;
         }
@@ -125,15 +125,16 @@
             width: 36px;
             height: 36px;
             background: linear-gradient(145deg, #fbbf24, #f59e0b);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             color: #1e293b;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         .logo-icon img {
@@ -142,36 +143,40 @@
             object-fit: cover;
         }
 
-        /* Front: Title now white, subtitle golden – exactly like back page */
         .logo-text h1 {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             color: #ffffff;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            line-height: 1.1;
+            white-space: nowrap;
         }
 
         .logo-text p {
-            font-size: 5.5px;
+            font-size: 6px;
             color: #fbbf24;
-            font-weight: 600;
+            font-weight: 700;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .badge {
             background: transparent !important;
-            padding: 3px 8px;
+            padding: 3px 10px;
             border-radius: 30px;
-            font-size: 6px;
-            font-weight: bold;
+            font-size: 8px;
+            font-weight: 800;
             color: #ffffff;
             border: none;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            white-space: nowrap;
         }
 
         .main-row {
             display: flex;
             gap: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             flex: 1;
             align-items: center;
         }
@@ -182,7 +187,7 @@
         }
         .photo-box {
             width: 52px;
-            height: 60px;
+            height: 58px;
             background: transparent !important;
             border-radius: 8px;
             border: 2px solid #fbbf24;
@@ -197,35 +202,37 @@
         .info-col {
             flex: 1;
             background: transparent !important;
-            padding: 6px 10px;
-            border-radius: 12px;
+            padding: 4px 6px;
+            border-radius: 10px;
             border: none !important;
         }
         .name {
-            font-size: 9.5px;
+            font-size: 12px;
             font-weight: 800;
             color: #ffffff;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            line-height: 1.2;
         }
         .designation {
             background: transparent !important;
             color: #ffffff;
             padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 6px;
+            border-radius: 6px;
+            font-size: 8px;
+            font-weight: 700;
             display: inline-block;
-            font-weight: 600;
-            margin-top: 3px;
+            margin-top: 2px;
             border: none;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         .info-list {
-            margin-top: 5px;
+            margin-top: 4px;
         }
         .info-row {
             display: flex;
             margin-bottom: 3px;
-            font-size: 6.5px;
+            font-size: 8px;
+            font-weight: 600;
         }
         .info-label {
             width: 40px;
@@ -235,58 +242,58 @@
         }
         .info-value {
             flex: 1;
-            font-weight: 600;
+            font-weight: 700;
             color: #ffffff;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
         .qrcode-col {
-            width: 75px;
+            width: 72px;
             flex-shrink: 0;
             text-align: center;
-            margin-left: 15px;
+            margin-left: 10px;
         }
         .qrcode-box {
             background: white;
             padding: 3px;
-            border-radius: 8px;
+            border-radius: 6px;
             display: inline-block;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             line-height: 0;
         }
         #qrcode canvas, #qrcode img {
-            width: 55px !important;
-            height: 55px !important;
+            width: 52px !important;
+            height: 52px !important;
             display: block;
         }
         .qr-text {
-            font-size: 5px;
-            margin-top: 4px;
+            font-size: 6px;
+            margin-top: 3px;
             color: #1e293b;
-            font-weight: 600;
+            font-weight: 700;
             background: rgba(255,255,255,0.7);
             padding: 2px 4px;
-            border-radius: 8px;
+            border-radius: 6px;
             display: inline-block;
         }
 
         .address-row {
             margin-top: 4px;
-            padding: 6px 10px;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none !important;
         }
         .address-label {
-            font-size: 5.5px;
+            font-size: 7px;
             font-weight: 700;
             color: #ffffff;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
         .address-value {
-            font-size: 6px;
-            font-weight: 500;
+            font-size: 8px;
+            font-weight: 600;
             color: #ffffff;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
             line-height: 1.2;
@@ -297,15 +304,16 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 4px;
-            padding: 6px 10px;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none !important;
         }
 
         .sign-area {
             font-family: 'Brush Script MT', cursive;
-            font-size: 8px;
+            font-size: 10px;
+            font-weight: 700;
             color: #ffffff;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
@@ -313,23 +321,23 @@
         .hologram {
             background: transparent !important;
             padding: 2px 6px;
-            border-radius: 20px;
-            font-size: 5px;
-            font-weight: bold;
+            border-radius: 16px;
+            font-size: 7px;
+            font-weight: 800;
             color: #ffffff;
             border: none;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
 
-        /* ========== Back Page Styles – already perfect ========== */
+        /* ========== Back Page Styles ========== */
         .back-top-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            padding: 6px 10px;
+            margin-bottom: 6px;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none !important;
         }
         
@@ -340,10 +348,10 @@
         }
         
         .back-logo-icon {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             background: linear-gradient(145deg, #fbbf24, #f59e0b);
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -357,22 +365,26 @@
         }
         
         .back-logo-icon span {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             color: #1e293b;
         }
         
         .back-company h5 {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: white;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            line-height: 1.1;
+            white-space: nowrap;
         }
         
         .back-company p {
-            font-size: 5px;
+            font-size: 6px;
+            font-weight: 700;
             color: #fbbf24;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            white-space: nowrap;
         }
         
         .back-help {
@@ -380,7 +392,7 @@
         }
         
         .back-help span {
-            font-size: 7px;
+            font-size: 8px;
             font-weight: 700;
             color: white;
             display: block;
@@ -388,7 +400,8 @@
         }
         
         .back-help small {
-            font-size: 5px;
+            font-size: 6px;
+            font-weight: 600;
             color: #fbbf24;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
@@ -397,11 +410,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            padding: 6px 10px;
+            gap: 8px;
+            margin: 6px 0;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none !important;
         }
         
@@ -411,12 +424,12 @@
         }
         
         .barcode {
-            height: 30px;
+            height: 28px;
             background: repeating-linear-gradient(90deg, 
                 #fff 0px, #fff 2px, 
                 #000 2px, #000 6px);
             width: 100%;
-            border-radius: 5px;
+            border-radius: 4px;
         }
         
         .back-qrcode-area {
@@ -426,30 +439,31 @@
         .back-qrcode-box {
             background: white;
             padding: 3px;
-            border-radius: 8px;
+            border-radius: 6px;
             display: inline-block;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             line-height: 0;
         }
         
         #backQrcode canvas, #backQrcode img {
-            width: 40px !important;
-            height: 40px !important;
+            width: 38px !important;
+            height: 38px !important;
             display: block;
         }
         
         .back-qr-text {
-            font-size: 4px;
+            font-size: 5px;
+            font-weight: 600;
             color: #fbbf24;
             margin-top: 2px;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-details {
-            margin-bottom: 6px;
-            padding: 6px 10px;
+            margin-bottom: 4px;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none !important;
         }
         
@@ -457,7 +471,8 @@
             display: flex;
             justify-content: space-between;
             padding: 2px 0;
-            font-size: 6px;
+            font-size: 7px;
+            font-weight: 600;
             border-bottom: 0.5px dashed rgba(255,255,255,0.15);
         }
         
@@ -473,16 +488,16 @@
         
         .back-value {
             color: white;
-            font-weight: 600;
+            font-weight: 700;
             font-family: monospace;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-address-section {
-            margin-bottom: 6px;
-            padding: 6px 10px;
+            margin-bottom: 4px;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             text-align: center;
             border: none !important;
         }
@@ -492,41 +507,47 @@
             font-weight: 800;
             color: #fbbf24;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            white-space: nowrap;
         }
         
         .back-address-section .company-address {
             font-size: 5px;
+            font-weight: 600;
             color: white;
-            margin-top: 2px;
+            margin-top: 1px;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
+            line-height: 1.2;
         }
         
         .back-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
+            padding: 4px 8px;
             background: transparent !important;
-            border-radius: 12px;
+            border-radius: 10px;
             margin-top: auto;
             border: none !important;
         }
         
         .back-auth-signature {
             font-family: 'Brush Script MT', cursive;
-            font-size: 8px;
+            font-size: 10px;
+            font-weight: 700;
             color: #fbbf24;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-website {
-            font-size: 5px;
+            font-size: 6px;
+            font-weight: 600;
             color: white;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
         
         .back-valid-date {
-            font-size: 5px;
+            font-size: 6px;
+            font-weight: 600;
             color: #fbbf24;
             text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);
         }
@@ -676,7 +697,7 @@
                         </div>
                     </div>
                     <div class="back-help">
-                        <span><i class="fas fa-phone-alt"></i> 98674-78423</span>
+                        <span><i class="fas fa-phone-alt"></i> 1800-202-4321</span>
                         <small>24/7 Helpline</small>
                     </div>
                 </div>
@@ -684,7 +705,7 @@
                 <div class="back-middle-section">
                     <div class="barcode-area">
                         <div class="barcode"></div>
-                        <div style="font-size: 4px; color: #fbbf24; margin-top: 3px;">SCAN TO VERIFY</div>
+                        <div style="font-size: 5px; color: #fbbf24; margin-top: 2px; font-weight: 600; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9);">SCAN TO VERIFY</div>
                     </div>
                     <div class="back-qrcode-area">
                         <div class="back-qrcode-box">
@@ -766,9 +787,9 @@
         const qrcodeDiv = document.getElementById("qrcode");
         qrcodeDiv.innerHTML = "";
         try {
-            new QRCode(qrcodeDiv, { text: verifyUrl, width: 55, height: 55, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+            new QRCode(qrcodeDiv, { text: verifyUrl, width: 52, height: 52, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         } catch(e) {
-            qrcodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=55x55&data=${encodeURIComponent(verifyUrl)}" width="55" height="55">`;
+            qrcodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=52x52&data=${encodeURIComponent(verifyUrl)}" width="52" height="52">`;
         }
         return verifyUrl;
     }
@@ -778,9 +799,9 @@
         const backQrcodeDiv = document.getElementById("backQrcode");
         backQrcodeDiv.innerHTML = "";
         try {
-            new QRCode(backQrcodeDiv, { text: verifyUrl, width: 40, height: 40, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+            new QRCode(backQrcodeDiv, { text: verifyUrl, width: 38, height: 38, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         } catch(e) {
-            backQrcodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=40x40&data=${encodeURIComponent(verifyUrl)}" width="40" height="40">`;
+            backQrcodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=38x38&data=${encodeURIComponent(verifyUrl)}" width="38" height="38">`;
         }
         return verifyUrl;
     }
@@ -988,7 +1009,7 @@
                         height: 60mm;
                         position: relative;
                         margin: 0;
-                        padding: 8px 12px;
+                        padding: 6px 10px;
                         page-break-after: always;
                         break-after: page;
                         border-radius: 14px;
@@ -1002,61 +1023,61 @@
                         flex-direction: column;
                         background: transparent;
                     }
-                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: transparent !important; border: none !important; }
+                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 4px 8px; background: transparent !important; border: none !important; }
                     .logo { display: flex; align-items: center; gap: 8px; }
-                    .logo-icon { width: 36px; height: 36px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                    .logo-text h1 { font-size: 15px; font-weight: 800; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .logo-text p { font-size: 5.5px; color: #fbbf24; font-weight: 600; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .badge { background: transparent !important; padding: 3px 8px; border-radius: 30px; font-size: 6px; font-weight: bold; color: #ffffff; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .main-row { display: flex; gap: 10px; margin-bottom: 8px; flex: 1; align-items: center; }
+                    .logo-icon { width: 36px; height: 36px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+                    .logo-text h1 { font-size: 14px; font-weight: 800; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.1; white-space: nowrap; }
+                    .logo-text p { font-size: 6px; color: #fbbf24; font-weight: 700; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); letter-spacing: 0.5px; white-space: nowrap; }
+                    .badge { background: transparent !important; padding: 3px 10px; border-radius: 30px; font-size: 8px; font-weight: 800; color: #ffffff; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); white-space: nowrap; }
+                    .main-row { display: flex; gap: 10px; margin-bottom: 6px; flex: 1; align-items: center; }
                     .photo-col { width: 52px; }
-                    .photo-box { width: 52px; height: 60px; background: transparent !important; border-radius: 8px; border: 2px solid #fbbf24; overflow: hidden; }
+                    .photo-box { width: 52px; height: 58px; background: transparent !important; border-radius: 8px; border: 2px solid #fbbf24; overflow: hidden; }
                     .photo-box img { width: 100%; height: 100%; object-fit: cover; }
-                    .info-col { flex: 1; background: transparent !important; padding: 6px 10px; border-radius: 12px; border: none !important; }
-                    .name { font-size: 9.5px; font-weight: 800; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .designation { background: transparent !important; color: #ffffff; padding: 2px 6px; border-radius: 8px; font-size: 6px; display: inline-block; font-weight: 600; margin-top: 3px; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .info-list { margin-top: 5px; }
-                    .info-row { display: flex; margin-bottom: 3px; font-size: 6.5px; }
+                    .info-col { flex: 1; background: transparent !important; padding: 4px 6px; border-radius: 10px; border: none !important; }
+                    .name { font-size: 12px; font-weight: 800; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.2; }
+                    .designation { background: transparent !important; color: #ffffff; padding: 2px 6px; border-radius: 6px; font-size: 8px; font-weight: 700; display: inline-block; margin-top: 2px; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .info-list { margin-top: 4px; }
+                    .info-row { display: flex; margin-bottom: 3px; font-size: 8px; font-weight: 600; }
                     .info-label { width: 40px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .info-value { flex: 1; font-weight: 600; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .qrcode-col { width: 75px; text-align: center; margin-left: 15px; }
-                    .qrcode-box { background: white; padding: 3px; border-radius: 8px; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 0; }
-                    .qrcode-box canvas, .qrcode-box img { width: 55px !important; height: 55px !important; display: block; }
-                    .qr-text { font-size: 5px; margin-top: 4px; color: #1e293b; font-weight: 600; background: rgba(255,255,255,0.7); padding: 2px 4px; border-radius: 8px; display: inline-block; }
-                    .address-row { margin-top: 4px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
-                    .address-label { font-size: 5.5px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); margin-bottom: 2px; }
-                    .address-value { font-size: 6px; font-weight: 500; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.2; }
-                    .footer-stamp { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
-                    .sign-area { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .hologram { background: transparent !important; padding: 2px 6px; border-radius: 20px; font-size: 5px; font-weight: bold; color: #ffffff; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .info-value { flex: 1; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .qrcode-col { width: 72px; text-align: center; margin-left: 10px; }
+                    .qrcode-box { background: white; padding: 3px; border-radius: 6px; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 0; }
+                    .qrcode-box canvas, .qrcode-box img { width: 52px !important; height: 52px !important; display: block; }
+                    .qr-text { font-size: 6px; margin-top: 3px; color: #1e293b; font-weight: 700; background: rgba(255,255,255,0.7); padding: 2px 4px; border-radius: 6px; display: inline-block; }
+                    .address-row { margin-top: 4px; padding: 4px 8px; background: transparent !important; border-radius: 10px; border: none !important; }
+                    .address-label { font-size: 7px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); margin-bottom: 1px; }
+                    .address-value { font-size: 8px; font-weight: 600; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.2; }
+                    .footer-stamp { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding: 4px 8px; background: transparent !important; border-radius: 10px; border: none !important; }
+                    .sign-area { font-family: 'Brush Script MT', cursive; font-size: 10px; font-weight: 700; color: #ffffff; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .hologram { background: transparent !important; padding: 2px 6px; border-radius: 16px; font-size: 7px; font-weight: 800; color: #ffffff; border: none; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     
-                    .back-top-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
+                    .back-top-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 4px 8px; background: transparent !important; border-radius: 10px; border: none !important; }
                     .back-logo-area { display: flex; align-items: center; gap: 8px; }
-                    .back-logo-icon { width: 32px; height: 32px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-                    .back-company h5 { font-size: 10px; font-weight: 800; color: white; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-company p { font-size: 5px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-logo-icon { width: 30px; height: 30px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+                    .back-company h5 { font-size: 12px; font-weight: 800; color: white; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.1; white-space: nowrap; }
+                    .back-company p { font-size: 6px; font-weight: 700; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); white-space: nowrap; }
                     .back-help { text-align: right; }
-                    .back-help span { font-size: 7px; font-weight: 700; color: white; display: block; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-help small { font-size: 5px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-middle-section { display: flex; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
+                    .back-help span { font-size: 8px; font-weight: 700; color: white; display: block; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-help small { font-size: 6px; font-weight: 600; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-middle-section { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 6px 0; padding: 4px 8px; background: transparent !important; border-radius: 10px; border: none !important; }
                     .barcode-area { flex: 1; text-align: center; }
-                    .barcode { height: 30px; background: repeating-linear-gradient(90deg, #fff 0px, #fff 2px, #000 2px, #000 6px); width: 100%; border-radius: 5px; }
+                    .barcode { height: 28px; background: repeating-linear-gradient(90deg, #fff 0px, #fff 2px, #000 2px, #000 6px); width: 100%; border-radius: 4px; }
                     .back-qrcode-area { text-align: center; }
-                    .back-qrcode-box { background: white; padding: 3px; border-radius: 8px; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 0; }
-                    .back-qrcode-box canvas, .back-qrcode-box img { width: 40px !important; height: 40px !important; display: block; }
-                    .back-qr-text { font-size: 4px; color: #fbbf24; margin-top: 2px; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-details { margin-bottom: 6px; padding: 6px 10px; background: transparent !important; border-radius: 12px; border: none !important; }
-                    .back-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 6px; border-bottom: 0.5px dashed rgba(255,255,255,0.15); }
+                    .back-qrcode-box { background: white; padding: 3px; border-radius: 6px; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 0; }
+                    .back-qrcode-box canvas, .back-qrcode-box img { width: 38px !important; height: 38px !important; display: block; }
+                    .back-qr-text { font-size: 5px; font-weight: 600; color: #fbbf24; margin-top: 2px; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-details { margin-bottom: 4px; padding: 4px 8px; background: transparent !important; border-radius: 10px; border: none !important; }
+                    .back-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 7px; font-weight: 600; border-bottom: 0.5px dashed rgba(255,255,255,0.15); }
                     .back-row:last-child { border-bottom: none; }
                     .back-label { color: #fbbf24; font-weight: 700; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-value { color: white; font-weight: 600; font-family: monospace; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-address-section { margin-bottom: 6px; padding: 6px 10px; background: transparent !important; border-radius: 12px; text-align: center; border: none !important; }
-                    .back-address-section .company-name { font-size: 7px; font-weight: 800; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-address-section .company-address { font-size: 5px; color: white; margin-top: 2px; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: transparent !important; border-radius: 12px; margin-top: auto; border: none !important; }
-                    .back-auth-signature { font-family: 'Brush Script MT', cursive; font-size: 8px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-website { font-size: 5px; color: white; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
-                    .back-valid-date { font-size: 5px; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-value { color: white; font-weight: 700; font-family: monospace; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-address-section { margin-bottom: 4px; padding: 4px 8px; background: transparent !important; border-radius: 10px; text-align: center; border: none !important; }
+                    .back-address-section .company-name { font-size: 7px; font-weight: 800; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); white-space: nowrap; }
+                    .back-address-section .company-address { font-size: 5px; font-weight: 600; color: white; margin-top: 1px; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); line-height: 1.2; }
+                    .back-footer { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; background: transparent !important; border-radius: 10px; margin-top: auto; border: none !important; }
+                    .back-auth-signature { font-family: 'Brush Script MT', cursive; font-size: 10px; font-weight: 700; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-website { font-size: 6px; font-weight: 600; color: white; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
+                    .back-valid-date { font-size: 6px; font-weight: 600; color: #fbbf24; text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9); }
                     
                     @media print {
                         body { margin: 0; padding: 0; }
@@ -1110,10 +1131,10 @@
                                 <div class="back-logo-icon">${companyLogoHtml}</div>
                                 <div class="back-company"><h5>${brandTitle}</h5><p>${brandSubtitle}</p></div>
                             </div>
-                            <div class="back-help"><span><i class="fas fa-phone-alt"></i> 98674-78423</span><small>24/7 Helpline</small></div>
+                            <div class="back-help"><span><i class="fas fa-phone-alt"></i> 1800-202-4321</span><small>24/7 Helpline</small></div>
                         </div>
                         <div class="back-middle-section">
-                            <div class="barcode-area"><div class="barcode"></div><div style="font-size:4px; color:#fbbf24; margin-top:3px;">SCAN TO VERIFY</div></div>
+                            <div class="barcode-area"><div class="barcode"></div><div style="font-size:5px; color:#fbbf24; margin-top:2px; font-weight:600; text-shadow:0 0 8px rgba(0,0,0,0.85),0 0 2px rgba(0,0,0,0.9);">SCAN TO VERIFY</div></div>
                             <div class="back-qrcode-area"><div class="back-qrcode-box" id="printBackQrcode"></div><div class="back-qr-text">QR Code</div></div>
                         </div>
                         <div class="back-details">
@@ -1136,8 +1157,8 @@
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
                 <script>
                     const verifyUrl = '${verifyUrl}';
-                    new QRCode(document.getElementById('printFrontQrcode'), { text: verifyUrl, width: 55, height: 55, colorDark: "#000000", colorLight: "#ffffff" });
-                    new QRCode(document.getElementById('printBackQrcode'), { text: verifyUrl, width: 40, height: 40, colorDark: "#000000", colorLight: "#ffffff" });
+                    new QRCode(document.getElementById('printFrontQrcode'), { text: verifyUrl, width: 52, height: 52, colorDark: "#000000", colorLight: "#ffffff" });
+                    new QRCode(document.getElementById('printBackQrcode'), { text: verifyUrl, width: 38, height: 38, colorDark: "#000000", colorLight: "#ffffff" });
                     setTimeout(() => { window.print(); }, 500);
                 <\/script>
             </body>
