@@ -267,7 +267,7 @@
             display: block;
         }
 
-        /* Golden QR Code text */
+        /* Golden QR Code text on front */
         .qr-text {
             font-size: 5px;
             margin-top: 2px;
@@ -425,7 +425,7 @@
             white-space: nowrap;
         }
         
-        /* UPDATED HELPLINE */
+        /* Helpline & address loaded from Firebase */
         .back-help {
             text-align: right;
         }
@@ -524,7 +524,7 @@
             font-size: 8px;
         }
         
-        /* UPDATED ADDRESS SECTION */
+        /* Address section – loaded from Firebase */
         .back-address-section {
             margin-bottom: 4px;
             padding: 4px 8px;
@@ -723,9 +723,9 @@
                             <p id="backBrandSubtitle">CONSTRUCTION & ENGINEERING</p>
                         </div>
                     </div>
-                    <!-- UPDATED HELPLINE -->
+                    <!-- Helpline from Firebase -->
                     <div class="back-help">
-                        <span><i class="fas fa-phone-alt"></i> 098-6747-8423</span>
+                        <span id="helplineDisplay"><i class="fas fa-phone-alt"></i> 1800-202-4321</span>
                         <small>24/7 Helpline</small>
                     </div>
                 </div>
@@ -749,10 +749,10 @@
                     <div class="back-row"><span class="back-label"><i class="fas fa-calendar"></i> JOINING :</span><span class="back-value" id="backJoining">---</span></div>
                 </div>
                 
-                <!-- UPDATED ADDRESS SECTION -->
+                <!-- Address from Firebase -->
                 <div class="back-address-section">
                     <div class="company-name">SP BUILD CONSTRUCTION PVT. LTD.</div>
-                    <div class="company-address">Behind HDFC Bank, Panch Pakhdi, Thane West, Thane, Maharashtra 400602</div>
+                    <div class="company-address" id="addressDisplay">123, Grand Trunk Road, Howrah, Kolkata - 711101, West Bengal, India</div>
                 </div>
                 
                 <div class="back-footer">
@@ -786,8 +786,13 @@
     let cardData = {};
     let signatureImage = null;
 
+    // Firebase contact data
+    let contactHelpline = '1800-202-4321';
+    let contactAddress = '123, Grand Trunk Road, Howrah, Kolkata - 711101, West Bengal, India';
+
     const COMPANY_ASSETS_PATH = 'companyAssets';
     
+    // ===== LOAD BRANDING =====
     async function loadBranding() {
         try {
             const brandSnap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/branding`));
@@ -801,6 +806,27 @@
         } catch(error) { console.error("Branding error:", error); }
     }
 
+    // ===== LOAD CONTACT DATA =====
+    async function loadContact() {
+        try {
+            const contactSnap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/contact`));
+            if (contactSnap.exists()) {
+                const data = contactSnap.val();
+                if (data.helpline) {
+                    contactHelpline = data.helpline;
+                    document.getElementById('helplineDisplay').innerHTML = `<i class="fas fa-phone-alt"></i> ${contactHelpline}`;
+                }
+                if (data.address) {
+                    contactAddress = data.address;
+                    document.getElementById('addressDisplay').textContent = contactAddress;
+                }
+            }
+        } catch(error) {
+            console.warn("Contact load error:", error);
+        }
+    }
+
+    // ===== LOAD SIGNATURE =====
     async function loadSignature() {
         try {
             const sigSnap = await window.get(window.ref(window.db, `${COMPANY_ASSETS_PATH}/signature`));
@@ -908,6 +934,7 @@
             await loadCompanyLogo();
             await loadCardBackgrounds();
             await loadSignature();
+            await loadContact();  // load helpline & address
             
             const userRef = window.ref(window.db, `users/${user.uid}`);
             const snapshot = await window.get(userRef);
@@ -1057,9 +1084,9 @@
         
         const frontSignatureLabel = `<span style="font-size:5px; font-weight:600; opacity:0.7; letter-spacing:0.5px; display:block; color:#ffffff; text-shadow:0 0 8px rgba(0,0,0,0.85),0 0 2px rgba(0,0,0,0.9);">Signature</span>`;
         
-        // Updated helpline and address for print
-        const helpline = '098-6747-8423';
-        const companyAddress = 'Behind HDFC Bank, Panch Pakhdi, Thane West, Thane, Maharashtra 400602';
+        // Use current contact data for print
+        const helpline = contactHelpline;
+        const address = contactAddress;
         
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -1219,7 +1246,7 @@
                         </div>
                         <div class="back-address-section">
                             <div class="company-name">SP BUILD CONSTRUCTION PVT. LTD.</div>
-                            <div class="company-address">${companyAddress}</div>
+                            <div class="company-address">${address}</div>
                         </div>
                         <div class="back-footer">
                             <div class="back-website">www.spbuild.com</div>
