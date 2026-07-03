@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
     <title>All Attendance | SP Construction</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js">
+    </script>
     <script type="module">
         import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, get, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
-        
+
         window.auth = auth;
         window.db = database;
         window.ref = ref;
@@ -31,15 +33,22 @@
     </script>
     <style>
         /* ===== FULL CSS (unchanged from previous working version) ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             padding: 20px;
             min-height: 100vh;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
         .header {
             background: #ffffff;
             border-radius: 28px;
@@ -50,10 +59,14 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            border: 1px solid rgba(245,158,11,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
         }
-        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
         .logo-icon {
             width: 48px;
             height: 48px;
@@ -63,12 +76,30 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(245,158,11,0.3);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
         }
-        .logo-icon span { font-size: 1.5rem; font-weight: 800; color: white; }
-        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .logo-text h1 { font-size: 1.3rem; font-weight: 800; color: #1e293b; letter-spacing: -0.3px; }
-        .logo-text p { font-size: 0.55rem; color: #f59e0b; letter-spacing: 1px; font-weight: 600; }
+        .logo-icon span {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+        }
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        .logo-text p {
+            font-size: 0.55rem;
+            color: #f59e0b;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
         .header-buttons {
             display: flex;
             gap: 12px;
@@ -89,7 +120,11 @@
             align-items: center;
             gap: 8px;
         }
-        .back-btn:hover { background: #f59e0b; color: white; transform: translateY(-2px); }
+        .back-btn:hover {
+            background: #f59e0b;
+            color: white;
+            transform: translateY(-2px);
+        }
         .add-new-btn {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             border: none;
@@ -103,10 +138,13 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 6px rgba(34,197,94,0.3);
+            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
         }
-        .add-new-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
-        
+        .add-new-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -119,32 +157,76 @@
             transition: all 0.3s;
             color: white;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: default;
         }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
-        .stat-info h4 { font-size: 0.7rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; opacity: 0.9; letter-spacing: 0.5px; }
-        .stat-card .value { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
-        .stat-card .sub-text { font-size: 0.55rem; opacity: 0.8; margin-top: 4px; }
-        .stat-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-        .card-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-        .card-2 { background: linear-gradient(135deg, #f97316, #ea580c); }
-        .card-3 { background: linear-gradient(135deg, #10b981, #059669); }
-        .card-4 { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-        .card-5 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .card-6 { background: linear-gradient(135deg, #ec489a, #db2777); }
-        .card-7 { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .card-8 { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        .stat-info h4 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .stat-card .sub-text {
+            font-size: 0.55rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .card-1 {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+        }
+        .card-2 {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+        .card-3 {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .card-4 {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
+        .card-5 {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        .card-6 {
+            background: linear-gradient(135deg, #ec489a, #db2777);
+        }
+        .card-7 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        .card-8 {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
         .banner-section {
             position: relative;
             margin-bottom: 28px;
             border-radius: 28px;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             background: #e2e8f0;
             min-height: 150px;
             display: flex;
@@ -153,7 +235,7 @@
             background-size: cover;
             background-position: center;
             transition: 0.3s;
-            border: 1px solid rgba(245,158,11,0.2);
+            border: 1px solid rgba(245, 158, 11, 0.2);
         }
         .banner-placeholder {
             background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -166,15 +248,21 @@
             align-items: center;
             gap: 12px;
         }
-        .banner-placeholder i { font-size: 2.5rem; opacity: 0.5; }
-        .banner-placeholder p { font-size: 0.8rem; opacity: 0.7; }
-        
+        .banner-placeholder i {
+            font-size: 2.5rem;
+            opacity: 0.5;
+        }
+        .banner-placeholder p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
         .data-card {
             background: #ffffff;
             border-radius: 28px;
             padding: 24px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            border: 1px solid rgba(245,158,11,0.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.15);
         }
         .section-title {
             display: flex;
@@ -184,9 +272,19 @@
             padding-bottom: 12px;
             border-bottom: 2px solid #fef3c7;
         }
-        .section-title i { font-size: 1.3rem; color: #f59e0b; background: #fef3c7; padding: 10px; border-radius: 14px; }
-        .section-title h3 { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
-        
+        .section-title i {
+            font-size: 1.3rem;
+            color: #f59e0b;
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 14px;
+        }
+        .section-title h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
         .admin-info-section {
             background: #f8fafc;
             border-radius: 20px;
@@ -200,12 +298,14 @@
             justify-content: space-between;
             gap: 16px;
         }
-        .admin-info-left, .admin-info-right {
+        .admin-info-left,
+        .admin-info-right {
             font-size: 0.75rem;
             color: #475569;
             line-height: 1.6;
         }
-        .admin-info-left span, .admin-info-right span {
+        .admin-info-left span,
+        .admin-info-right span {
             font-weight: 700;
             color: #1e293b;
         }
@@ -222,14 +322,14 @@
             width: 100%;
             margin: 12px 0 8px 0;
         }
-        
+
         .search-wrapper {
             margin-bottom: 28px;
             position: relative;
             background: #f8fafc;
             border-radius: 60px;
             padding: 3px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
         .search-icon {
             position: absolute;
@@ -250,9 +350,11 @@
             background: white;
             transition: 0.2s;
             outline: none;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
-        #searchInput:focus { box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+        #searchInput:focus {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
         .result-badge {
             margin-top: 12px;
             font-size: 0.75rem;
@@ -264,8 +366,14 @@
             gap: 8px;
             padding: 0 8px;
         }
-        .result-count { background: #fef3c7; padding: 4px 12px; border-radius: 40px; font-weight: 600; color: #d97706; }
-        
+        .result-count {
+            background: #fef3c7;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #d97706;
+        }
+
         .download-controls {
             background: #fefaf5;
             border-radius: 28px;
@@ -286,10 +394,16 @@
             background: white;
             padding: 8px 20px;
             border-radius: 60px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        .download-group label { font-size: 0.75rem; font-weight: 700; color: #475569; letter-spacing: 0.3px; }
-        select, .download-group input {
+        .download-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
+            letter-spacing: 0.3px;
+        }
+        select,
+        .download-group input {
             border: 1px solid #e2e8f0;
             padding: 8px 14px;
             border-radius: 40px;
@@ -299,7 +413,11 @@
             outline: none;
             transition: 0.15s;
         }
-        select:focus, .download-group input:focus { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
+        select:focus,
+        .download-group input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
         .limit-control {
             display: flex;
             align-items: center;
@@ -308,8 +426,16 @@
             padding: 0 16px;
             border-radius: 40px;
         }
-        .limit-control input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: #f59e0b; }
-        .limit-control input[type="number"] { width: 80px; padding: 6px 8px; }
+        .limit-control input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: #f59e0b;
+        }
+        .limit-control input[type="number"] {
+            width: 80px;
+            padding: 6px 8px;
+        }
         .download-btn {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             border: none;
@@ -323,12 +449,15 @@
             align-items: center;
             gap: 10px;
             transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(34,197,94,0.3);
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
             margin-left: auto;
             margin-right: auto;
         }
-        .download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.4); }
-        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        }
+
         .table-container {
             overflow-x: auto;
             overflow-y: auto;
@@ -338,13 +467,60 @@
             border: 1px solid #eef2f6;
             background: white;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th, td { padding: 14px 12px; text-align: center !important; border-bottom: 1px solid #f0f2f5; font-size: 0.8rem; }
-        th { background: #f8fafc; font-weight: 700; color: #475569; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; z-index: 10; }
-        tbody tr:hover { background: #fef9ec; transition: 0.2s; }
-        .badge-present { background: #dcfce7; color: #15803d; padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
-        .badge-absent { background: #fee2e2; color: #b91c1c; padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
-        .badge-halfday { background: #fff3e3; color: #d97706; padding: 5px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: center !important;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 0.8rem;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #475569;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tbody tr:hover {
+            background: #fef9ec;
+            transition: 0.2s;
+        }
+        .badge-present {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-absent {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-halfday {
+            background: #fff3e3;
+            color: #d97706;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
         .action-btns {
             display: flex;
             gap: 8px;
@@ -361,7 +537,10 @@
             font-weight: 600;
             transition: 0.2s;
         }
-        .edit-btn:hover { background: #2563eb; transform: scale(1.02); }
+        .edit-btn:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
         .delete-btn {
             background: #ef4444;
             color: white;
@@ -373,15 +552,49 @@
             font-weight: 600;
             transition: 0.2s;
         }
-        .delete-btn:hover { background: #dc2626; transform: scale(1.02); }
-        
-        .loading { display: flex; justify-content: center; align-items: center; padding: 50px; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .no-data { text-align: center; padding: 50px; color: #94a3b8; }
-        .summary-row { background: #fef3c7; font-weight: 800; border-top: 2px solid #f59e0b; }
-        .summary-row td { font-weight: 800; color: #1e293b; background: #fffbeb; }
-        
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.02);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #94a3b8;
+        }
+        .summary-row {
+            background: #fef3c7;
+            font-weight: 800;
+            border-top: 2px solid #f59e0b;
+        }
+        .summary-row td {
+            font-weight: 800;
+            color: #1e293b;
+            background: #fffbeb;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -389,12 +602,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-        .modal.show { display: flex; }
+        .modal.show {
+            display: flex;
+        }
         .modal-content {
             background: white;
             border-radius: 32px;
@@ -424,7 +639,8 @@
             color: #475569;
             margin-bottom: 5px;
         }
-        .modal-input-group input, .modal-input-group select {
+        .modal-input-group input,
+        .modal-input-group select {
             width: 100%;
             padding: 10px 12px;
             border: 2px solid #e2e8f0;
@@ -433,7 +649,8 @@
             font-family: 'Inter', sans-serif;
             transition: 0.2s;
         }
-        .modal-input-group input:focus, .modal-input-group select:focus {
+        .modal-input-group input:focus,
+        .modal-input-group select:focus {
             outline: none;
             border-color: #f59e0b;
         }
@@ -456,13 +673,18 @@
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
         }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
         .btn-cancel {
             background: #e2e8f0;
             color: #475569;
         }
-        .btn-cancel:hover { background: #cbd5e1; }
-        
+        .btn-cancel:hover {
+            background: #cbd5e1;
+        }
+
         .autocomplete-container {
             position: relative;
             width: 100%;
@@ -479,19 +701,29 @@
             overflow-y: auto;
             z-index: 101;
             display: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        .autocomplete-suggestions.show { display: block; }
+        .autocomplete-suggestions.show {
+            display: block;
+        }
         .suggestion-item {
             padding: 10px 15px;
             cursor: pointer;
             border-bottom: 1px solid #f0f2f5;
             transition: 0.2s;
         }
-        .suggestion-item:hover { background: #fef3c7; }
-        .suggestion-name { font-weight: 600; color: #1e293b; }
-        .suggestion-id { font-size: 0.7rem; color: #f59e0b; }
-        
+        .suggestion-item:hover {
+            background: #fef3c7;
+        }
+        .suggestion-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .suggestion-id {
+            font-size: 0.7rem;
+            color: #f59e0b;
+        }
+
         .access-denied {
             display: flex;
             flex-direction: column;
@@ -527,1040 +759,1112 @@
             cursor: pointer;
             font-weight: 600;
         }
-        
+
         @media (max-width: 700px) {
-            .download-controls { flex-direction: column; align-items: stretch; }
-            .download-group { justify-content: center; }
-            .download-btn { width: 100%; justify-content: center; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .stat-card .value { font-size: 1.2rem; }
-            .table-container { max-height: 50vh; }
-            .header { padding: 16px; }
-            .modal-form-grid { grid-template-columns: 1fr; }
-            .admin-info-grid { flex-direction: column; gap: 8px; }
+            .download-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .download-group {
+                justify-content: center;
+            }
+            .download-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .stat-card .value {
+                font-size: 1.2rem;
+            }
+            .table-container {
+                max-height: 50vh;
+            }
+            .header {
+                padding: 16px;
+            }
+            .modal-form-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-info-grid {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <div class="logo-section">
-            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
-            <div class="logo-text">
-                <h1 id="headerTitle">SP CONSTRUCTION</h1>
-                <p id="headerSubtitle">ATTENDANCE MANAGER</p>
-            </div>
-        </div>
-        <div class="header-buttons">
-            <button class="add-new-btn" id="openAddModalBtn"><i class="fas fa-plus-circle"></i> Add New</button>
-            <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-        </div>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card card-1"><div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Records</h4><div class="value" id="statTotalRecords">0</div><div class="sub-text">Attendance entries</div></div><div class="stat-icon"><i class="fas fa-database"></i></div></div>
-        <div class="stat-card card-2"><div class="stat-info"><h4><i class="fas fa-users"></i> Total Workers</h4><div class="value" id="statTotalWorkers">0</div><div class="sub-text">Unique workers</div></div><div class="stat-icon"><i class="fas fa-user-friends"></i></div></div>
-        <div class="stat-card card-3"><div class="stat-info"><h4><i class="fas fa-clock"></i> Total Hours</h4><div class="value" id="statTotalHours">0</div><div class="sub-text">Worked hours</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
-        <div class="stat-card card-4"><div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Total Earnings</h4><div class="value" id="statTotalEarnings">Rs.0</div><div class="sub-text">Gross revenue</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
-        <div class="stat-card card-5"><div class="stat-info"><h4><i class="fas fa-money-bill-wave"></i> Total Paid</h4><div class="value" id="statTotalPaid">Rs.0</div><div class="sub-text">Disbursed amount</div></div><div class="stat-icon"><i class="fas fa-wallet"></i></div></div>
-        <div class="stat-card card-6"><div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Total Due</h4><div class="value" id="statTotalDue">Rs.0</div><div class="sub-text">Outstanding</div></div><div class="stat-icon"><i class="fas fa-hourglass-start"></i></div></div>
-        <div class="stat-card card-7"><div class="stat-info"><h4><i class="fas fa-user-check"></i> Present Today</h4><div class="value" id="statPresentToday">0</div><div class="sub-text">Workers present</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
-        <div class="stat-card card-8"><div class="stat-info"><h4><i class="fas fa-trend-up"></i> Today's Earnings</h4><div class="value" id="statTodayEarnings">Rs.0</div><div class="sub-text">Today's revenue</div></div><div class="stat-icon"><i class="fas fa-chart-simple"></i></div></div>
-    </div>
-
-    <div class="banner-section" id="bannerSection">
-        <div id="bannerContent" style="width:100%; min-height:140px; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center; transition:0.3s;">
-            <div class="banner-placeholder" id="bannerPlaceholder"><i class="fas fa-image"></i><p>Dashboard banner image will appear here</p></div>
-        </div>
-    </div>
-
-    <div class="data-card" id="mainContentCard">
-        <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>All Worker Attendance Records</h3></div>
-        
-        <div class="admin-info-section" id="adminInfoSection">
-            <div class="admin-info-grid">
-                <div class="admin-info-left"><span>Generated By:</span> <span id="adminName">Loading...</span><br><span>Admin ID:</span> <span id="adminId">Loading...</span><br><span>Email:</span> <span id="adminEmail">Loading...</span></div>
-                <div class="admin-info-right"><span>Mobile:</span> <span id="adminMobile">Loading...</span><br><span>Address:</span> <span id="adminAddress">Loading...</span><br><span>Report Date:</span> <span id="reportDate">Loading...</span></div>
-            </div>
-            <div class="separator-line"></div>
-        </div>
-        
-        <div id="attendanceContent">
-            <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="searchInput" placeholder="Search by date (YYYY-MM-DD), worker name, or worker ID..."><div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 records</span></div></div>
-            <div class="separator-line-light"></div>
-            <div class="table-container">
-                <table id="attendanceTable">
-                    <thead><tr><th>Date</th><th>Worker Name</th><th>Worker ID</th><th>Status</th><th>Hours</th><th>Rate (Rs.)</th><th>Earnings (Rs.)</th><th>Paid (Rs.)</th><th>Due (Rs.)</th><th>Work Description</th><th style="width:120px;">Actions</th></tr></thead>
-                    <tbody id="attendanceTableBody"><tr><td colspan="11" class="loading"><div class="spinner"></div></td></tr></tbody>
-                    <tfoot id="attendanceTableFooter"></tfoot>
-                </table>
-            </div>
-            <div class="download-controls">
-                <div class="download-group"><i class="fas fa-database" style="color:#f59e0b;"></i><label>DATA SOURCE</label><select id="dataSourceSelect"><option value="all">All records</option><option value="filtered">Filtered records (search result)</option></select></div>
-                <div class="download-group"><div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled><span style="font-size:0.7rem;">records</span></div><select id="downloadFormat"><option value="csv">CSV</option><option value="pdf">PDF</option></select></div>
-                <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
-            </div>
-        </div>
-        <div id="accessDeniedMessage" style="display:none;"></div>
-    </div>
-</div>
-
-<div class="modal" id="attendanceModal">
-    <div class="modal-content">
-        <h3 id="modalTitle">Add New Attendance Record</h3>
-        <div class="modal-form-grid">
-            <div class="modal-input-group"><label>Date</label><input type="date" id="modalDate" value=""></div>
-            <div class="modal-input-group"><label>Worker Name / ID</label><div class="autocomplete-container"><input type="text" id="modalWorkerSearch" placeholder="Type worker name or ID..." autocomplete="off"><div id="modalWorkerSuggestions" class="autocomplete-suggestions"></div></div></div>
-            <div class="modal-input-group"><label>Status</label><select id="modalStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select></div>
-            <div class="modal-input-group"><label>Work Hours</label><input type="number" id="modalHours" step="0.5" placeholder="Hours worked"></div>
-            <div class="modal-input-group"><label>Daily Rate (Rs.)</label><input type="number" id="modalRate" placeholder="Rate per day"></div>
-            <div class="modal-input-group"><label>Work Description</label><input type="text" id="modalWorkDesc" placeholder="What work done"></div>
-            <div class="modal-input-group"><label>Payment Given (Rs.)</label><input type="number" id="modalPaid" placeholder="Amount paid"></div>
-        </div>
-        <div id="modalSelectedWorkerInfo" style="background:#fef3c7; padding:8px 12px; border-radius:12px; margin-top:5px; display:none;"><span><i class="fas fa-check-circle" style="color:#22c55e;"></i> Selected: <strong id="modalSelectedWorkerName">-</strong> <span id="modalSelectedWorkerId" style="color:#f59e0b;"></span></span></div>
-        <div class="modal-buttons"><button class="btn-save" id="modalSaveBtn"><i class="fas fa-save"></i> Save</button><button class="btn-cancel" id="modalCancelBtn"><i class="fas fa-times"></i> Cancel</button></div>
-    </div>
-</div>
-
-<script type="module">
-    const db = window.db;
-    const auth = window.auth;
-    
-    let allAttendanceRecords = [];
-    let currentFilteredRecords = [];
-    let currentUserUid = null;
-    let allUsers = [];
-    let selectedWorkerForModal = null;
-    let editRecordId = null;
-    let isAdminUser = false;
-    let adminChecked = false;
-    let currentAdminInfo = {
-        name: '',
-        userId: '',
-        email: '',
-        mobile: '',
-        address: ''
-    };
-    let pdfLogoBase64 = null;
-    let companyLogoBase64 = null;
-    
-    const tbody = document.getElementById('attendanceTableBody');
-    const tfoot = document.getElementById('attendanceTableFooter');
-    const searchInput = document.getElementById('searchInput');
-    const resultCountSpan = document.getElementById('resultCountSpan');
-    const dataSourceSelect = document.getElementById('dataSourceSelect');
-    const limitCheckbox = document.getElementById('limitCheckbox');
-    const limitCountInput = document.getElementById('limitCount');
-    const downloadFormatSelect = document.getElementById('downloadFormat');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const headerLogo = document.getElementById('headerLogo');
-    const headerTitleSpan = document.getElementById('headerTitle');
-    const headerSubtitleSpan = document.getElementById('headerSubtitle');
-    const attendanceContent = document.getElementById('attendanceContent');
-    const accessDeniedDiv = document.getElementById('accessDeniedMessage');
-    
-    const adminNameSpan = document.getElementById('adminName');
-    const adminIdSpan = document.getElementById('adminId');
-    const adminEmailSpan = document.getElementById('adminEmail');
-    const adminMobileSpan = document.getElementById('adminMobile');
-    const adminAddressSpan = document.getElementById('adminAddress');
-    const reportDateSpan = document.getElementById('reportDate');
-    
-    const modal = document.getElementById('attendanceModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDate = document.getElementById('modalDate');
-    const modalWorkerSearch = document.getElementById('modalWorkerSearch');
-    const modalWorkerSuggestions = document.getElementById('modalWorkerSuggestions');
-    const modalStatus = document.getElementById('modalStatus');
-    const modalHours = document.getElementById('modalHours');
-    const modalRate = document.getElementById('modalRate');
-    const modalWorkDesc = document.getElementById('modalWorkDesc');
-    const modalPaid = document.getElementById('modalPaid');
-    const modalSelectedWorkerInfo = document.getElementById('modalSelectedWorkerInfo');
-    const modalSelectedWorkerName = document.getElementById('modalSelectedWorkerName');
-    const modalSelectedWorkerId = document.getElementById('modalSelectedWorkerId');
-    const modalSaveBtn = document.getElementById('modalSaveBtn');
-    const modalCancelBtn = document.getElementById('modalCancelBtn');
-    const openAddModalBtn = document.getElementById('openAddModalBtn');
-    
-    const statTotalRecords = document.getElementById('statTotalRecords');
-    const statTotalWorkers = document.getElementById('statTotalWorkers');
-    const statTotalHours = document.getElementById('statTotalHours');
-    const statTotalEarnings = document.getElementById('statTotalEarnings');
-    const statTotalPaid = document.getElementById('statTotalPaid');
-    const statTotalDue = document.getElementById('statTotalDue');
-    const statPresentToday = document.getElementById('statPresentToday');
-    const statTodayEarnings = document.getElementById('statTodayEarnings');
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-    }
-    
-    function formatIndianNumber(num) {
-        if (num === null || num === undefined || isNaN(num)) return '0';
-        let n = Math.round(parseFloat(num));
-        if (n < 1000) return n.toString();
-        let str = n.toString();
-        let lastThree = str.slice(-3);
-        let other = str.slice(0, -3);
-        if (other !== '') lastThree = ',' + lastThree;
-        return other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-    }
-    
-    function formatNumber(value) {
-        if (value === null || value === undefined) return '0';
-        let num = parseFloat(value);
-        if (isNaN(num)) return '0';
-        return formatIndianNumber(num);
-    }
-    
-    function getStatusBadge(status) {
-        if (status === 'present') return '<span class="badge-present">Present</span>';
-        if (status === 'absent') return '<span class="badge-absent">Absent</span>';
-        return '<span class="badge-halfday">Half Day</span>';
-    }
-    
-    function calculateEarnings(status, hours, rate) {
-        if (status === 'absent') return 0;
-        if (status === 'halfday') return rate / 2;
-        if (hours && hours > 0) return hours * (rate / 8);
-        return rate;
-    }
-    
-    // ========== GLOBAL BRANDING FUNCTIONS (same as dashboard) ==========
-    async function loadGlobalBranding() {
-        try {
-            const brandSnap = await window.get(window.ref(db, `companyAssets/branding`));
-            if (brandSnap.exists()) {
-                const brand = brandSnap.val();
-                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
-                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
-                console.log("Global branding loaded:", brand);
-            } else {
-                headerTitleSpan.textContent = 'SP CONSTRUCTION';
-                headerSubtitleSpan.textContent = 'ATTENDANCE MANAGER';
-                console.log("No global branding, using defaults");
-            }
-        } catch(err) {
-            console.warn("Error loading global branding:", err);
-        }
-    }
-    
-    function listenToGlobalBranding() {
-        const brandingRef = window.ref(db, `companyAssets/branding`);
-        window.onValue(brandingRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const brand = snapshot.val();
-                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
-                if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
-                console.log("Real-time global branding update:", brand);
-            } else {
-                headerTitleSpan.textContent = 'SP CONSTRUCTION';
-                headerSubtitleSpan.textContent = 'ATTENDANCE MANAGER';
-                console.log("Global branding removed, reset to defaults");
-            }
-        });
-    }
-    
-    async function loadCompanyLogo() {
-        try {
-            const logoRef = window.ref(db, `companyAssets/footerLogo`);
-            const snapshot = await window.get(logoRef);
-            
-            if (headerLogo) {
-                if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                    const logoUrl = snapshot.val();
-                    companyLogoBase64 = logoUrl;
-                    headerLogo.innerHTML = `<img src="${logoUrl}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                    console.log("Company logo loaded successfully");
-                } else {
-                    headerLogo.innerHTML = `<span>SP</span>`;
-                    console.log("No logo found, showing default SP");
-                }
-            }
-        } catch(err) {
-            console.warn("Error loading company logo:", err);
-            if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
-        }
-    }
-    
-    function listenLogoChanges() {
-        const logoRef = window.ref(db, `companyAssets/footerLogo`);
-        window.onValue(logoRef, (snapshot) => {
-            if (headerLogo) {
-                if (snapshot.val() && snapshot.val().startsWith('data:image')) {
-                    companyLogoBase64 = snapshot.val();
-                    headerLogo.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                } else {
-                    headerLogo.innerHTML = `<span>SP</span>`;
-                }
-            }
-        });
-    }
-    // ========== END GLOBAL BRANDING ==========
-    
-    function updateAdminInfoDisplay() {
-        if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
-        if (adminIdSpan) adminIdSpan.innerText = currentAdminInfo.userId || 'ADMIN001';
-        if (adminEmailSpan) adminEmailSpan.innerText = currentAdminInfo.email || 'N/A';
-        if (adminMobileSpan) adminMobileSpan.innerText = currentAdminInfo.mobile || 'N/A';
-        if (adminAddressSpan) adminAddressSpan.innerText = currentAdminInfo.address || 'N/A';
-        if (reportDateSpan) {
-            const now = new Date();
-            reportDateSpan.innerText = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' | ' + now.toLocaleTimeString();
-        }
-    }
-    
-    async function loadPdfLogo() {
-        try {
-            const pdfLogoRef = window.ref(db, `companyAssets/pdfLogo`);
-            const snapshot = await window.get(pdfLogoRef);
-            if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
-                pdfLogoBase64 = snapshot.val();
-                console.log("PDF Logo loaded");
-                return;
-            }
-            const footerRef = window.ref(db, `companyAssets/footerLogo`);
-            const footerSnap = await window.get(footerRef);
-            if (footerSnap.exists() && footerSnap.val() && footerSnap.val().startsWith('data:image')) {
-                pdfLogoBase64 = footerSnap.val();
-                console.log("Footer Logo loaded as fallback for PDF");
-                return;
-            }
-            pdfLogoBase64 = null;
-        } catch(err) {
-            pdfLogoBase64 = null;
-        }
-    }
-    
-    async function loadBannerImage() {
-        try {
-            const bannersRef = window.ref(db, `companyAssets/banners`);
-            const snapshot = await window.get(bannersRef);
-            const bannerContainer = document.getElementById('bannerContent');
-            const placeholder = document.getElementById('bannerPlaceholder');
-            
-            if (snapshot.exists()) {
-                const banners = Object.values(snapshot.val());
-                if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
-                    bannerContainer.style.backgroundImage = `url(${banners[0].image})`;
-                    bannerContainer.style.backgroundSize = 'cover';
-                    bannerContainer.style.backgroundPosition = 'center';
-                    if (placeholder) placeholder.style.display = 'none';
-                    return;
-                }
-            }
-            bannerContainer.style.backgroundImage = '';
-            if (placeholder) placeholder.style.display = 'flex';
-        } catch(e) {}
-    }
-    
-    async function loadCurrentAdminInfo(user) {
-        if (!user) return;
-        try {
-            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
-            const userData = userSnap.val();
-            if (userData) {
-                currentAdminInfo.name = userData.fullName || userData.firstName || user.email?.split('@')[0] || 'Admin';
-                currentAdminInfo.userId = userData.userId || user.uid?.slice(0, 8) || 'ADMIN001';
-                currentAdminInfo.email = userData.email || user.email || 'N/A';
-                currentAdminInfo.mobile = userData.mobile || userData.phone || 'N/A';
-                currentAdminInfo.address = userData.address || userData.city || 'N/A';
-            } else {
-                currentAdminInfo.name = user.email?.split('@')[0] || 'Admin';
-                currentAdminInfo.userId = user.uid?.slice(0, 8) || 'ADMIN001';
-                currentAdminInfo.email = user.email || 'N/A';
-                currentAdminInfo.mobile = 'N/A';
-                currentAdminInfo.address = 'N/A';
-            }
-            updateAdminInfoDisplay();
-        } catch (err) {}
-    }
-    
-    function drawPDFLogo(doc, x, y, size = 18) {
-        if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
-            try {
-                doc.addImage(pdfLogoBase64, 'JPEG', x, y - 5, size, size);
-                return true;
-            } catch(e) {}
-        }
-        const radius = size / 2;
-        const centerX = x + radius;
-        const centerY = (y - 5) + radius;
-        doc.setFillColor(245, 158, 11);
-        doc.circle(centerX, centerY, radius, 'F');
-        doc.setFontSize(12);
-        doc.setTextColor(255, 255, 255);
-        doc.setFont("helvetica", "bold");
-        doc.text("SP", centerX, centerY + 4, { align: "center" });
-        return true;
-    }
-    
-    function drawWatermarkOverlay(doc, w, h) {
-        if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
-            try {
-                const maxSize = Math.min(w, h) * 0.45;
-                const x = (w - maxSize) / 2;
-                const y = (h - maxSize) / 2;
-                doc.setGState(new doc.GState({ opacity: 0.12 }));
-                doc.addImage(pdfLogoBase64, 'JPEG', x, y, maxSize, maxSize);
-                doc.setGState(new doc.GState({ opacity: 1 }));
-            } catch(e) {}
-        }
-        return true;
-    }
-    
-    function showAccessDenied() {
-        if (attendanceContent) attendanceContent.style.display = 'none';
-        if (accessDeniedDiv) {
-            accessDeniedDiv.style.display = 'block';
-            accessDeniedDiv.innerHTML = `
-                <div class="access-denied">
-                    <i class="fas fa-shield-alt"></i>
-                    <h2>Access Denied</h2>
-                    <p>You don't have administrator privileges to access this page.</p>
-                    <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+    <div class="container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+                <div class="logo-text">
+                    <h1 id="headerTitle">SP CONSTRUCTION</h1>
+                    <p id="headerSubtitle">ATTENDANCE MANAGER</p>
                 </div>
-            `;
-        }
-    }
-    
-    async function checkAdminAndLoad(user) {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        try {
-            const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
-            const userData = userSnap.val();
-            if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
-                showAccessDenied();
-                return;
-            }
-            isAdminUser = true;
-            if (attendanceContent) attendanceContent.style.display = 'block';
-            if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
-            await loadCurrentAdminInfo(user);
-            await loadUsers();
-            await loadAllAttendance();
-            await loadPdfLogo();
-            await loadCompanyLogo();
-            listenLogoChanges();
-            await loadBannerImage();
-            await loadGlobalBranding();
-            listenToGlobalBranding();
-        } catch (error) {
-            showAccessDenied();
-        }
-    }
-    
-    async function loadUsers() {
-        try {
-            const usersRef = window.ref(db, 'users');
-            const snapshot = await window.get(usersRef);
-            if (snapshot.exists()) {
-                allUsers = Object.values(snapshot.val());
-            } else {
-                allUsers = [];
-            }
-        } catch (err) {
-            console.error("Error loading users:", err);
-        }
-    }
-    
-    function computeTotals(records) {
-        let totalHours = 0, totalEarnings = 0, totalPaid = 0, totalDue = 0;
-        const uniqueWorkers = new Set();
-        for (const r of records) {
-            totalHours += r.hours || 0;
-            const earn = r.earnings || 0;
-            const paid = r.paid || 0;
-            totalEarnings += earn;
-            totalPaid += paid;
-            totalDue += (earn - paid);
-            if (r.workerId) uniqueWorkers.add(r.workerId);
-        }
-        return {
-            recordCount: records.length,
-            uniqueWorkers: uniqueWorkers.size,
-            totalHours: totalHours,
-            totalEarnings: totalEarnings,
-            totalPaid: totalPaid,
-            totalDue: totalDue
+            </div>
+            <div class="header-buttons">
+                <button class="add-new-btn" id="openAddModalBtn"><i class="fas fa-plus-circle"></i> Add New</button>
+                <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card card-1"><div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Records</h4><div class="value" id="statTotalRecords">0</div><div class="sub-text">Attendance entries</div></div><div class="stat-icon"><i class="fas fa-database"></i></div></div>
+            <div class="stat-card card-2"><div class="stat-info"><h4><i class="fas fa-users"></i> Total Workers</h4><div class="value" id="statTotalWorkers">0</div><div class="sub-text">Unique workers</div></div><div class="stat-icon"><i class="fas fa-user-friends"></i></div></div>
+            <div class="stat-card card-3"><div class="stat-info"><h4><i class="fas fa-clock"></i> Total Hours</h4><div class="value" id="statTotalHours">0</div><div class="sub-text">Worked hours</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
+            <div class="stat-card card-4"><div class="stat-info"><h4><i class="fas fa-rupee-sign"></i> Total Earnings</h4><div class="value" id="statTotalEarnings">Rs.0</div><div class="sub-text">Gross revenue</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
+            <div class="stat-card card-5"><div class="stat-info"><h4><i class="fas fa-money-bill-wave"></i> Total Paid</h4><div class="value" id="statTotalPaid">Rs.0</div><div class="sub-text">Disbursed amount</div></div><div class="stat-icon"><i class="fas fa-wallet"></i></div></div>
+            <div class="stat-card card-6"><div class="stat-info"><h4><i class="fas fa-hand-holding-usd"></i> Total Due</h4><div class="value" id="statTotalDue">Rs.0</div><div class="sub-text">Outstanding</div></div><div class="stat-icon"><i class="fas fa-hourglass-start"></i></div></div>
+            <div class="stat-card card-7"><div class="stat-info"><h4><i class="fas fa-user-check"></i> Present Today</h4><div class="value" id="statPresentToday">0</div><div class="sub-text">Workers present</div></div><div class="stat-icon"><i class="fas fa-sun"></i></div></div>
+            <div class="stat-card card-8"><div class="stat-info"><h4><i class="fas fa-trend-up"></i> Today's Earnings</h4><div class="value" id="statTodayEarnings">Rs.0</div><div class="sub-text">Today's revenue</div></div><div class="stat-icon"><i class="fas fa-chart-simple"></i></div></div>
+        </div>
+
+        <div class="banner-section" id="bannerSection">
+            <div id="bannerContent" style="width:100%; min-height:140px; display:flex; align-items:center; justify-content:center; background-size:cover; background-position:center; transition:0.3s;">
+                <div class="banner-placeholder" id="bannerPlaceholder"><i class="fas fa-image"></i><p>Dashboard banner image will appear here</p></div>
+            </div>
+        </div>
+
+        <div class="data-card" id="mainContentCard">
+            <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>All Worker Attendance Records</h3></div>
+
+            <div class="admin-info-section" id="adminInfoSection">
+                <div class="admin-info-grid">
+                    <div class="admin-info-left"><span>Generated By:</span> <span id="adminName">Loading...</span><br><span>Admin ID:</span> <span id="adminId">Loading...</span><br><span>Email:</span> <span id="adminEmail">Loading...</span></div>
+                    <div class="admin-info-right"><span>Mobile:</span> <span id="adminMobile">Loading...</span><br><span>Address:</span> <span id="adminAddress">Loading...</span><br><span>Report Date:</span> <span id="reportDate">Loading...</span></div>
+                </div>
+                <div class="separator-line"></div>
+            </div>
+
+            <div id="attendanceContent">
+                <div class="search-wrapper"><i class="fas fa-search search-icon"></i><input type="text" id="searchInput" placeholder="Search by date (YYYY-MM-DD), worker name, or worker ID..."><div class="result-badge"><span><i class="fas fa-filter"></i> Live filter</span><span class="result-count" id="resultCountSpan">0 records</span></div></div>
+                <div class="separator-line-light"></div>
+                <div class="table-container">
+                    <table id="attendanceTable">
+                        <thead><tr><th>Date</th><th>Worker Name</th><th>Worker ID</th><th>Status</th><th>Hours</th><th>Rate (Rs.)</th><th>Earnings (Rs.)</th><th>Paid (Rs.)</th><th>Due (Rs.)</th><th>Work Description</th><th style="width:120px;">Actions</th></tr></thead>
+                        <tbody id="attendanceTableBody"><tr><td colspan="11" class="loading"><div class="spinner"></div></td></tr></tbody>
+                        <tfoot id="attendanceTableFooter"></tfoot>
+                    </table>
+                </div>
+                <div class="download-controls">
+                    <div class="download-group"><i class="fas fa-database" style="color:#f59e0b;"></i><label>DATA SOURCE</label><select id="dataSourceSelect"><option value="all">All records</option><option value="filtered">Filtered records (search result)</option></select></div>
+                    <div class="download-group"><div class="limit-control"><input type="checkbox" id="limitCheckbox"><label>Limit to latest</label><input type="number" id="limitCount" min="1" value="10" disabled><span style="font-size:0.7rem;">records</span></div><select id="downloadFormat"><option value="csv">CSV</option><option value="pdf">PDF</option></select></div>
+                    <button id="downloadBtn" class="download-btn"><i class="fas fa-file-export"></i> Download Report</button>
+                </div>
+            </div>
+            <div id="accessDeniedMessage" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="attendanceModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Add New Attendance Record</h3>
+            <div class="modal-form-grid">
+                <div class="modal-input-group"><label>Date *</label><input type="date" id="modalDate" value=""></div>
+                <div class="modal-input-group"><label>Worker Name / ID *</label><div class="autocomplete-container"><input type="text" id="modalWorkerSearch" placeholder="Type worker name or ID..." autocomplete="off"><div id="modalWorkerSuggestions" class="autocomplete-suggestions"></div></div></div>
+                <div class="modal-input-group"><label>Status</label><select id="modalStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="halfday">Half Day</option></select></div>
+                <div class="modal-input-group"><label>Work Hours</label><input type="number" id="modalHours" step="0.5" placeholder="Hours worked"></div>
+                <div class="modal-input-group"><label>Daily Rate (Rs.)</label><input type="number" id="modalRate" placeholder="Rate per day"></div>
+                <div class="modal-input-group"><label>Work Description</label><input type="text" id="modalWorkDesc" placeholder="What work done"></div>
+                <div class="modal-input-group"><label>Payment Given (Rs.)</label><input type="number" id="modalPaid" placeholder="Amount paid"></div>
+            </div>
+            <div id="modalSelectedWorkerInfo" style="background:#fef3c7; padding:8px 12px; border-radius:12px; margin-top:5px; display:none;"><span><i class="fas fa-check-circle" style="color:#22c55e;"></i> Selected: <strong id="modalSelectedWorkerName">-</strong> <span id="modalSelectedWorkerId" style="color:#f59e0b;"></span></span></div>
+            <div class="modal-buttons"><button class="btn-save" id="modalSaveBtn"><i class="fas fa-save"></i> Save</button><button class="btn-cancel" id="modalCancelBtn"><i class="fas fa-times"></i> Cancel</button></div>
+        </div>
+    </div>
+
+    <script type="module">
+        const db = window.db;
+        const auth = window.auth;
+
+        let allAttendanceRecords = [];
+        let currentFilteredRecords = [];
+        let currentUserUid = null;
+        let allUsers = [];
+        let selectedWorkerForModal = null;
+        let editRecordId = null;
+        let isAdminUser = false;
+        let adminChecked = false;
+        let currentAdminInfo = {
+            name: '',
+            userId: '',
+            email: '',
+            mobile: '',
+            address: ''
         };
-    }
-    
-    function updateStatsCards(records) {
-        const totals = computeTotals(records);
-        statTotalRecords.innerText = formatIndianNumber(totals.recordCount);
-        statTotalWorkers.innerText = formatIndianNumber(totals.uniqueWorkers);
-        statTotalHours.innerText = formatIndianNumber(totals.totalHours);
-        statTotalEarnings.innerHTML = `Rs.${formatIndianNumber(totals.totalEarnings)}`;
-        statTotalPaid.innerHTML = `Rs.${formatIndianNumber(totals.totalPaid)}`;
-        statTotalDue.innerHTML = `Rs.${formatIndianNumber(totals.totalDue)}`;
-        
-        const today = new Date().toISOString().split('T')[0];
-        let presentTodayCount = 0;
-        let todayTotalEarnings = 0;
-        for (const r of records) {
-            if (r.date === today) {
-                if (r.status === 'present') presentTodayCount++;
-                todayTotalEarnings += r.earnings || 0;
-            }
+        let pdfLogoBase64 = null;
+        let companyLogoBase64 = null;
+
+        const tbody = document.getElementById('attendanceTableBody');
+        const tfoot = document.getElementById('attendanceTableFooter');
+        const searchInput = document.getElementById('searchInput');
+        const resultCountSpan = document.getElementById('resultCountSpan');
+        const dataSourceSelect = document.getElementById('dataSourceSelect');
+        const limitCheckbox = document.getElementById('limitCheckbox');
+        const limitCountInput = document.getElementById('limitCount');
+        const downloadFormatSelect = document.getElementById('downloadFormat');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const headerLogo = document.getElementById('headerLogo');
+        const headerTitleSpan = document.getElementById('headerTitle');
+        const headerSubtitleSpan = document.getElementById('headerSubtitle');
+        const attendanceContent = document.getElementById('attendanceContent');
+        const accessDeniedDiv = document.getElementById('accessDeniedMessage');
+
+        const adminNameSpan = document.getElementById('adminName');
+        const adminIdSpan = document.getElementById('adminId');
+        const adminEmailSpan = document.getElementById('adminEmail');
+        const adminMobileSpan = document.getElementById('adminMobile');
+        const adminAddressSpan = document.getElementById('adminAddress');
+        const reportDateSpan = document.getElementById('reportDate');
+
+        const modal = document.getElementById('attendanceModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDate = document.getElementById('modalDate');
+        const modalWorkerSearch = document.getElementById('modalWorkerSearch');
+        const modalWorkerSuggestions = document.getElementById('modalWorkerSuggestions');
+        const modalStatus = document.getElementById('modalStatus');
+        const modalHours = document.getElementById('modalHours');
+        const modalRate = document.getElementById('modalRate');
+        const modalWorkDesc = document.getElementById('modalWorkDesc');
+        const modalPaid = document.getElementById('modalPaid');
+        const modalSelectedWorkerInfo = document.getElementById('modalSelectedWorkerInfo');
+        const modalSelectedWorkerName = document.getElementById('modalSelectedWorkerName');
+        const modalSelectedWorkerId = document.getElementById('modalSelectedWorkerId');
+        const modalSaveBtn = document.getElementById('modalSaveBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const openAddModalBtn = document.getElementById('openAddModalBtn');
+
+        const statTotalRecords = document.getElementById('statTotalRecords');
+        const statTotalWorkers = document.getElementById('statTotalWorkers');
+        const statTotalHours = document.getElementById('statTotalHours');
+        const statTotalEarnings = document.getElementById('statTotalEarnings');
+        const statTotalPaid = document.getElementById('statTotalPaid');
+        const statTotalDue = document.getElementById('statTotalDue');
+        const statPresentToday = document.getElementById('statPresentToday');
+        const statTodayEarnings = document.getElementById('statTodayEarnings');
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
-        statPresentToday.innerText = formatIndianNumber(presentTodayCount);
-        statTodayEarnings.innerHTML = `Rs.${formatIndianNumber(todayTotalEarnings)}`;
-    }
-    
-    function renderFooter(records) {
-        if (!records.length) { tfoot.innerHTML = ''; return; }
-        const totals = computeTotals(records);
-        const dueColor = totals.totalDue < 0 ? '#dc2626' : '#15803d';
-        tfoot.innerHTML = `
-            <tr class="summary-row">
-                <td colspan="2"><strong>TOTAL SUMMARY</strong></td>
-                <td><strong>${totals.uniqueWorkers} Workers</strong></td>
-                <td><strong>${totals.recordCount} Records</strong></td>
-                <td><strong>${formatIndianNumber(totals.totalHours)} hrs</strong></td>
-                <td>—</strong></td>
-                <td><strong>Rs.${formatIndianNumber(totals.totalEarnings)}</strong></td>
-                <td><strong>Rs.${formatIndianNumber(totals.totalPaid)}</strong></td>
-                <td style="color: ${dueColor};"><strong>Rs.${formatIndianNumber(totals.totalDue)}</strong></td>
-                <td>—</strong></td>
-                <td>—</strong></td>
-            </tr>
-        `;
-    }
-    
-    function renderTable() {
-        if (!currentFilteredRecords.length) {
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data">No attendance records found<\/td><tr>';
-            resultCountSpan.innerText = `0 records`;
-            tfoot.innerHTML = '';
-            updateStatsCards([]);
-            return;
+
+        function formatIndianNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '0';
+            let n = Math.round(parseFloat(num));
+            if (n < 1000) return n.toString();
+            let str = n.toString();
+            let lastThree = str.slice(-3);
+            let other = str.slice(0, -3);
+            if (other !== '') lastThree = ',' + lastThree;
+            return other.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
         }
-        let html = '';
-        for (let r of currentFilteredRecords) {
-            const due = (r.earnings || 0) - (r.paid || 0);
-            const dueColor = due < 0 ? '#dc2626' : '#15803d';
-            html += `
-                <tr>
-                    <td>${escapeHtml(r.date || 'N/A')}</td>
-                    <td><strong>${escapeHtml(r.workerName || 'N/A')}</strong></td>
-                    <td style="color:#f59e0b; font-weight:600;">${escapeHtml(r.workerId || 'N/A')}</td>
-                    <td>${getStatusBadge(r.status)}</td>
-                    <td>${r.hours || 0}</td>
-                    <td class="amount-positive">Rs.${formatNumber(r.rate || 0)}</td>
-                    <td class="amount-positive">Rs.${formatNumber(r.earnings || 0)}</td>
-                    <td class="amount-positive">Rs.${formatNumber(r.paid || 0)}</td>
-                    <td style="color: ${dueColor}; font-weight:600;">Rs.${formatNumber(due)}</td>
-                    <td>${escapeHtml(r.workDesc || '-')}</td>
-                    <td class="action-btns">
-                        <button class="edit-btn" onclick="openEditModal('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="delete-btn" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i> Del</button>
-                    </td>
-                </tr>
-            `;
+
+        function formatNumber(value) {
+            if (value === null || value === undefined) return '0';
+            let num = parseFloat(value);
+            if (isNaN(num)) return '0';
+            return formatIndianNumber(num);
         }
-        tbody.innerHTML = html;
-        resultCountSpan.innerText = `${currentFilteredRecords.length} record${currentFilteredRecords.length !== 1 ? 's' : ''}`;
-        renderFooter(currentFilteredRecords);
-        updateStatsCards(currentFilteredRecords);
-    }
-    
-    function filterRecords(searchTerm) {
-        const term = searchTerm.trim().toLowerCase();
-        if (!term) {
-            currentFilteredRecords = [...allAttendanceRecords];
-            renderTable();
-            return;
+
+        function getStatusBadge(status) {
+            if (status === 'present') return '<span class="badge-present">Present</span>';
+            if (status === 'absent') return '<span class="badge-absent">Absent</span>';
+            return '<span class="badge-halfday">Half Day</span>';
         }
-        const filtered = allAttendanceRecords.filter(rec => {
-            const dateMatch = rec.date && rec.date.toLowerCase().includes(term);
-            const nameMatch = rec.workerName && rec.workerName.toLowerCase().includes(term);
-            const idMatch = rec.workerId && rec.workerId.toLowerCase().includes(term);
-            return dateMatch || nameMatch || idMatch;
-        });
-        currentFilteredRecords = filtered;
-        renderTable();
-    }
-    
-    async function loadAllAttendance() {
-        if (!isAdminUser) return;
-        try {
-            const snapshot = await window.get(window.ref(db, 'attendance'));
-            let records = [];
-            if (snapshot.exists()) {
-                const raw = snapshot.val();
-                records = Object.entries(raw).map(([id, data]) => ({ id, ...data }));
-            }
-            records.sort((a,b) => new Date(b.date) - new Date(a.date));
-            allAttendanceRecords = records;
-            currentFilteredRecords = [...allAttendanceRecords];
-            renderTable();
-            if (searchInput.value.trim() !== "") {
-                filterRecords(searchInput.value);
-            }
-        } catch (error) {
-            console.error(error);
-            tbody.innerHTML = '<tr><td colspan="11" class="no-data">Error loading data<\/td></tr>';
-            tfoot.innerHTML = '';
+
+        function calculateEarnings(status, hours, rate) {
+            if (status === 'absent') return 0;
+            if (status === 'halfday') return rate / 2;
+            if (hours && hours > 0) return hours * (rate / 8);
+            return rate;
         }
-    }
-    
-    async function addAttendanceRecord(recordData) {
-        if (!isAdminUser) return;
-        try {
-            const newRef = window.push(window.ref(db, 'attendance'));
-            await window.set(newRef, recordData);
-            await loadAllAttendance();
-            showToast('Record added successfully!');
-            if (window.addNotification) {
-                await window.addNotification('নতুন উপস্থিতি যোগ করা হয়েছে', `${recordData.workerName} - ${recordData.date} তারিখে`, 'success');
-            }
-        } catch (error) {
-            console.error(error);
-            showToast('Failed to add record', true);
-        }
-    }
-    
-    async function updateAttendanceRecord(id, recordData) {
-        if (!isAdminUser) return;
-        try {
-            const recordRef = window.ref(db, `attendance/${id}`);
-            await window.update(recordRef, recordData);
-            await loadAllAttendance();
-            showToast('Record updated successfully!');
-            if (window.addNotification) {
-                await window.addNotification('উপস্থিতি সম্পাদিত হয়েছে', `${recordData.workerName} - ${recordData.date} তারিখে তথ্য পরিবর্তিত`, 'info');
-            }
-        } catch (error) {
-            console.error(error);
-            showToast('Failed to update record', true);
-        }
-    }
-    
-    window.deleteRecord = async function(id) {
-        if (!isAdminUser) return;
-        if (confirm('Are you sure you want to delete this record?')) {
+
+        // ========== GLOBAL BRANDING FUNCTIONS (same as dashboard) ==========
+        async function loadGlobalBranding() {
             try {
-                const recordRef = window.ref(db, `attendance/${id}`);
-                await window.remove(recordRef);
-                await loadAllAttendance();
-                showToast('Record deleted successfully!');
-                if (window.addNotification) {
-                    await window.addNotification('উপস্থিতি রেকর্ড মুছে ফেলা হয়েছে', 'একটি উপস্থিতি এন্ট্রি ডিলিট করা হয়েছে', 'warning');
+                const brandSnap = await window.get(window.ref(db, `companyAssets/branding`));
+                if (brandSnap.exists()) {
+                    const brand = brandSnap.val();
+                    if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                    if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                    console.log("Global branding loaded:", brand);
+                } else {
+                    headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                    headerSubtitleSpan.textContent = 'ATTENDANCE MANAGER';
+                    console.log("No global branding, using defaults");
                 }
-            } catch (error) {
-                console.error(error);
-                showToast('Failed to delete record', true);
+            } catch (err) {
+                console.warn("Error loading global branding:", err);
             }
         }
-    };
-    
-    function setupModalAutoSuggest() {
-        modalWorkerSearch.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            if (!query) {
-                modalWorkerSuggestions.classList.remove('show');
-                return;
-            }
-            const filtered = allUsers.filter(user => {
-                const fullName = (user.firstName + ' ' + user.lastName).toLowerCase();
-                const userId = (user.userId || '').toLowerCase();
-                return fullName.includes(query) || userId.includes(query);
+
+        function listenToGlobalBranding() {
+            const brandingRef = window.ref(db, `companyAssets/branding`);
+            window.onValue(brandingRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const brand = snapshot.val();
+                    if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                    if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                    console.log("Real-time global branding update:", brand);
+                } else {
+                    headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                    headerSubtitleSpan.textContent = 'ATTENDANCE MANAGER';
+                    console.log("Global branding removed, reset to defaults");
+                }
             });
-            if (filtered.length === 0) {
-                modalWorkerSuggestions.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;">No workers found</div>';
-                modalWorkerSuggestions.classList.add('show');
-                return;
-            }
-            modalWorkerSuggestions.innerHTML = filtered.map(user => {
-                const fullName = user.firstName + ' ' + user.lastName;
-                return `<div class="suggestion-item" onclick="selectWorkerForModal('${user.userId}', '${escapeHtml(fullName)}')">
-                            <div class="suggestion-name">${escapeHtml(fullName)}</div>
-                            <div class="suggestion-id">ID: ${user.userId}</div>
-                        </div>`;
-            }).join('');
-            modalWorkerSuggestions.classList.add('show');
-        });
-        
-        document.addEventListener('click', function(e) {
-            if (!modalWorkerSearch.contains(e.target) && !modalWorkerSuggestions.contains(e.target)) {
-                modalWorkerSuggestions.classList.remove('show');
-            }
-        });
-    }
-    
-    window.selectWorkerForModal = function(userId, fullName) {
-        selectedWorkerForModal = { userId, fullName };
-        modalWorkerSearch.value = fullName;
-        modalSelectedWorkerName.innerText = fullName;
-        modalSelectedWorkerId.innerText = 'ID: ' + userId;
-        modalSelectedWorkerInfo.style.display = 'block';
-        modalWorkerSuggestions.classList.remove('show');
-    };
-    
-    function clearModalSelection() {
-        selectedWorkerForModal = null;
-        modalWorkerSearch.value = '';
-        modalSelectedWorkerInfo.style.display = 'none';
-    }
-    
-    function openAddModal() {
-        if (!isAdminUser) return;
-        editRecordId = null;
-        modalTitle.innerText = 'Add New Attendance Record';
-        modalDate.value = new Date().toISOString().split('T')[0];
-        clearModalSelection();
-        modalStatus.value = 'present';
-        modalHours.value = '';
-        modalRate.value = '';
-        modalWorkDesc.value = '';
-        modalPaid.value = '';
-        modal.classList.add('show');
-    }
-    
-    window.openEditModal = function(id) {
-        if (!isAdminUser) return;
-        const record = allAttendanceRecords.find(r => r.id === id);
-        if (!record) return;
-        editRecordId = id;
-        modalTitle.innerText = 'Edit Attendance Record';
-        modalDate.value = record.date || '';
-        modalWorkerSearch.value = record.workerName || '';
-        selectedWorkerForModal = { userId: record.workerId, fullName: record.workerName };
-        modalSelectedWorkerName.innerText = record.workerName || '';
-        modalSelectedWorkerId.innerText = 'ID: ' + (record.workerId || '');
-        modalSelectedWorkerInfo.style.display = 'block';
-        modalStatus.value = record.status || 'present';
-        modalHours.value = record.hours || '';
-        modalRate.value = record.rate || '';
-        modalWorkDesc.value = record.workDesc || '';
-        modalPaid.value = record.paid || '';
-        modal.classList.add('show');
-    };
-    
-    function closeModal() {
-        modal.classList.remove('show');
-        editRecordId = null;
-        clearModalSelection();
-    }
-    
-    async function saveModalRecord() {
-        if (!isAdminUser) return;
-        const date = modalDate.value;
-        const status = modalStatus.value;
-        const hours = parseFloat(modalHours.value) || 0;
-        const rate = parseFloat(modalRate.value) || 0;
-        const workDesc = modalWorkDesc.value.trim() || '-';
-        const paid = parseFloat(modalPaid.value) || 0;
-        
-        if (!date) {
-            showToast('Please select a date', true);
-            return;
         }
-        if (!selectedWorkerForModal) {
-            showToast('Please select a worker', true);
-            return;
-        }
-        if (rate <= 0) {
-            showToast('Please enter daily rate', true);
-            return;
-        }
-        
-        const earnings = calculateEarnings(status, hours, rate);
-        const due = earnings - paid;
-        
-        const recordData = {
-            workerId: selectedWorkerForModal.userId,
-            workerName: selectedWorkerForModal.fullName,
-            date: date,
-            status: status,
-            hours: status === 'absent' ? 0 : hours,
-            rate: rate,
-            earnings: earnings,
-            paid: paid,
-            due: due,
-            workDesc: workDesc,
-            createdAt: new Date().toISOString()
-        };
-        
-        if (editRecordId) {
-            recordData.updatedAt = new Date().toISOString();
-            await updateAttendanceRecord(editRecordId, recordData);
-        } else {
-            await addAttendanceRecord(recordData);
-        }
-        closeModal();
-    }
-    
-    function showToast(msg, isErr = false, duration = 3000) {
-        const toast = document.createElement('div');
-        toast.innerText = msg;
-        toast.style.position = 'fixed';
-        toast.style.bottom = '30px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.background = isErr ? '#dc2626' : '#15803d';
-        toast.style.color = 'white';
-        toast.style.padding = '10px 24px';
-        toast.style.borderRadius = '40px';
-        toast.style.fontSize = '0.8rem';
-        toast.style.zIndex = '9999';
-        toast.style.fontFamily = 'Inter, sans-serif';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), duration);
-    }
-    
-    function prepareExportData(records) {
-        return records.map(rec => ({
-            date: rec.date || 'N/A',
-            workerName: rec.workerName || 'N/A',
-            workerId: rec.workerId || 'N/A',
-            status: rec.status === 'present' ? 'Present' : (rec.status === 'absent' ? 'Absent' : 'Half Day'),
-            hours: rec.hours || 0,
-            rate: rec.rate || 0,
-            earnings: rec.earnings || 0,
-            paid: rec.paid || 0,
-            due: (rec.earnings || 0) - (rec.paid || 0),
-            workDesc: rec.workDesc || '-'
-        }));
-    }
-    
-    function downloadCSV(records, fileName) {
-        if (!records.length) { alert("No records to export."); return; }
-        const data = prepareExportData(records);
-        const headers = ["Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate (Rs.)", "Earnings (Rs.)", "Paid (Rs.)", "Due (Rs.)", "Work Description"];
-        const csvRows = [headers.join(",")];
-        for (const row of data) {
-            const values = headers.map(header => {
-                let key = header.toLowerCase().replace(/[^a-z]/g, '');
-                if (key === 'rate') key = 'rate';
-                if (key === 'earnings') key = 'earnings';
-                if (key === 'paid') key = 'paid';
-                if (key === 'due') key = 'due';
-                if (key === 'workdescription') key = 'workDesc';
-                let val = row[key] !== undefined ? row[key] : '';
-                if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) val = `"${val.replace(/"/g, '""')}"`;
-                return val;
-            });
-            csvRows.push(values.join(","));
-        }
-        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.href = url; link.download = fileName;
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-    
-    // ========== PDF DOWNLOAD WITH CUSTOM BANNER IMAGE ==========
-    async function downloadPDF(records, fileName) {
-        if (!records.length) { alert("No records to generate PDF."); return; }
-        showToast('Generating PDF...');
-        try {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            const w = doc.internal.pageSize.getWidth();
-            const h = doc.internal.pageSize.getHeight();
-            const cx = w/2;
-            let y = 10;
-            
-            // Try to load custom PDF header image from companyAssets/pdfHeaderImage
-            let pdfHeaderBase64 = null;
+
+        async function loadCompanyLogo() {
             try {
-                const pdfHeaderSnap = await window.get(window.ref(db, `companyAssets/pdfHeaderImage`));
-                if (pdfHeaderSnap.exists() && pdfHeaderSnap.val() && pdfHeaderSnap.val().startsWith('data:image')) {
-                    pdfHeaderBase64 = pdfHeaderSnap.val();
+                const logoRef = window.ref(db, `companyAssets/footerLogo`);
+                const snapshot = await window.get(logoRef);
+
+                if (headerLogo) {
+                    if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                        const logoUrl = snapshot.val();
+                        companyLogoBase64 = logoUrl;
+                        headerLogo.innerHTML =
+                            `<img src="${logoUrl}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                        console.log("Company logo loaded successfully");
+                    } else {
+                        headerLogo.innerHTML = `<span>SP</span>`;
+                        console.log("No logo found, showing default SP");
+                    }
                 }
-            } catch(e) { console.warn("Could not load PDF header image", e); }
-            
-            if (pdfHeaderBase64) {
-                // Add banner image at the top
-                const imgWidth = w - 20; // 10mm margins
-                let imgHeight = 25; // fixed height, you can adjust
-                try {
-                    doc.addImage(pdfHeaderBase64, 'JPEG', 10, y, imgWidth, imgHeight, undefined, 'FAST');
-                    y += imgHeight + 5;
-                } catch(e) {
-                    console.warn("Error adding PDF header image, falling back to text", e);
-                    drawTextHeader(doc);
-                    y += 24;
-                }
-            } else {
-                drawTextHeader(doc);
-                y += 24;
+            } catch (err) {
+                console.warn("Error loading company logo:", err);
+                if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
             }
-            
-            function drawTextHeader(doc) {
-                const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
-                const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'ATTENDANCE MANAGER';
-                drawPDFLogo(doc, 14, y, 16);
-                doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(245,158,11);
-                doc.text(`${globalTitle} - ATTENDANCE REPORT`, cx, y+9, { align:"center" });
-                doc.setDrawColor(245,158,11); doc.setLineWidth(0.6); doc.line(12, y+14, w-12, y+14);
-                doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text(globalSubtitle, cx, y+19, { align:"center" });
-                return y+24;
-            }
-            
-            // Admin info
-            doc.setFontSize(8); doc.setTextColor(80,80,80); doc.setFont("helvetica","normal");
-            doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, 12, y);
-            doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, 12, y+5);
-            doc.text(`Email: ${escapeHtml(currentAdminInfo.email)}`, 12, y+10);
-            doc.text(`Mobile: ${escapeHtml(currentAdminInfo.mobile)}`, 12, y+15);
-            doc.text(`Address: ${escapeHtml(currentAdminInfo.address)}`, 12, y+20);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, w-12, y, { align:"right" });
-            doc.text(`Total Records: ${records.length}`, w-12, y+6, { align:"right" });
-            doc.text(`Unique Workers: ${new Set(records.map(r=>r.workerId)).size}`, w-12, y+12, { align:"right" });
-            y += 26;
-            
-            doc.setDrawColor(245,158,11); doc.setLineWidth(0.4); doc.line(12, y-2, w-12, y-2);
-            doc.setDrawColor(200,200,200); doc.setLineWidth(0.3); doc.line(12, y, w-12, y);
-            
-            const tableData = records.map(rec => [
-                rec.date || 'N/A',
-                rec.workerName || 'N/A',
-                rec.workerId || 'N/A',
-                rec.status === 'present' ? 'Present' : (rec.status === 'absent' ? 'Absent' : 'Half'),
-                (rec.hours || 0).toString(),
-                `Rs.${formatIndianNumber(rec.rate || 0)}`,
-                `Rs.${formatIndianNumber(rec.earnings || 0)}`,
-                `Rs.${formatIndianNumber(rec.paid || 0)}`,
-                `Rs.${formatIndianNumber((rec.earnings||0) - (rec.paid||0))}`,
-                (rec.workDesc || '-').substring(0, 25)
-            ]);
-            
-            doc.autoTable({
-                startY: y+4,
-                head: [["Date", "Worker Name", "ID", "Status", "Hrs", "Rate", "Earnings", "Paid", "Due", "Work Desc"]],
-                body: tableData,
-                theme: 'striped',
-                headStyles: { fillColor: [245,158,11], textColor: 255, fontStyle: 'bold', halign: 'center', fontSize: 7 },
-                bodyStyles: { fontSize: 6.5, cellPadding: 1.2, textColor: [50,50,50], halign: 'center' },
-                columnStyles: {
-                    0: { cellWidth: 16, halign: 'center' },
-                    1: { cellWidth: 35, halign: 'left' },
-                    2: { cellWidth: 18, halign: 'center' },
-                    3: { cellWidth: 14, halign: 'center' },
-                    4: { cellWidth: 10, halign: 'center' },
-                    5: { cellWidth: 18, halign: 'right' },
-                    6: { cellWidth: 22, halign: 'right' },
-                    7: { cellWidth: 18, halign: 'right' },
-                    8: { cellWidth: 18, halign: 'right' },
-                    9: { cellWidth: 42, halign: 'left' }
-                },
-                margin: { left: 10, right: 10 },
-                didDrawPage: (data) => {
-                    const pc = doc.internal.getNumberOfPages();
-                    for(let i=1;i<=pc;i++){
-                        doc.setPage(i);
-                        drawWatermarkOverlay(doc, w, h);
-                        doc.setFontSize(7);
-                        doc.setTextColor(148,163,184);
-                        doc.text(`Page ${i} of ${pc}`, cx, h-8, { align:"center" });
+        }
+
+        function listenLogoChanges() {
+            const logoRef = window.ref(db, `companyAssets/footerLogo`);
+            window.onValue(logoRef, (snapshot) => {
+                if (headerLogo) {
+                    if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+                        companyLogoBase64 = snapshot.val();
+                        headerLogo.innerHTML =
+                            `<img src="${snapshot.val()}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    } else {
+                        headerLogo.innerHTML = `<span>SP</span>`;
                     }
                 }
             });
-            
-            const totals = computeTotals(records);
-            let finalY = doc.lastAutoTable.finalY + 8;
-            if (finalY + 55 > h - 10) { doc.addPage(); finalY = 15; }
-            const boxW = 185, boxX = (w-boxW)/2;
-            doc.setDrawColor(245,158,11); doc.setFillColor(255,248,225); doc.rect(boxX, finalY, boxW, 46, 'FD');
-            doc.setFontSize(11); doc.setTextColor(245,158,11); doc.setFont("helvetica","bold"); doc.text("COMPLETE SUMMARY", cx, finalY+7, { align:"center" });
-            doc.setDrawColor(245,158,11); doc.line(cx-40, finalY+10, cx+40, finalY+10);
-            doc.setFontSize(8); doc.setTextColor(51,51,51); doc.setFont("helvetica","normal");
-            const col1=boxX+10, col2=boxX+75, col3=boxX+140;
-            doc.text(`Workers: ${totals.uniqueWorkers}`, col1, finalY+19);
-            doc.text(`Records: ${totals.recordCount}`, col2, finalY+19);
-            doc.text(`Hours: ${formatIndianNumber(totals.totalHours)}`, col3, finalY+19);
-            doc.text(`Total Earnings: Rs.${formatIndianNumber(totals.totalEarnings)}`, col1, finalY+28);
-            doc.text(`Total Paid: Rs.${formatIndianNumber(totals.totalPaid)}`, col2, finalY+28);
-            const dueColor = totals.totalDue<0?[220,38,38]:[34,197,94];
-            doc.setTextColor(dueColor[0],dueColor[1],dueColor[2]);
-            doc.text(`Total Due: Rs.${formatIndianNumber(Math.abs(totals.totalDue))}`, col3, finalY+28);
-            
-            // Final watermark overlay on all pages
-            for (let i=1; i<=doc.internal.getNumberOfPages(); i++) {
-                doc.setPage(i);
-                drawWatermarkOverlay(doc, w, h);
+        }
+        // ========== END GLOBAL BRANDING ==========
+
+        function updateAdminInfoDisplay() {
+            if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
+            if (adminIdSpan) adminIdSpan.innerText = currentAdminInfo.userId || 'ADMIN001';
+            if (adminEmailSpan) adminEmailSpan.innerText = currentAdminInfo.email || 'N/A';
+            if (adminMobileSpan) adminMobileSpan.innerText = currentAdminInfo.mobile || 'N/A';
+            if (adminAddressSpan) adminAddressSpan.innerText = currentAdminInfo.address || 'N/A';
+            if (reportDateSpan) {
+                const now = new Date();
+                reportDateSpan.innerText = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short',
+                        year: 'numeric' }) + ' | ' + now.toLocaleTimeString();
             }
-            
-            doc.save(fileName);
-            showToast('PDF downloaded successfully!');
-        } catch(e) { console.error(e); showToast('Failed to generate PDF', true); }
-    }
-    
-    function getRecordsToExport() {
-        const source = dataSourceSelect.value;
-        let baseRecords = (source === 'all') ? [...allAttendanceRecords] : [...currentFilteredRecords];
-        if (limitCheckbox.checked) {
-            let limit = parseInt(limitCountInput.value, 10);
-            if (isNaN(limit) || limit < 1) limit = 10;
-            if (limit < baseRecords.length) baseRecords = baseRecords.slice(0, limit);
         }
-        return baseRecords;
-    }
-    
-    function handleDownload() {
-        if (!isAdminUser) return;
-        const records = getRecordsToExport();
-        if (!records.length) { alert("No records available."); return; }
-        const format = downloadFormatSelect.value;
-        const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-        const sourceLabel = dataSourceSelect.value === 'all' ? 'all' : 'filtered';
-        const limitLabel = limitCheckbox.checked ? `_latest${limitCountInput.value}` : '';
-        const fileName = `attendance_${sourceLabel}${limitLabel}_${timestamp}.${format === 'csv' ? 'csv' : 'pdf'}`;
-        if (format === 'csv') {
-            downloadCSV(records, fileName);
-        } else {
-            downloadPDF(records, fileName);
+
+        async function loadPdfLogo() {
+            try {
+                const pdfLogoRef = window.ref(db, `companyAssets/pdfLogo`);
+                const snapshot = await window.get(pdfLogoRef);
+                if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    pdfLogoBase64 = snapshot.val();
+                    console.log("PDF Logo loaded");
+                    return;
+                }
+                const footerRef = window.ref(db, `companyAssets/footerLogo`);
+                const footerSnap = await window.get(footerRef);
+                if (footerSnap.exists() && footerSnap.val() && footerSnap.val().startsWith('data:image')) {
+                    pdfLogoBase64 = footerSnap.val();
+                    console.log("Footer Logo loaded as fallback for PDF");
+                    return;
+                }
+                pdfLogoBase64 = null;
+            } catch (err) {
+                pdfLogoBase64 = null;
+            }
         }
-    }
-    
-    function toggleLimitInput() {
-        limitCountInput.disabled = !limitCheckbox.checked;
-        if (limitCheckbox.checked && (!limitCountInput.value || parseInt(limitCountInput.value) < 1)) limitCountInput.value = "10";
-    }
-    
-    let debounceTimer;
-    function onSearchInput() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => { filterRecords(searchInput.value); }, 300);
-    }
-    
-    function bindEvents() {
-        searchInput.addEventListener('input', onSearchInput);
-        limitCheckbox.addEventListener('change', toggleLimitInput);
-        downloadBtn.addEventListener('click', handleDownload);
-        toggleLimitInput();
-        openAddModalBtn.addEventListener('click', openAddModal);
-        modalCancelBtn.addEventListener('click', closeModal);
-        modalSaveBtn.addEventListener('click', saveModalRecord);
-        setupModalAutoSuggest();
-    }
-    
-    window.onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
+
+        async function loadBannerImage() {
+            try {
+                const bannersRef = window.ref(db, `companyAssets/banners`);
+                const snapshot = await window.get(bannersRef);
+                const bannerContainer = document.getElementById('bannerContent');
+                const placeholder = document.getElementById('bannerPlaceholder');
+
+                if (snapshot.exists()) {
+                    const banners = Object.values(snapshot.val());
+                    if (banners.length > 0 && banners[0].image && banners[0].image.startsWith('data:image')) {
+                        bannerContainer.style.backgroundImage = `url(${banners[0].image})`;
+                        bannerContainer.style.backgroundSize = 'cover';
+                        bannerContainer.style.backgroundPosition = 'center';
+                        if (placeholder) placeholder.style.display = 'none';
+                        return;
+                    }
+                }
+                bannerContainer.style.backgroundImage = '';
+                if (placeholder) placeholder.style.display = 'flex';
+            } catch (e) {}
         }
-        currentUserUid = user.uid;
-        await checkAdminAndLoad(user);
-        if (isAdminUser) {
-            bindEvents();
-            window.onValue(window.ref(db, 'attendance'), () => {
-                if (isAdminUser) loadAllAttendance();
+
+        async function loadCurrentAdminInfo(user) {
+            if (!user) return;
+            try {
+                const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+                const userData = userSnap.val();
+                if (userData) {
+                    currentAdminInfo.name = userData.fullName || userData.firstName || user.email?.split('@')[0] || 'Admin';
+                    currentAdminInfo.userId = userData.userId || user.uid?.slice(0, 8) || 'ADMIN001';
+                    currentAdminInfo.email = userData.email || user.email || 'N/A';
+                    currentAdminInfo.mobile = userData.mobile || userData.phone || 'N/A';
+                    currentAdminInfo.address = userData.address || userData.city || 'N/A';
+                } else {
+                    currentAdminInfo.name = user.email?.split('@')[0] || 'Admin';
+                    currentAdminInfo.userId = user.uid?.slice(0, 8) || 'ADMIN001';
+                    currentAdminInfo.email = user.email || 'N/A';
+                    currentAdminInfo.mobile = 'N/A';
+                    currentAdminInfo.address = 'N/A';
+                }
+                updateAdminInfoDisplay();
+            } catch (err) {}
+        }
+
+        function drawPDFLogo(doc, x, y, size = 18) {
+            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+                try {
+                    doc.addImage(pdfLogoBase64, 'JPEG', x, y - 5, size, size);
+                    return true;
+                } catch (e) {}
+            }
+            const radius = size / 2;
+            const centerX = x + radius;
+            const centerY = (y - 5) + radius;
+            doc.setFillColor(245, 158, 11);
+            doc.circle(centerX, centerY, radius, 'F');
+            doc.setFontSize(12);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("SP", centerX, centerY + 4, { align: "center" });
+            return true;
+        }
+
+        function drawWatermarkOverlay(doc, w, h) {
+            if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
+                try {
+                    const maxSize = Math.min(w, h) * 0.45;
+                    const x = (w - maxSize) / 2;
+                    const y = (h - maxSize) / 2;
+                    doc.setGState(new doc.GState({ opacity: 0.12 }));
+                    doc.addImage(pdfLogoBase64, 'JPEG', x, y, maxSize, maxSize);
+                    doc.setGState(new doc.GState({ opacity: 1 }));
+                } catch (e) {}
+            }
+            return true;
+        }
+
+        function showAccessDenied() {
+            if (attendanceContent) attendanceContent.style.display = 'none';
+            if (accessDeniedDiv) {
+                accessDeniedDiv.style.display = 'block';
+                accessDeniedDiv.innerHTML = `
+                        <div class="access-denied">
+                            <i class="fas fa-shield-alt"></i>
+                            <h2>Access Denied</h2>
+                            <p>You don't have administrator privileges to access this page.</p>
+                            <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+                        </div>
+                    `;
+            }
+        }
+
+        async function checkAdminAndLoad(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const userSnap = await window.get(window.ref(db, `users/${user.uid}`));
+                const userData = userSnap.val();
+                if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
+                    showAccessDenied();
+                    return;
+                }
+                isAdminUser = true;
+                if (attendanceContent) attendanceContent.style.display = 'block';
+                if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+                await loadCurrentAdminInfo(user);
+                await loadUsers();
+                await loadAllAttendance();
+                await loadPdfLogo();
+                await loadCompanyLogo();
+                listenLogoChanges();
+                await loadBannerImage();
+                await loadGlobalBranding();
+                listenToGlobalBranding();
+            } catch (error) {
+                showAccessDenied();
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const usersRef = window.ref(db, 'users');
+                const snapshot = await window.get(usersRef);
+                if (snapshot.exists()) {
+                    allUsers = Object.values(snapshot.val());
+                } else {
+                    allUsers = [];
+                }
+            } catch (err) {
+                console.error("Error loading users:", err);
+            }
+        }
+
+        function computeTotals(records) {
+            let totalHours = 0,
+                totalEarnings = 0,
+                totalPaid = 0,
+                totalDue = 0;
+            const uniqueWorkers = new Set();
+            for (const r of records) {
+                totalHours += r.hours || 0;
+                const earn = r.earnings || 0;
+                const paid = r.paid || 0;
+                totalEarnings += earn;
+                totalPaid += paid;
+                totalDue += (earn - paid);
+                if (r.workerId) uniqueWorkers.add(r.workerId);
+            }
+            return {
+                recordCount: records.length,
+                uniqueWorkers: uniqueWorkers.size,
+                totalHours: totalHours,
+                totalEarnings: totalEarnings,
+                totalPaid: totalPaid,
+                totalDue: totalDue
+            };
+        }
+
+        function updateStatsCards(records) {
+            const totals = computeTotals(records);
+            statTotalRecords.innerText = formatIndianNumber(totals.recordCount);
+            statTotalWorkers.innerText = formatIndianNumber(totals.uniqueWorkers);
+            statTotalHours.innerText = formatIndianNumber(totals.totalHours);
+            statTotalEarnings.innerHTML = `Rs.${formatIndianNumber(totals.totalEarnings)}`;
+            statTotalPaid.innerHTML = `Rs.${formatIndianNumber(totals.totalPaid)}`;
+            statTotalDue.innerHTML = `Rs.${formatIndianNumber(totals.totalDue)}`;
+
+            const today = new Date().toISOString().split('T')[0];
+            let presentTodayCount = 0;
+            let todayTotalEarnings = 0;
+            for (const r of records) {
+                if (r.date === today) {
+                    if (r.status === 'present') presentTodayCount++;
+                    todayTotalEarnings += r.earnings || 0;
+                }
+            }
+            statPresentToday.innerText = formatIndianNumber(presentTodayCount);
+            statTodayEarnings.innerHTML = `Rs.${formatIndianNumber(todayTotalEarnings)}`;
+        }
+
+        function renderFooter(records) {
+            if (!records.length) { tfoot.innerHTML = ''; return; }
+            const totals = computeTotals(records);
+            const dueColor = totals.totalDue < 0 ? '#dc2626' : '#15803d';
+            tfoot.innerHTML = `
+                    <tr class="summary-row">
+                        <td colspan="2"><strong>TOTAL SUMMARY</strong></td>
+                        <td><strong>${totals.uniqueWorkers} Workers</strong></td>
+                        <td><strong>${totals.recordCount} Records</strong></td>
+                        <td><strong>${formatIndianNumber(totals.totalHours)} hrs</strong></td>
+                        <td>—</strong></td>
+                        <td><strong>Rs.${formatIndianNumber(totals.totalEarnings)}</strong></td>
+                        <td><strong>Rs.${formatIndianNumber(totals.totalPaid)}</strong></td>
+                        <td style="color: ${dueColor};"><strong>Rs.${formatIndianNumber(totals.totalDue)}</strong></td>
+                        <td>—</strong></td>
+                        <td>—</strong></td>
+                    </tr>
+                `;
+        }
+
+        function renderTable() {
+            if (!currentFilteredRecords.length) {
+                tbody.innerHTML = '<tr><td colspan="11" class="no-data">No attendance records found<\/td><tr>';
+                resultCountSpan.innerText = `0 records`;
+                tfoot.innerHTML = '';
+                updateStatsCards([]);
+                return;
+            }
+            let html = '';
+            for (let r of currentFilteredRecords) {
+                const due = (r.earnings || 0) - (r.paid || 0);
+                const dueColor = due < 0 ? '#dc2626' : '#15803d';
+                html += `
+                        <tr>
+                            <td>${escapeHtml(r.date || 'N/A')}</td>
+                            <td><strong>${escapeHtml(r.workerName || 'N/A')}</strong></td>
+                            <td style="color:#f59e0b; font-weight:600;">${escapeHtml(r.workerId || 'N/A')}</td>
+                            <td>${getStatusBadge(r.status)}</td>
+                            <td>${r.hours || 0}</td>
+                            <td class="amount-positive">Rs.${formatNumber(r.rate || 0)}</td>
+                            <td class="amount-positive">Rs.${formatNumber(r.earnings || 0)}</td>
+                            <td class="amount-positive">Rs.${formatNumber(r.paid || 0)}</td>
+                            <td style="color: ${dueColor}; font-weight:600;">Rs.${formatNumber(due)}</td>
+                            <td>${escapeHtml(r.workDesc || '-')}</td>
+                            <td class="action-btns">
+                                <button class="edit-btn" onclick="openEditModal('${r.id}')"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="delete-btn" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i> Del</button>
+                            </td>
+                        </tr>
+                    `;
+            }
+            tbody.innerHTML = html;
+            resultCountSpan.innerText = `${currentFilteredRecords.length} record${currentFilteredRecords.length !== 1 ? 's' : ''}`;
+            renderFooter(currentFilteredRecords);
+            updateStatsCards(currentFilteredRecords);
+        }
+
+        function filterRecords(searchTerm) {
+            const term = searchTerm.trim().toLowerCase();
+            if (!term) {
+                currentFilteredRecords = [...allAttendanceRecords];
+                renderTable();
+                return;
+            }
+            const filtered = allAttendanceRecords.filter(rec => {
+                const dateMatch = rec.date && rec.date.toLowerCase().includes(term);
+                const nameMatch = rec.workerName && rec.workerName.toLowerCase().includes(term);
+                const idMatch = rec.workerId && rec.workerId.toLowerCase().includes(term);
+                return dateMatch || nameMatch || idMatch;
             });
-            window.onValue(window.ref(db, 'users'), () => {
-                if (isAdminUser) loadUsers();
+            currentFilteredRecords = filtered;
+            renderTable();
+        }
+
+        async function loadAllAttendance() {
+            if (!isAdminUser) return;
+            try {
+                const snapshot = await window.get(window.ref(db, 'attendance'));
+                let records = [];
+                if (snapshot.exists()) {
+                    const raw = snapshot.val();
+                    records = Object.entries(raw).map(([id, data]) => ({ id, ...data }));
+                }
+                records.sort((a, b) => new Date(b.date) - new Date(a.date));
+                allAttendanceRecords = records;
+                currentFilteredRecords = [...allAttendanceRecords];
+                renderTable();
+                if (searchInput.value.trim() !== "") {
+                    filterRecords(searchInput.value);
+                }
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="11" class="no-data">Error loading data<\/td></tr>';
+                tfoot.innerHTML = '';
+            }
+        }
+
+        async function addAttendanceRecord(recordData) {
+            if (!isAdminUser) return;
+            try {
+                const newRef = window.push(window.ref(db, 'attendance'));
+                await window.set(newRef, recordData);
+                await loadAllAttendance();
+                showToast('Record added successfully!');
+                if (window.addNotification) {
+                    await window.addNotification('নতুন উপস্থিতি যোগ করা হয়েছে', `${recordData.workerName} - ${recordData.date} তারিখে`,
+                        'success');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Failed to add record', true);
+            }
+        }
+
+        async function updateAttendanceRecord(id, recordData) {
+            if (!isAdminUser) return;
+            try {
+                const recordRef = window.ref(db, `attendance/${id}`);
+                await window.update(recordRef, recordData);
+                await loadAllAttendance();
+                showToast('Record updated successfully!');
+                if (window.addNotification) {
+                    await window.addNotification('উপস্থিতি সম্পাদিত হয়েছে', `${recordData.workerName} - ${recordData.date} তারিখে তথ্য পরিবর্তিত`,
+                        'info');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Failed to update record', true);
+            }
+        }
+
+        window.deleteRecord = async function(id) {
+            if (!isAdminUser) return;
+            if (confirm('Are you sure you want to delete this record?')) {
+                try {
+                    const recordRef = window.ref(db, `attendance/${id}`);
+                    await window.remove(recordRef);
+                    await loadAllAttendance();
+                    showToast('Record deleted successfully!');
+                    if (window.addNotification) {
+                        await window.addNotification('উপস্থিতি রেকর্ড মুছে ফেলা হয়েছে', 'একটি উপস্থিতি এন্ট্রি ডিলিট করা হয়েছে',
+                        'warning');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast('Failed to delete record', true);
+                }
+            }
+        };
+
+        function setupModalAutoSuggest() {
+            modalWorkerSearch.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                if (!query) {
+                    modalWorkerSuggestions.classList.remove('show');
+                    return;
+                }
+                const filtered = allUsers.filter(user => {
+                    const fullName = (user.firstName + ' ' + user.lastName).toLowerCase();
+                    const userId = (user.userId || '').toLowerCase();
+                    return fullName.includes(query) || userId.includes(query);
+                });
+                if (filtered.length === 0) {
+                    modalWorkerSuggestions.innerHTML =
+                        '<div class="suggestion-item" style="color:#94a3b8;">No workers found</div>';
+                    modalWorkerSuggestions.classList.add('show');
+                    return;
+                }
+                modalWorkerSuggestions.innerHTML = filtered.map(user => {
+                    const fullName = user.firstName + ' ' + user.lastName;
+                    return `<div class="suggestion-item" onclick="selectWorkerForModal('${user.userId}', '${escapeHtml(fullName)}')">
+                                <div class="suggestion-name">${escapeHtml(fullName)}</div>
+                                <div class="suggestion-id">ID: ${user.userId}</div>
+                            </div>`;
+                }).join('');
+                modalWorkerSuggestions.classList.add('show');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!modalWorkerSearch.contains(e.target) && !modalWorkerSuggestions.contains(e.target)) {
+                    modalWorkerSuggestions.classList.remove('show');
+                }
             });
         }
-    });
-</script>
+
+        window.selectWorkerForModal = function(userId, fullName) {
+            selectedWorkerForModal = { userId, fullName };
+            modalWorkerSearch.value = fullName;
+            modalSelectedWorkerName.innerText = fullName;
+            modalSelectedWorkerId.innerText = 'ID: ' + userId;
+            modalSelectedWorkerInfo.style.display = 'block';
+            modalWorkerSuggestions.classList.remove('show');
+        };
+
+        function clearModalSelection() {
+            selectedWorkerForModal = null;
+            modalWorkerSearch.value = '';
+            modalSelectedWorkerInfo.style.display = 'none';
+        }
+
+        function openAddModal() {
+            if (!isAdminUser) return;
+            editRecordId = null;
+            modalTitle.innerText = 'Add New Attendance Record';
+            modalDate.value = new Date().toISOString().split('T')[0];
+            clearModalSelection();
+            modalStatus.value = 'present';
+            modalHours.value = '';
+            modalRate.value = '';
+            modalWorkDesc.value = '';
+            modalPaid.value = '';
+            modal.classList.add('show');
+        }
+
+        window.openEditModal = function(id) {
+            if (!isAdminUser) return;
+            const record = allAttendanceRecords.find(r => r.id === id);
+            if (!record) return;
+            editRecordId = id;
+            modalTitle.innerText = 'Edit Attendance Record';
+            modalDate.value = record.date || '';
+            modalWorkerSearch.value = record.workerName || '';
+            selectedWorkerForModal = { userId: record.workerId, fullName: record.workerName };
+            modalSelectedWorkerName.innerText = record.workerName || '';
+            modalSelectedWorkerId.innerText = 'ID: ' + (record.workerId || '');
+            modalSelectedWorkerInfo.style.display = 'block';
+            modalStatus.value = record.status || 'present';
+            modalHours.value = record.hours || '';
+            modalRate.value = record.rate || '';
+            modalWorkDesc.value = record.workDesc || '';
+            modalPaid.value = record.paid || '';
+            modal.classList.add('show');
+        };
+
+        function closeModal() {
+            modal.classList.remove('show');
+            editRecordId = null;
+            clearModalSelection();
+        }
+
+        // ============================================================
+        //  FIX: Save modal record with all fields optional (except date & worker)
+        // ============================================================
+        async function saveModalRecord() {
+            if (!isAdminUser) return;
+
+            const date = modalDate.value;
+            const status = modalStatus.value || 'present';
+            const hours = parseFloat(modalHours.value) || 0;
+            const rate = parseFloat(modalRate.value) || 0;
+            const workDesc = modalWorkDesc.value.trim() || '-';
+            const paid = parseFloat(modalPaid.value) || 0;
+
+            // Date is required
+            if (!date) {
+                showToast('Please select a date', true);
+                return;
+            }
+
+            // Worker is required
+            if (!selectedWorkerForModal) {
+                showToast('Please select a worker', true);
+                return;
+            }
+
+            // Rate is now OPTIONAL — if empty, it defaults to 0 and record saves.
+            // All other fields also have sensible defaults.
+
+            const earnings = calculateEarnings(status, hours, rate);
+            const due = earnings - paid;
+
+            const recordData = {
+                workerId: selectedWorkerForModal.userId,
+                workerName: selectedWorkerForModal.fullName,
+                date: date,
+                status: status,
+                hours: status === 'absent' ? 0 : hours,
+                rate: rate,
+                earnings: earnings,
+                paid: paid,
+                due: due,
+                workDesc: workDesc,
+                createdAt: new Date().toISOString()
+            };
+
+            if (editRecordId) {
+                recordData.updatedAt = new Date().toISOString();
+                await updateAttendanceRecord(editRecordId, recordData);
+            } else {
+                await addAttendanceRecord(recordData);
+            }
+            closeModal();
+        }
+
+        function showToast(msg, isErr = false, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.innerText = msg;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '30px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.background = isErr ? '#dc2626' : '#15803d';
+            toast.style.color = 'white';
+            toast.style.padding = '10px 24px';
+            toast.style.borderRadius = '40px';
+            toast.style.fontSize = '0.8rem';
+            toast.style.zIndex = '9999';
+            toast.style.fontFamily = 'Inter, sans-serif';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), duration);
+        }
+
+        function prepareExportData(records) {
+            return records.map(rec => ({
+                date: rec.date || 'N/A',
+                workerName: rec.workerName || 'N/A',
+                workerId: rec.workerId || 'N/A',
+                status: rec.status === 'present' ? 'Present' : (rec.status === 'absent' ? 'Absent' : 'Half Day'),
+                hours: rec.hours || 0,
+                rate: rec.rate || 0,
+                earnings: rec.earnings || 0,
+                paid: rec.paid || 0,
+                due: (rec.earnings || 0) - (rec.paid || 0),
+                workDesc: rec.workDesc || '-'
+            }));
+        }
+
+        function downloadCSV(records, fileName) {
+            if (!records.length) { alert("No records to export."); return; }
+            const data = prepareExportData(records);
+            const headers = ["Date", "Worker Name", "Worker ID", "Status", "Hours", "Rate (Rs.)", "Earnings (Rs.)",
+                "Paid (Rs.)", "Due (Rs.)", "Work Description"
+            ];
+            const csvRows = [headers.join(",")];
+            for (const row of data) {
+                const values = headers.map(header => {
+                    let key = header.toLowerCase().replace(/[^a-z]/g, '');
+                    if (key === 'rate') key = 'rate';
+                    if (key === 'earnings') key = 'earnings';
+                    if (key === 'paid') key = 'paid';
+                    if (key === 'due') key = 'due';
+                    if (key === 'workdescription') key = 'workDesc';
+                    let val = row[key] !== undefined ? row[key] : '';
+                    if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) val = `"${val.replace(/"/g, '""')}"`;
+                    return val;
+                });
+                csvRows.push(values.join(","));
+            }
+            const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // ========== PDF DOWNLOAD WITH CUSTOM BANNER IMAGE ==========
+        async function downloadPDF(records, fileName) {
+            if (!records.length) { alert("No records to generate PDF."); return; }
+            showToast('Generating PDF...');
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const w = doc.internal.pageSize.getWidth();
+                const h = doc.internal.pageSize.getHeight();
+                const cx = w / 2;
+                let y = 10;
+
+                let pdfHeaderBase64 = null;
+                try {
+                    const pdfHeaderSnap = await window.get(window.ref(db, `companyAssets/pdfHeaderImage`));
+                    if (pdfHeaderSnap.exists() && pdfHeaderSnap.val() && pdfHeaderSnap.val().startsWith('data:image')) {
+                        pdfHeaderBase64 = pdfHeaderSnap.val();
+                    }
+                } catch (e) { console.warn("Could not load PDF header image", e); }
+
+                if (pdfHeaderBase64) {
+                    const imgWidth = w - 20;
+                    let imgHeight = 25;
+                    try {
+                        doc.addImage(pdfHeaderBase64, 'JPEG', 10, y, imgWidth, imgHeight, undefined, 'FAST');
+                        y += imgHeight + 5;
+                    } catch (e) {
+                        console.warn("Error adding PDF header image, falling back to text", e);
+                        drawTextHeader(doc);
+                        y += 24;
+                    }
+                } else {
+                    drawTextHeader(doc);
+                    y += 24;
+                }
+
+                function drawTextHeader(doc) {
+                    const globalTitle = headerTitleSpan ? headerTitleSpan.textContent : 'SP CONSTRUCTION';
+                    const globalSubtitle = headerSubtitleSpan ? headerSubtitleSpan.textContent : 'ATTENDANCE MANAGER';
+                    drawPDFLogo(doc, 14, y, 16);
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(16);
+                    doc.setTextColor(245, 158, 11);
+                    doc.text(`${globalTitle} - ATTENDANCE REPORT`, cx, y + 9, { align: "center" });
+                    doc.setDrawColor(245, 158, 11);
+                    doc.setLineWidth(0.6);
+                    doc.line(12, y + 14, w - 12, y + 14);
+                    doc.setFontSize(9);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text(globalSubtitle, cx, y + 19, { align: "center" });
+                    return y + 24;
+                }
+
+                doc.setFontSize(8);
+                doc.setTextColor(80, 80, 80);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Generated By: ${escapeHtml(currentAdminInfo.name)}`, 12, y);
+                doc.text(`Admin ID: ${escapeHtml(currentAdminInfo.userId)}`, 12, y + 5);
+                doc.text(`Email: ${escapeHtml(currentAdminInfo.email)}`, 12, y + 10);
+                doc.text(`Mobile: ${escapeHtml(currentAdminInfo.mobile)}`, 12, y + 15);
+                doc.text(`Address: ${escapeHtml(currentAdminInfo.address)}`, 12, y + 20);
+                doc.text(`Generated: ${new Date().toLocaleString()}`, w - 12, y, { align: "right" });
+                doc.text(`Total Records: ${records.length}`, w - 12, y + 6, { align: "right" });
+                doc.text(`Unique Workers: ${new Set(records.map(r=>r.workerId)).size}`, w - 12, y + 12, { align: "right" });
+                y += 26;
+
+                doc.setDrawColor(245, 158, 11);
+                doc.setLineWidth(0.4);
+                doc.line(12, y - 2, w - 12, y - 2);
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.3);
+                doc.line(12, y, w - 12, y);
+
+                const tableData = records.map(rec => [
+                    rec.date || 'N/A',
+                    rec.workerName || 'N/A',
+                    rec.workerId || 'N/A',
+                    rec.status === 'present' ? 'Present' : (rec.status === 'absent' ? 'Absent' : 'Half'),
+                    (rec.hours || 0).toString(),
+                    `Rs.${formatIndianNumber(rec.rate || 0)}`,
+                    `Rs.${formatIndianNumber(rec.earnings || 0)}`,
+                    `Rs.${formatIndianNumber(rec.paid || 0)}`,
+                    `Rs.${formatIndianNumber((rec.earnings||0) - (rec.paid||0))}`,
+                    (rec.workDesc || '-').substring(0, 25)
+                ]);
+
+                doc.autoTable({
+                    startY: y + 4,
+                    head: [
+                        ["Date", "Worker Name", "ID", "Status", "Hrs", "Rate", "Earnings", "Paid", "Due",
+                            "Work Desc"
+                        ]
+                    ],
+                    body: tableData,
+                    theme: 'striped',
+                    headStyles: { fillColor: [245, 158, 11], textColor: 255, fontStyle: 'bold', halign: 'center',
+                        fontSize: 7 },
+                    bodyStyles: { fontSize: 6.5, cellPadding: 1.2, textColor: [50, 50, 50], halign: 'center' },
+                    columnStyles: {
+                        0: { cellWidth: 16, halign: 'center' },
+                        1: { cellWidth: 35, halign: 'left' },
+                        2: { cellWidth: 18, halign: 'center' },
+                        3: { cellWidth: 14, halign: 'center' },
+                        4: { cellWidth: 10, halign: 'center' },
+                        5: { cellWidth: 18, halign: 'right' },
+                        6: { cellWidth: 22, halign: 'right' },
+                        7: { cellWidth: 18, halign: 'right' },
+                        8: { cellWidth: 18, halign: 'right' },
+                        9: { cellWidth: 42, halign: 'left' }
+                    },
+                    margin: { left: 10, right: 10 },
+                    didDrawPage: (data) => {
+                        const pc = doc.internal.getNumberOfPages();
+                        for (let i = 1; i <= pc; i++) {
+                            doc.setPage(i);
+                            drawWatermarkOverlay(doc, w, h);
+                            doc.setFontSize(7);
+                            doc.setTextColor(148, 163, 184);
+                            doc.text(`Page ${i} of ${pc}`, cx, h - 8, { align: "center" });
+                        }
+                    }
+                });
+
+                const totals = computeTotals(records);
+                let finalY = doc.lastAutoTable.finalY + 8;
+                if (finalY + 55 > h - 10) { doc.addPage();
+                    finalY = 15; }
+                const boxW = 185,
+                    boxX = (w - boxW) / 2;
+                doc.setDrawColor(245, 158, 11);
+                doc.setFillColor(255, 248, 225);
+                doc.rect(boxX, finalY, boxW, 46, 'FD');
+                doc.setFontSize(11);
+                doc.setTextColor(245, 158, 11);
+                doc.setFont("helvetica", "bold");
+                doc.text("COMPLETE SUMMARY", cx, finalY + 7, { align: "center" });
+                doc.setDrawColor(245, 158, 11);
+                doc.line(cx - 40, finalY + 10, cx + 40, finalY + 10);
+                doc.setFontSize(8);
+                doc.setTextColor(51, 51, 51);
+                doc.setFont("helvetica", "normal");
+                const col1 = boxX + 10,
+                    col2 = boxX + 75,
+                    col3 = boxX + 140;
+                doc.text(`Workers: ${totals.uniqueWorkers}`, col1, finalY + 19);
+                doc.text(`Records: ${totals.recordCount}`, col2, finalY + 19);
+                doc.text(`Hours: ${formatIndianNumber(totals.totalHours)}`, col3, finalY + 19);
+                doc.text(`Total Earnings: Rs.${formatIndianNumber(totals.totalEarnings)}`, col1, finalY + 28);
+                doc.text(`Total Paid: Rs.${formatIndianNumber(totals.totalPaid)}`, col2, finalY + 28);
+                const dueColor = totals.totalDue < 0 ? [220, 38, 38] : [34, 197, 94];
+                doc.setTextColor(dueColor[0], dueColor[1], dueColor[2]);
+                doc.text(`Total Due: Rs.${formatIndianNumber(Math.abs(totals.totalDue))}`, col3, finalY + 28);
+
+                for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
+                    doc.setPage(i);
+                    drawWatermarkOverlay(doc, w, h);
+                }
+
+                doc.save(fileName);
+                showToast('PDF downloaded successfully!');
+            } catch (e) { console.error(e);
+                showToast('Failed to generate PDF', true); }
+        }
+
+        function getRecordsToExport() {
+            const source = dataSourceSelect.value;
+            let baseRecords = (source === 'all') ? [...allAttendanceRecords] : [...currentFilteredRecords];
+            if (limitCheckbox.checked) {
+                let limit = parseInt(limitCountInput.value, 10);
+                if (isNaN(limit) || limit < 1) limit = 10;
+                if (limit < baseRecords.length) baseRecords = baseRecords.slice(0, limit);
+            }
+            return baseRecords;
+        }
+
+        function handleDownload() {
+            if (!isAdminUser) return;
+            const records = getRecordsToExport();
+            if (!records.length) { alert("No records available."); return; }
+            const format = downloadFormatSelect.value;
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const sourceLabel = dataSourceSelect.value === 'all' ? 'all' : 'filtered';
+            const limitLabel = limitCheckbox.checked ? `_latest${limitCountInput.value}` : '';
+            const fileName =
+                `attendance_${sourceLabel}${limitLabel}_${timestamp}.${format === 'csv' ? 'csv' : 'pdf'}`;
+            if (format === 'csv') {
+                downloadCSV(records, fileName);
+            } else {
+                downloadPDF(records, fileName);
+            }
+        }
+
+        function toggleLimitInput() {
+            limitCountInput.disabled = !limitCheckbox.checked;
+            if (limitCheckbox.checked && (!limitCountInput.value || parseInt(limitCountInput.value) < 1)) limitCountInput
+                .value = "10";
+        }
+
+        let debounceTimer;
+
+        function onSearchInput() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => { filterRecords(searchInput.value); }, 300);
+        }
+
+        function bindEvents() {
+            searchInput.addEventListener('input', onSearchInput);
+            limitCheckbox.addEventListener('change', toggleLimitInput);
+            downloadBtn.addEventListener('click', handleDownload);
+            toggleLimitInput();
+            openAddModalBtn.addEventListener('click', openAddModal);
+            modalCancelBtn.addEventListener('click', closeModal);
+            modalSaveBtn.addEventListener('click', saveModalRecord);
+            setupModalAutoSuggest();
+        }
+
+        window.onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUserUid = user.uid;
+            await checkAdminAndLoad(user);
+            if (isAdminUser) {
+                bindEvents();
+                window.onValue(window.ref(db, 'attendance'), () => {
+                    if (isAdminUser) loadAllAttendance();
+                });
+                window.onValue(window.ref(db, 'users'), () => {
+                    if (isAdminUser) loadUsers();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
