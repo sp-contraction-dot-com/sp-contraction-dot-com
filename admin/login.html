@@ -51,16 +51,76 @@
         .auth-header h2 { font-size: 1.6rem; font-weight: 700; color: #1e293b; }
         .input-group { margin-bottom: 20px; }
         .input-group label { display: block; font-size: 0.75rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
-        .input-field { position: relative; display: flex; align-items: center; }
-        .input-field i:not(.toggle-password) { position: absolute; left: 16px; color: #94a3b8; z-index: 2; }
-        .input-field input { width: 100%; padding: 14px 50px 14px 45px; border: 2px solid #e2e8f0; border-radius: 20px; font-size: 0.95rem; background: #f8fafc; }
-        .input-field input:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
-        .toggle-password {
-            position: absolute; right: 16px; background: transparent; border: none;
-            cursor: pointer; color: #94a3b8; font-size: 1rem; z-index: 2;
+        .input-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            background: #f8fafc;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .toggle-password:hover { color: #f59e0b; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; transition: all 0.3s; }
+        .input-field:focus-within {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+        }
+        .input-field i:not(.toggle-password i) {
+            position: absolute;
+            left: 16px;
+            color: #94a3b8;
+            font-size: 1rem;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .input-field input {
+            width: 100%;
+            padding: 14px 50px 14px 45px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            background: transparent;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .input-field input::placeholder {
+            color: #94a3b8;
+        }
+        /* ===== IMPROVED TOGGLE BUTTON ===== */
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            z-index: 2;
+            padding: 6px 4px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            width: 32px;
+            height: 32px;
+        }
+        .toggle-password:hover {
+            color: #f59e0b;
+            background: rgba(245,158,11,0.08);
+        }
+        .toggle-password:active {
+            transform: translateY(-50%) scale(0.92);
+        }
+        .toggle-password i {
+            font-size: 1.1rem;
+            transition: all 0.25s ease;
+            pointer-events: none;
+        }
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; transition: all 0.3s;
+        }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(245,158,11,0.3); }
         .btn-secondary { background: transparent; border: 2px solid #e2e8f0; color: #334155; margin-top: 12px; }
         .btn-secondary:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: none; }
@@ -87,13 +147,13 @@
         <div class="logo-wrapper" id="logoWrapper">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1 id="headerTitle">SP CONSTRUCTION</h1>
-                <p id="headerSubtitle">BUILDING DREAMS</p>
+                <h1 id="headerTitle"></h1>
+                <p id="headerSubtitle"></p>
             </div>
         </div>
     </div>
     <div class="auth-card">
-        <div class="auth-header"><h2>Welcome Back! 👋</h2></div>
+        <div class="auth-header"><h2>Welcome Back! </h2></div>
         <div id="alertBox" class="alert"></div>
         
         <div class="input-group">
@@ -105,7 +165,7 @@
             <div class="input-field">
                 <i class="fas fa-lock"></i>
                 <input type="password" id="password" placeholder="Enter password">
-                <button type="button" class="toggle-password" onclick="togglePassword()">
+                <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Toggle password visibility">
                     <i class="far fa-eye-slash"></i>
                 </button>
             </div>
