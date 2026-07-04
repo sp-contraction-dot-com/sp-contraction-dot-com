@@ -8,18 +8,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- intl-tel-input for international phone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js">
+    </script>
     <!-- Firebase SDK with external config -->
     <script type="module">
         import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
         import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
-        
+
         window.auth = auth;
         window.db = database;
         window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
@@ -60,7 +61,7 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             padding: 10px 24px;
             border-radius: 60px;
             backdrop-filter: blur(4px);
@@ -95,14 +96,14 @@
         }
         .logo-text p {
             font-size: 0.6rem;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             letter-spacing: 1px;
         }
         .auth-card {
-            background: rgba(255,255,255,0.98);
+            background: rgba(255, 255, 255, 0.98);
             border-radius: 32px;
             padding: 32px 28px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
         .auth-header {
             text-align: center;
@@ -119,7 +120,7 @@
             margin-top: 4px;
         }
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .input-group label {
             display: block;
@@ -128,64 +129,102 @@
             color: #334155;
             margin-bottom: 6px;
         }
+        /* ===== IMPROVED INPUT FIELD ===== */
         .input-field {
             position: relative;
             display: flex;
             align-items: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            background: #f8fafc;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .input-field i:not(.toggle-password) {
+        .input-field:focus-within {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+        .input-field i:not(.toggle-password i) {
             position: absolute;
             left: 16px;
             color: #94a3b8;
             font-size: 1rem;
             z-index: 2;
+            pointer-events: none;
         }
         .input-field input {
             width: 100%;
             padding: 14px 50px 14px 45px;
-            border: 2px solid #e2e8f0;
+            border: none;
             border-radius: 20px;
             font-size: 0.95rem;
-            background: #f8fafc;
-            transition: all 0.3s;
-        }
-        .input-field input:focus {
+            background: transparent;
             outline: none;
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+            font-family: 'Inter', sans-serif;
         }
+        .input-field input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* ===== TOGGLE BUTTON INSIDE FIELD ===== */
         .toggle-password {
             position: absolute;
-            right: 16px;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
             background: transparent;
             border: none;
             cursor: pointer;
             color: #94a3b8;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            z-index: 2;
+            padding: 6px 4px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
-            z-index: 2;
+            transition: all 0.25s ease;
+            width: 32px;
+            height: 32px;
         }
         .toggle-password:hover {
             color: #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
         }
+        .toggle-password:active {
+            transform: translateY(-50%) scale(0.92);
+        }
+        .toggle-password i {
+            font-size: 1.1rem;
+            transition: all 0.25s ease;
+            pointer-events: none;
+        }
+
+        /* ===== PHONE INPUT FIX ===== */
         .iti {
             width: 100%;
             display: block;
         }
         .iti__flag-container {
-            padding-left: 10px;
+            padding-left: 2px;
         }
         .iti__selected-flag {
             background: transparent !important;
             border-radius: 20px 0 0 20px;
             padding-left: 12px;
+            padding-right: 8px;
+        }
+        .iti__selected-flag:hover {
+            background: rgba(245, 158, 11, 0.05) !important;
         }
         .phone-input {
-            padding-left: 80px !important;
+            padding-left: 88px !important;
+            width: 100% !important;
         }
+        /* Remove the extra plus from the input itself */
+        .input-field.phone-field input {
+            padding-left: 88px;
+        }
+
         .btn {
             width: 100%;
             padding: 14px;
@@ -200,7 +239,7 @@
         }
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(245,158,11,0.3);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
         }
         .btn-secondary {
             background: transparent;
@@ -245,7 +284,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -294,6 +333,13 @@
             border-radius: 40px;
             cursor: pointer;
             margin-top: 5px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .copy-btn:hover {
+            background: #cbd5e1;
         }
         .loading {
             display: none;
@@ -302,7 +348,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             justify-content: center;
             align-items: center;
@@ -319,8 +365,12 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
         .alert {
             padding: 12px 16px;
@@ -365,12 +415,16 @@
             cursor: pointer;
             text-decoration: underline;
         }
+        .resend-link:hover {
+            color: #d97706;
+        }
+
         @media (max-width: 550px) {
             body {
                 padding: 20px 15px;
             }
             .auth-card {
-                padding: 24px 20px;
+                padding: 24px 18px;
             }
             .row-2 {
                 grid-template-columns: 1fr;
@@ -382,397 +436,431 @@
             .logo-text h1 {
                 font-size: 1rem;
             }
+            .input-field input {
+                font-size: 0.85rem;
+                padding: 12px 44px 12px 40px;
+            }
+            .phone-input {
+                padding-left: 80px !important;
+            }
+            .toggle-password {
+                right: 10px;
+                width: 28px;
+                height: 28px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="loading" id="loading"><div class="spinner"></div></div>
-
-<div class="modal" id="successModal">
-    <div class="modal-content">
-        <div class="modal-icon"><i class="fas fa-envelope-open-text"></i></div>
-        <h3>Verification Email Sent! 📧</h3>
-        <div class="user-id-box">
-            <p style="color:#475569;">Your User ID:</p>
-            <span id="displayUserId">********</span>
-        </div>
-        <button class="copy-btn" onclick="copyUserId()"><i class="fas fa-copy"></i> Copy</button>
-        <p style="margin: 15px 0; color: #64748b; font-size: 0.8rem;">
-            ✅ A <strong>verification link</strong> has been sent to your email address.<br>
-            Please check your inbox and click the link to activate your account.
-        </p>
-        <div class="resend-info">
-            <span>Didn't receive the email? </span>
-            <span class="resend-link" onclick="resendVerificationEmail()">Click here to resend</span>
-        </div>
-        <button class="btn" onclick="window.location.href='login.html'" style="margin-top: 15px;">Go to Login</button>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
     </div>
-</div>
 
-<div class="auth-container">
-    <div class="logo-section">
-        <div class="logo-wrapper">
-            <div class="logo-icon" id="headerLogo"><span>SP</span></div>
-            <div class="logo-text">
-                <h1 id="headerTitle">SP CONSTRUCTION</h1>
-                <p id="headerSubtitle">BUILDING DREAMS</p>
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon"><i class="fas fa-envelope-open-text"></i></div>
+            <h3>Verification Email Sent! 📧</h3>
+            <div class="user-id-box">
+                <p style="color:#475569;">Your User ID:</p>
+                <span id="displayUserId">********</span>
+            </div>
+            <button class="copy-btn" onclick="copyUserId()"><i class="fas fa-copy"></i> Copy</button>
+            <p style="margin: 15px 0; color: #64748b; font-size: 0.8rem;">
+                ✅ A <strong>verification link</strong> has been sent to your email address.<br>
+                Please check your inbox and click the link to activate your account.
+            </p>
+            <div class="resend-info">
+                <span>Didn't receive the email? </span>
+                <span class="resend-link" onclick="resendVerificationEmail()">Click here to resend</span>
+            </div>
+            <button class="btn" onclick="window.location.href='login.html'" style="margin-top: 15px;">Go to Login</button>
+        </div>
+    </div>
+
+    <div class="auth-container">
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <div class="logo-icon" id="headerLogo"><span>SP</span></div>
+                <div class="logo-text">
+                    <h1 id="headerTitle"></h1>
+                    <p id="headerSubtitle"></p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="auth-card">
-        <div class="auth-header"><h2>Create Account ✨</h2><p>Please fill in your information</p></div>
-        <div id="alertBox" class="alert"></div>
-        
-        <div class="row-2">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Create Account ✨</h2>
+                <p>Please fill in your information</p>
+            </div>
+            <div id="alertBox" class="alert"></div>
+
+            <div class="row-2">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="firstName" placeholder="John">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="lastName" placeholder="Doe">
+                    </div>
+                </div>
+            </div>
+
             <div class="input-group">
-                <label>First Name</label>
-                <div class="input-field"><i class="fas fa-user"></i><input type="text" id="firstName" placeholder="John"></div>
+                <label>Email Address</label>
+                <div class="input-field">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="example@email.com">
+                </div>
             </div>
-            <div class="input-group">
-                <label>Last Name</label>
-                <div class="input-field"><i class="fas fa-user"></i><input type="text" id="lastName" placeholder="Doe"></div>
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <label>Email Address</label>
-            <div class="input-field"><i class="fas fa-envelope"></i><input type="email" id="email" placeholder="example@email.com"></div>
-        </div>
-        
-        <div class="input-group">
-            <label>Phone Number</label>
-            <div class="input-field">
-                <i class="fas fa-phone"></i>
-                <input type="tel" id="mobile" class="phone-input" placeholder="+1234567890">
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <label>Date of Birth</label>
-            <div class="input-field"><i class="fas fa-calendar"></i><input type="date" id="dob"></div>
-        </div>
-        
-        <div class="input-group">
-            <label>Password</label>
-            <div class="input-field">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="password" placeholder="Enter password">
-                <button type="button" class="toggle-password" onclick="togglePassword('password')">
-                    <i class="far fa-eye-slash"></i>
-                </button>
-            </div>
-            <div class="password-strength" id="passwordStrength"></div>
-        </div>
-        
-        <div class="input-group">
-            <label>Confirm Password</label>
-            <div class="input-field">
-                <i class="fas fa-check-circle"></i>
-                <input type="password" id="confirmPassword" placeholder="Confirm password">
-                <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
-                    <i class="far fa-eye-slash"></i>
-                </button>
-            </div>
-        </div>
-        
-        <button class="btn" onclick="handleRegister()">Register Now</button>
-        
-        <div class="divider"><div class="divider-line"></div><div class="divider-text">Already have an account?</div><div class="divider-line"></div></div>
-        <button class="btn btn-secondary" onclick="window.location.href='login.html'">Sign In</button>
-    </div>
-</div>
 
-<script type="module">
-    import { firebaseConfig } from './js/firebase-config.js';
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    
-    const COMPANY_ASSETS_PATH = 'companyAssets';
-    const headerTitleSpan = document.getElementById('headerTitle');
-    const headerSubtitleSpan = document.getElementById('headerSubtitle');
-    const headerLogoDiv = document.getElementById('headerLogo');
-    
-    async function loadGlobalBranding() {
-        try {
-            const brandSnap = await get(ref(db, `${COMPANY_ASSETS_PATH}/branding`));
-            if (brandSnap.exists()) {
-                const brand = brandSnap.val();
+            <div class="input-group">
+                <label>Phone Number</label>
+                <div class="input-field phone-field">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="mobile" class="phone-input" placeholder="Enter phone number">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Date of Birth</label>
+                <div class="input-field">
+                    <i class="fas fa-calendar"></i>
+                    <input type="date" id="dob">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Enter password">
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')" aria-label="Toggle password visibility">
+                        <i class="far fa-eye-slash"></i>
+                    </button>
+                </div>
+                <div class="password-strength" id="passwordStrength"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Confirm Password</label>
+                <div class="input-field">
+                    <i class="fas fa-check-circle"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm password">
+                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')" aria-label="Toggle password visibility">
+                        <i class="far fa-eye-slash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn" onclick="handleRegister()">Register Now</button>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-text">Already have an account?</div>
+                <div class="divider-line"></div>
+            </div>
+            <button class="btn btn-secondary" onclick="window.location.href='login.html'">Sign In</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { firebaseConfig } from './js/firebase-config.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        const COMPANY_ASSETS_PATH = 'companyAssets';
+        const headerTitleSpan = document.getElementById('headerTitle');
+        const headerSubtitleSpan = document.getElementById('headerSubtitle');
+        const headerLogoDiv = document.getElementById('headerLogo');
+
+        async function loadGlobalBranding() {
+            try {
+                const brandSnap = await get(ref(db, `${COMPANY_ASSETS_PATH}/branding`));
+                if (brandSnap.exists()) {
+                    const brand = brandSnap.val();
+                    if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                    if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
+                } else {
+                    headerTitleSpan.textContent = 'SP CONSTRUCTION';
+                    headerSubtitleSpan.textContent = 'BUILDING DREAMS';
+                }
+            } catch (err) { console.warn(err); }
+        }
+
+        async function loadCompanyLogo() {
+            try {
+                const logoSnap = await get(ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`));
+                if (logoSnap.exists() && logoSnap.val() && logoSnap.val().startsWith('data:image')) {
+                    headerLogoDiv.innerHTML = `<img src="${logoSnap.val()}" alt="Company Logo">`;
+                } else {
+                    headerLogoDiv.innerHTML = `<span>SP</span>`;
+                }
+            } catch (err) { console.warn(err); }
+        }
+
+        loadGlobalBranding();
+        loadCompanyLogo();
+
+        onValue(ref(db, `${COMPANY_ASSETS_PATH}/branding`), (snapshot) => {
+            if (snapshot.exists()) {
+                const brand = snapshot.val();
                 if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
                 if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
             } else {
                 headerTitleSpan.textContent = 'SP CONSTRUCTION';
                 headerSubtitleSpan.textContent = 'BUILDING DREAMS';
             }
-        } catch(err) { console.warn(err); }
-    }
-    
-    async function loadCompanyLogo() {
-        try {
-            const logoSnap = await get(ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`));
-            if (logoSnap.exists() && logoSnap.val() && logoSnap.val().startsWith('data:image')) {
-                headerLogoDiv.innerHTML = `<img src="${logoSnap.val()}" alt="Company Logo">`;
+        });
+
+        onValue(ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`), (snapshot) => {
+            if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+                headerLogoDiv.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
             } else {
                 headerLogoDiv.innerHTML = `<span>SP</span>`;
             }
-        } catch(err) { console.warn(err); }
-    }
-    
-    loadGlobalBranding();
-    loadCompanyLogo();
-    
-    onValue(ref(db, `${COMPANY_ASSETS_PATH}/branding`), (snapshot) => {
-        if (snapshot.exists()) {
-            const brand = snapshot.val();
-            if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
-            if (headerSubtitleSpan && brand.subtitle) headerSubtitleSpan.textContent = brand.subtitle;
-        } else {
-            headerTitleSpan.textContent = 'SP CONSTRUCTION';
-            headerSubtitleSpan.textContent = 'BUILDING DREAMS';
+        });
+
+        let tempUserId = '';
+        let tempUserEmail = '';
+        let iti = null;
+        let createdUser = null;
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alertBox');
+            alert.textContent = message;
+            alert.className = `alert alert-${type} show`;
+            setTimeout(() => alert.classList.remove('show'), 5000);
         }
-    });
-    
-    onValue(ref(db, `${COMPANY_ASSETS_PATH}/footerLogo`), (snapshot) => {
-        if (snapshot.val() && snapshot.val().startsWith('data:image')) {
-            headerLogoDiv.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo">`;
-        } else {
-            headerLogoDiv.innerHTML = `<span>SP</span>`;
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (show) loading.classList.add('show');
+            else loading.classList.remove('show');
         }
-    });
-    
-    let tempUserId = '';
-    let tempUserEmail = '';
-    let iti = null;
-    let createdUser = null;
-    
-    function showAlert(message, type) {
-        const alert = document.getElementById('alertBox');
-        alert.textContent = message;
-        alert.className = `alert alert-${type} show`;
-        setTimeout(() => alert.classList.remove('show'), 5000);
-    }
-    
-    function showLoading(show) {
-        const loading = document.getElementById('loading');
-        if (show) loading.classList.add('show');
-        else loading.classList.remove('show');
-    }
-    
-    function generateUserId() {
-        return Math.floor(10000000 + Math.random() * 90000000).toString();
-    }
-    
-    function checkPasswordStrength(password) {
-        const strengthDiv = document.getElementById('passwordStrength');
-        if (!password) {
-            strengthDiv.innerHTML = '';
-            return;
+
+        function generateUserId() {
+            return Math.floor(10000000 + Math.random() * 90000000).toString();
         }
-        let strength = 0;
-        if (password.length >= 6) strength++;
-        if (password.length >= 8) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^A-Za-z0-9]/.test(password)) strength++;
-        
-        if (strength <= 2) {
-            strengthDiv.innerHTML = '<span class="strength-weak">🔴 Weak Password</span>';
-        } else if (strength <= 4) {
-            strengthDiv.innerHTML = '<span class="strength-medium">🟡 Medium Password</span>';
-        } else {
-            strengthDiv.innerHTML = '<span class="strength-strong">🟢 Strong Password</span>';
+
+        function checkPasswordStrength(password) {
+            const strengthDiv = document.getElementById('passwordStrength');
+            if (!password) {
+                strengthDiv.innerHTML = '';
+                return;
+            }
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            if (strength <= 2) {
+                strengthDiv.innerHTML = '<span class="strength-weak">🔴 Weak Password</span>';
+            } else if (strength <= 4) {
+                strengthDiv.innerHTML = '<span class="strength-medium">🟡 Medium Password</span>';
+            } else {
+                strengthDiv.innerHTML = '<span class="strength-strong">🟢 Strong Password</span>';
+            }
         }
-    }
-    
-    window.togglePassword = function(fieldId) {
-        const field = document.getElementById(fieldId);
-        const toggleBtn = field.parentElement.querySelector('.toggle-password i');
-        if (field.type === 'password') {
-            field.type = 'text';
-            toggleBtn.classList.remove('fa-eye-slash');
-            toggleBtn.classList.add('fa-eye');
-        } else {
-            field.type = 'password';
-            toggleBtn.classList.remove('fa-eye');
-            toggleBtn.classList.add('fa-eye-slash');
-        }
-    };
-    
-    window.copyUserId = function() {
-        navigator.clipboard.writeText(tempUserId);
-        alert('User ID copied!');
-    };
-    
-    window.resendVerificationEmail = async function() {
-        if (createdUser) {
-            showLoading(true);
+
+        window.togglePassword = function(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggleBtn = field.parentElement.querySelector('.toggle-password i');
+            if (field.type === 'password') {
+                field.type = 'text';
+                toggleBtn.classList.remove('fa-eye-slash');
+                toggleBtn.classList.add('fa-eye');
+            } else {
+                field.type = 'password';
+                toggleBtn.classList.remove('fa-eye');
+                toggleBtn.classList.add('fa-eye-slash');
+            }
+        };
+
+        window.copyUserId = function() {
+            navigator.clipboard.writeText(tempUserId);
+            alert('User ID copied!');
+        };
+
+        window.resendVerificationEmail = async function() {
+            if (createdUser) {
+                showLoading(true);
+                try {
+                    await sendEmailVerification(createdUser);
+                    showLoading(false);
+                    alert('Verification email resent! Please check your inbox.');
+                } catch (error) {
+                    showLoading(false);
+                    alert('Failed to resend email. Please try again later.');
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.querySelector('#mobile');
+            if (phoneInput && typeof intlTelInput !== 'undefined') {
+                iti = window.intlTelInput(phoneInput, {
+                    initialCountry: "in",
+                    separateDialCode: true,
+                    preferredCountries: ["in", "us", "gb", "ae", "sa", "sg", "my"],
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                });
+            }
+        });
+
+        document.getElementById('password')?.addEventListener('input', function(e) {
+            checkPasswordStrength(e.target.value);
+        });
+
+        async function checkEmailExists(email) {
             try {
-                await sendEmailVerification(createdUser);
+                const methods = await fetchSignInMethodsForEmail(auth, email);
+                return methods.length > 0;
+            } catch (error) {
+                console.error("Error checking email:", error);
+                return false;
+            }
+        }
+
+        async function isFirstUser() {
+            try {
+                const snapshot = await get(ref(db, 'users'));
+                return !snapshot.exists() || Object.keys(snapshot.val()).length === 0;
+            } catch (e) {
+                return true;
+            }
+        }
+
+        window.handleRegister = async function() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const fullName = `${firstName} ${lastName}`.trim();
+            const email = document.getElementById('email').value.trim();
+            let mobile = document.getElementById('mobile').value.trim();
+            const dob = document.getElementById('dob').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Get full international number from intl-tel-input
+            if (iti) {
+                const fullNumber = iti.getNumber();
+                if (fullNumber) mobile = fullNumber;
+            }
+
+            if (!firstName || !lastName) {
+                showAlert('Please enter first name and last name', 'error');
+                return;
+            }
+            if (!email) {
+                showAlert('Please enter email address', 'error');
+                return;
+            }
+            if (!mobile) {
+                showAlert('Please enter phone number', 'error');
+                return;
+            }
+            if (!dob) {
+                showAlert('Please select date of birth', 'error');
+                return;
+            }
+            if (!password) {
+                showAlert('Please enter password', 'error');
+                return;
+            }
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters', 'error');
+                return;
+            }
+            if (!/^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(email)) {
+                showAlert('Please enter a valid email address', 'error');
+                return;
+            }
+
+            showLoading(true);
+
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
                 showLoading(false);
-                alert('Verification email resent! Please check your inbox.');
+                showAlert('This email is already registered! Please use a different email or login.', 'error');
+                return;
+            }
+
+            const firstUser = await isFirstUser();
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                createdUser = user;
+                tempUserEmail = email;
+
+                tempUserId = generateUserId();
+
+                await updateProfile(user, { displayName: fullName });
+                await sendEmailVerification(user);
+                console.log("✅ Verification email sent to:", email);
+
+                const userRole = firstUser ? 'admin' : 'user';
+                const isAdmin = firstUser;
+
+                await set(ref(db, `users/${user.uid}`), {
+                    userId: tempUserId,
+                    firstName: firstName,
+                    lastName: lastName,
+                    fullName: fullName,
+                    email: email,
+                    mobile: mobile,
+                    dob: dob,
+                    registeredAt: new Date().toISOString(),
+                    emailVerified: false,
+                    uid: user.uid,
+                    profileCompleted: false,
+                    role: userRole,
+                    isAdmin: isAdmin
+                });
+
+                if (firstUser) {
+                    console.log("🎉 First user registered as ADMIN!");
+                }
+
+                console.log("✅ User data saved to database");
+
+                showLoading(false);
+                document.getElementById('displayUserId').textContent = tempUserId;
+                document.getElementById('successModal').classList.add('show');
+
             } catch (error) {
                 showLoading(false);
-                alert('Failed to resend email. Please try again later.');
+                let message = 'Registration failed!';
+                if (error.code === 'auth/email-already-in-use') {
+                    message = 'This email is already registered! Please use a different email.';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'Invalid email address';
+                } else if (error.code === 'auth/weak-password') {
+                    message = 'Password is too weak';
+                } else if (error.code === 'auth/network-request-failed') {
+                    message = 'Network error. Please check your connection.';
+                }
+                showAlert(message, 'error');
+                console.error("Registration error:", error);
             }
-        }
-    };
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const phoneInput = document.querySelector('#mobile');
-        if (phoneInput && typeof intlTelInput !== 'undefined') {
-            iti = window.intlTelInput(phoneInput, {
-                initialCountry: "in",
-                separateDialCode: true,
-                preferredCountries: ["in", "us", "gb", "ae", "sa", "sg", "my"],
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-            });
-        }
-    });
-    
-    document.getElementById('password')?.addEventListener('input', function(e) {
-        checkPasswordStrength(e.target.value);
-    });
-    
-    async function checkEmailExists(email) {
-        try {
-            const methods = await fetchSignInMethodsForEmail(auth, email);
-            return methods.length > 0;
-        } catch (error) {
-            console.error("Error checking email:", error);
-            return false;
-        }
-    }
-    
-    async function isFirstUser() {
-        try {
-            const snapshot = await get(ref(db, 'users'));
-            return !snapshot.exists() || Object.keys(snapshot.val()).length === 0;
-        } catch (e) {
-            return true;
-        }
-    }
-    
-    window.handleRegister = async function() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const fullName = `${firstName} ${lastName}`.trim();
-        const email = document.getElementById('email').value.trim();
-        let mobile = document.getElementById('mobile').value.trim();
-        const dob = document.getElementById('dob').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        if (iti) {
-            const fullNumber = iti.getNumber();
-            if (fullNumber) mobile = fullNumber;
-        }
-        
-        if (!firstName || !lastName) {
-            showAlert('Please enter first name and last name', 'error');
-            return;
-        }
-        if (!email) {
-            showAlert('Please enter email address', 'error');
-            return;
-        }
-        if (!mobile) {
-            showAlert('Please enter phone number', 'error');
-            return;
-        }
-        if (!dob) {
-            showAlert('Please select date of birth', 'error');
-            return;
-        }
-        if (!password) {
-            showAlert('Please enter password', 'error');
-            return;
-        }
-        if (password !== confirmPassword) {
-            showAlert('Passwords do not match', 'error');
-            return;
-        }
-        if (password.length < 6) {
-            showAlert('Password must be at least 6 characters', 'error');
-            return;
-        }
-        if (!/^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(email)) {
-            showAlert('Please enter a valid email address', 'error');
-            return;
-        }
-        
-        showLoading(true);
-        
-        const emailExists = await checkEmailExists(email);
-        if (emailExists) {
-            showLoading(false);
-            showAlert('This email is already registered! Please use a different email or login.', 'error');
-            return;
-        }
-        
-        const firstUser = await isFirstUser();
-        
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            createdUser = user;
-            tempUserEmail = email;
-            
-            tempUserId = generateUserId();
-            
-            await updateProfile(user, { displayName: fullName });
-            await sendEmailVerification(user);
-            console.log("✅ Verification email sent to:", email);
-            
-            const userRole = firstUser ? 'admin' : 'user';
-            const isAdmin = firstUser;
-            
-            await set(ref(db, `users/${user.uid}`), {
-                userId: tempUserId,
-                firstName: firstName,
-                lastName: lastName,
-                fullName: fullName,
-                email: email,
-                mobile: mobile,
-                dob: dob,
-                registeredAt: new Date().toISOString(),
-                emailVerified: false,
-                uid: user.uid,
-                profileCompleted: false,
-                role: userRole,
-                isAdmin: isAdmin
-            });
-            
-            if (firstUser) {
-                console.log("🎉 First user registered as ADMIN!");
-            }
-            
-            console.log("✅ User data saved to database");
-            
-            showLoading(false);
-            document.getElementById('displayUserId').textContent = tempUserId;
-            document.getElementById('successModal').classList.add('show');
-            
-        } catch (error) {
-            showLoading(false);
-            let message = 'Registration failed!';
-            if (error.code === 'auth/email-already-in-use') {
-                message = 'This email is already registered! Please use a different email.';
-            } else if (error.code === 'auth/invalid-email') {
-                message = 'Invalid email address';
-            } else if (error.code === 'auth/weak-password') {
-                message = 'Password is too weak';
-            } else if (error.code === 'auth/network-request-failed') {
-                message = 'Network error. Please check your connection.';
-            }
-            showAlert(message, 'error');
-            console.error("Registration error:", error);
-        }
-    };
-</script>
+        };
+    </script>
 </body>
 </html>
