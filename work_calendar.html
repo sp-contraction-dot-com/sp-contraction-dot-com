@@ -147,7 +147,7 @@
             overflow: hidden;
         }
         .hero-banner::before {
-            content: "📅";
+            content: "";
             position: absolute;
             right: -20px;
             bottom: -20px;
@@ -519,8 +519,8 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1 id="brandTitle">SP CONSTRUCTION</h1>
-                <p id="brandSubtitle">EMPLOYEE PORTAL</p>
+                <h1 id="brandTitle"></h1>
+                <p id="brandSubtitle"></p>
             </div>
         </div>
         <div class="user-info-section">
@@ -537,7 +537,7 @@
     <!-- Hero Banner - Centered -->
     <div class="hero-banner">
         <div class="hero-text">
-            <h2>📅 <span>Work Calendar</span></h2>
+            <h2> <span>Work Calendar</span></h2>
             <p>Track attendance, earnings & work history</p>
         </div>
         <div class="month-selector">
@@ -577,7 +577,7 @@
             <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
             <div class="stat-info">
                 <h4>EARNINGS</h4>
-                <div class="stat-value" id="monthEarnings">₹0</div>
+                <div class="stat-value" id="monthEarnings">0</div>
                 <div class="stat-sub">Gross this month</div>
             </div>
         </div>
@@ -618,7 +618,7 @@
         <div id="bannerContent" style="width:100%; min-height:130px; display:flex; align-items:center; justify-content:center;">
             <div class="banner-placeholder" id="bannerPlaceholder">
                 <i class="fas fa-image"></i>
-                <p>🏗️ SP Construction Banner</p>
+                <p> SP Construction Banner</p>
             </div>
         </div>
     </div>
@@ -900,7 +900,7 @@
         document.getElementById('presentDays').innerHTML = presentCount.toFixed(1);
         document.getElementById('absentDays').innerHTML = absentCount;
         document.getElementById('totalHours').innerHTML = totalHours.toFixed(1);
-        document.getElementById('monthEarnings').innerHTML = `₹${formatIndianNumber(totalEarnings)}`;
+        document.getElementById('monthEarnings').innerHTML = `${formatIndianNumber(totalEarnings)}`;
         document.getElementById('attendanceRate').innerHTML = `${attendanceRate.toFixed(1)}%`;
     }
     
@@ -925,7 +925,7 @@
         if (s === 'present') return 'Present';
         if (s === 'halfday') return 'Half Day';
         if (s === 'absent') return 'Absent';
-        return '—';
+        return '�';
     }
     
     function getStatusClass(status) {
@@ -948,23 +948,23 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-circle"></i> Status</span>
-                    <span class="detail-value"><span class="status-badge status-absent">❌ Absent (No Entry)</span></span>
+                    <span class="detail-value"><span class="status-badge status-absent"> Absent (No Entry)</span></span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-clock"></i> Hours</span>
-                    <span class="detail-value">—</span>
+                    <span class="detail-value">�</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-coins"></i> Earnings</span>
-                    <span class="detail-value">₹0</span>
+                    <span class="detail-value">0</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-hand-holding-usd"></i> Paid</span>
-                    <span class="detail-value">₹0</span>
+                    <span class="detail-value">0</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-exclamation-triangle"></i> Due</span>
-                    <span class="detail-value">₹0</span>
+                    <span class="detail-value">0</span>
                 </div>
             `;
         } else {
@@ -972,7 +972,7 @@
             const dueColor = due < 0 ? '#dc2626' : (due > 0 ? '#d97706' : '#15803d');
             const statusText = getStatusText(record.status);
             const statusClass = getStatusClass(record.status);
-            const dueDisplay = due < 0 ? `-₹${formatIndianNumber(Math.abs(due))}` : `₹${formatIndianNumber(due)}`;
+            const dueDisplay = due < 0 ? `-${formatIndianNumber(Math.abs(due))}` : `${formatIndianNumber(due)}`;
             
             modalContent.innerHTML = `
                 <div class="detail-row">
@@ -989,15 +989,15 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-tag"></i> Rate</span>
-                    <span class="detail-value">₹${formatIndianNumber(record.rate || 0)}</span>
+                    <span class="detail-value">${formatIndianNumber(record.rate || 0)}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-coins"></i> Earnings</span>
-                    <span class="detail-value">₹${formatIndianNumber(record.earnings || 0)}</span>
+                    <span class="detail-value">${formatIndianNumber(record.earnings || 0)}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-hand-holding-usd"></i> Paid</span>
-                    <span class="detail-value">₹${formatIndianNumber(record.paid || 0)}</span>
+                    <span class="detail-value">${formatIndianNumber(record.paid || 0)}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-exclamation-triangle"></i> Due</span>
@@ -1005,7 +1005,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-briefcase"></i> Work Desc</span>
-                    <span class="detail-value">${record.workDesc || record.description || '—'}</span>
+                    <span class="detail-value">${record.workDesc || record.description || '�'}</span>
                 </div>
             `;
         }
