@@ -760,6 +760,45 @@
             font-weight: 600;
         }
 
+        /* PAGE LOADER */
+        #pageLoader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            gap: 20px;
+            transition: opacity 0.4s ease;
+        }
+        #pageLoader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #pageLoader .spinner {
+            width: 50px;
+            height: 50px;
+        }
+        #pageLoader p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Initially hide content until admin check */
+        #mainContentCard {
+            display: none;
+        }
+        #accessDeniedMessage {
+            display: none;
+        }
+
         @media (max-width: 700px) {
             .download-controls {
                 flex-direction: column;
@@ -796,13 +835,20 @@
     </style>
 </head>
 <body>
+
+    <!-- PAGE LOADER -->
+    <div id="pageLoader">
+        <div class="spinner"></div>
+        <p>Loading attendance data…</p>
+    </div>
+
     <div class="container">
         <div class="header">
             <div class="logo-section">
                 <div class="logo-icon" id="headerLogo"><span>SP</span></div>
                 <div class="logo-text">
-                    <h1 id="headerTitle">SP CONSTRUCTION</h1>
-                    <p id="headerSubtitle">ATTENDANCE MANAGER</p>
+                    <h1 id="headerTitle"></h1>
+                    <p id="headerSubtitle"></p>
                 </div>
             </div>
             <div class="header-buttons">
@@ -811,7 +857,7 @@
             </div>
         </div>
 
-        <div class="stats-grid">
+        <div class="stats-grid" id="statsGrid">
             <div class="stat-card card-1"><div class="stat-info"><h4><i class="fas fa-chart-line"></i> Total Records</h4><div class="value" id="statTotalRecords">0</div><div class="sub-text">Attendance entries</div></div><div class="stat-icon"><i class="fas fa-database"></i></div></div>
             <div class="stat-card card-2"><div class="stat-info"><h4><i class="fas fa-users"></i> Total Workers</h4><div class="value" id="statTotalWorkers">0</div><div class="sub-text">Unique workers</div></div><div class="stat-icon"><i class="fas fa-user-friends"></i></div></div>
             <div class="stat-card card-3"><div class="stat-info"><h4><i class="fas fa-clock"></i> Total Hours</h4><div class="value" id="statTotalHours">0</div><div class="sub-text">Worked hours</div></div><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div></div>
@@ -898,6 +944,7 @@
         let pdfLogoBase64 = null;
         let companyLogoBase64 = null;
 
+        // DOM refs
         const tbody = document.getElementById('attendanceTableBody');
         const tfoot = document.getElementById('attendanceTableFooter');
         const searchInput = document.getElementById('searchInput');
@@ -912,6 +959,8 @@
         const headerSubtitleSpan = document.getElementById('headerSubtitle');
         const attendanceContent = document.getElementById('attendanceContent');
         const accessDeniedDiv = document.getElementById('accessDeniedMessage');
+        const mainContentCard = document.getElementById('mainContentCard');
+        const pageLoader = document.getElementById('pageLoader');
 
         const adminNameSpan = document.getElementById('adminName');
         const adminIdSpan = document.getElementById('adminId');
@@ -946,6 +995,7 @@
         const statPresentToday = document.getElementById('statPresentToday');
         const statTodayEarnings = document.getElementById('statTodayEarnings');
 
+        // helper functions
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
@@ -982,7 +1032,7 @@
             return rate;
         }
 
-        // ========== GLOBAL BRANDING FUNCTIONS (same as dashboard) ==========
+        // ========== GLOBAL BRANDING FUNCTIONS ==========
         async function loadGlobalBranding() {
             try {
                 const brandSnap = await window.get(window.ref(db, `companyAssets/branding`));
@@ -1054,7 +1104,6 @@
                 }
             });
         }
-        // ========== END GLOBAL BRANDING ==========
 
         function updateAdminInfoDisplay() {
             if (adminNameSpan) adminNameSpan.innerText = currentAdminInfo.name || 'Admin';
@@ -1168,6 +1217,7 @@
             return true;
         }
 
+        // ========== Admin check and content reveal ==========
         function showAccessDenied() {
             if (attendanceContent) attendanceContent.style.display = 'none';
             if (accessDeniedDiv) {
@@ -1181,6 +1231,13 @@
                         </div>
                     `;
             }
+            mainContentCard.style.display = 'block';
+        }
+
+        function showAttendanceContent() {
+            if (attendanceContent) attendanceContent.style.display = 'block';
+            if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+            mainContentCard.style.display = 'block';
         }
 
         async function checkAdminAndLoad(user) {
@@ -1193,11 +1250,11 @@
                 const userData = userSnap.val();
                 if (!userData || (userData.role !== 'admin' && userData.isAdmin !== true)) {
                     showAccessDenied();
+                    pageLoader.classList.add('hidden');
                     return;
                 }
                 isAdminUser = true;
-                if (attendanceContent) attendanceContent.style.display = 'block';
-                if (accessDeniedDiv) accessDeniedDiv.style.display = 'none';
+                showAttendanceContent();
                 await loadCurrentAdminInfo(user);
                 await loadUsers();
                 await loadAllAttendance();
@@ -1207,11 +1264,14 @@
                 await loadBannerImage();
                 await loadGlobalBranding();
                 listenToGlobalBranding();
+                pageLoader.classList.add('hidden');
             } catch (error) {
                 showAccessDenied();
+                pageLoader.classList.add('hidden');
             }
         }
 
+        // ========== Data functions ==========
         async function loadUsers() {
             try {
                 const usersRef = window.ref(db, 'users');
@@ -1370,6 +1430,7 @@
             }
         }
 
+        // ========== CRUD ==========
         async function addAttendanceRecord(recordData) {
             if (!isAdminUser) return;
             try {
@@ -1423,6 +1484,7 @@
             }
         };
 
+        // ========== Modal ==========
         function setupModalAutoSuggest() {
             modalWorkerSearch.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
@@ -1513,9 +1575,6 @@
             clearModalSelection();
         }
 
-        // ============================================================
-        //  FIX: Save modal record with all fields optional (except date & worker)
-        // ============================================================
         async function saveModalRecord() {
             if (!isAdminUser) return;
 
@@ -1526,20 +1585,14 @@
             const workDesc = modalWorkDesc.value.trim() || '-';
             const paid = parseFloat(modalPaid.value) || 0;
 
-            // Date is required
             if (!date) {
                 showToast('Please select a date', true);
                 return;
             }
-
-            // Worker is required
             if (!selectedWorkerForModal) {
                 showToast('Please select a worker', true);
                 return;
             }
-
-            // Rate is now OPTIONAL — if empty, it defaults to 0 and record saves.
-            // All other fields also have sensible defaults.
 
             const earnings = calculateEarnings(status, hours, rate);
             const due = earnings - paid;
@@ -1585,6 +1638,7 @@
             setTimeout(() => toast.remove(), duration);
         }
 
+        // ========== Export ==========
         function prepareExportData(records) {
             return records.map(rec => ({
                 date: rec.date || 'N/A',
@@ -1632,7 +1686,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // ========== PDF DOWNLOAD WITH CUSTOM BANNER IMAGE ==========
         async function downloadPDF(records, fileName) {
             if (!records.length) { alert("No records to generate PDF."); return; }
             showToast('Generating PDF...');
@@ -1848,6 +1901,7 @@
             setupModalAutoSuggest();
         }
 
+        // ========== Auth listener ==========
         window.onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
