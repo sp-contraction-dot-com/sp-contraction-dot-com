@@ -7,20 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="module">
+        // ========== FIREBASE IMPORT (using config file) ==========
+        import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAT3LQUFBhiZINM9NZTulX7umf-P1Y6i2I",
-            authDomain: "sp-build-official.firebaseapp.com",
-            projectId: "sp-build-official",
-            storageBucket: "sp-build-official.firebasestorage.app",
-            messagingSenderId: "377403616440",
-            appId: "1:377403616440:web:bfae56e748f05de22a184d",
-            measurementId: "G-P319FN0C0N",
-            databaseURL: "https://sp-build-official-default-rtdb.firebaseio.com/"
-        };
+        import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -34,8 +25,10 @@
         window.get = get;
         window.update = update;
         window.onAuthStateChanged = onAuthStateChanged;
+        window.onValue = onValue;
     </script>
     <style>
+        /* (পুরো CSS আগের মতোই – কোনো পরিবর্তন নেই) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -84,6 +77,12 @@
             justify-content: center;
             color: white;
             font-weight: 800;
+            overflow: hidden;
+        }
+        .logo-mini .icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .logo-mini span { font-size: 1rem; color: white; font-weight: 600; letter-spacing: 0.5px; }
         
@@ -424,8 +423,8 @@
     <div class="glass-header">
         <div class="icon-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></div>
         <div class="logo-mini">
-            <div class="icon">SP</div>
-            <span>SP CONSTRUCTION</span>
+            <div class="icon" id="headerLogo"><span>SP</span></div>
+            <span id="headerTitle"></span>
         </div>
         <div class="icon-btn" onclick="refreshProfile()"><i class="fas fa-sync-alt"></i></div>
     </div>
@@ -461,6 +460,9 @@
     let currentAuth = null;
     let selectedBase64 = null;
     
+    const headerLogo = document.getElementById('headerLogo');
+    const headerTitleSpan = document.getElementById('headerTitle');
+    
     function showLoading(show) { document.getElementById('loading').classList.toggle('show', show); }
     function showToast(msg, isErr = false) {
         const t = document.createElement('div');
@@ -472,24 +474,80 @@
     }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
     
-    // ========== ADVANCED IMAGE COMPRESSION THAT HANDLES ANY SIZE (30MB+ to under 5MB) ==========
+    // ========== GLOBAL BRANDING (same as other pages) ==========
+    async function loadGlobalBranding() {
+        try {
+            const brandSnap = await window.get(window.ref(window.db, `companyAssets/branding`));
+            if (brandSnap.exists()) {
+                const brand = brandSnap.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                else headerTitleSpan.textContent = 'SP CONSTRUCTION';
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+            }
+        } catch(err) {
+            console.warn("Error loading global branding:", err);
+            headerTitleSpan.textContent = 'SP CONSTRUCTION';
+        }
+    }
+    
+    function listenToGlobalBranding() {
+        const brandingRef = window.ref(window.db, `companyAssets/branding`);
+        window.onValue(brandingRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const brand = snapshot.val();
+                if (headerTitleSpan && brand.title) headerTitleSpan.textContent = brand.title;
+                else headerTitleSpan.textContent = 'SP CONSTRUCTION';
+            } else {
+                headerTitleSpan.textContent = 'SP CONSTRUCTION';
+            }
+        });
+    }
+    
+    async function loadCompanyLogo() {
+        try {
+            const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
+            const snapshot = await window.get(logoRef);
+            if (headerLogo) {
+                if (snapshot.exists() && snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    const logoUrl = snapshot.val();
+                    headerLogo.innerHTML = `<img src="${logoUrl}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                }
+            }
+        } catch(err) {
+            console.warn("Error loading company logo:", err);
+            if (headerLogo) headerLogo.innerHTML = `<span>SP</span>`;
+        }
+    }
+    
+    function listenLogoChanges() {
+        const logoRef = window.ref(window.db, `companyAssets/footerLogo`);
+        window.onValue(logoRef, (snapshot) => {
+            if (headerLogo) {
+                if (snapshot.val() && snapshot.val().startsWith('data:image')) {
+                    headerLogo.innerHTML = `<img src="${snapshot.val()}" alt="Company Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                } else {
+                    headerLogo.innerHTML = `<span>SP</span>`;
+                }
+            }
+        });
+    }
+    // ========== END GLOBAL BRANDING ==========
+    
+    // ========== IMAGE COMPRESSION (unchanged) ==========
     async function smartCompressImage(file, onProgress) {
-        // Accept any image type including large megapixel photos
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     if (onProgress) onProgress(20);
-                    
-                    // Calculate optimal dimensions to ensure final size < 5MB
-                    // For very high resolution images, we use aggressive downscaling
                     let width = img.width;
                     let height = img.height;
-                    const maxPixels = 1024 * 1024; // 1 Megapixel target for safe compression under 5MB
+                    const maxPixels = 1024 * 1024;
                     const currentPixels = width * height;
-                    
-                    // Adaptive scaling based on original size
                     let scale = 1;
                     if (currentPixels > maxPixels * 4) {
                         scale = Math.sqrt(maxPixels / currentPixels) * 0.8;
@@ -498,34 +556,23 @@
                     } else if (currentPixels > maxPixels) {
                         scale = Math.sqrt(maxPixels / currentPixels);
                     }
-                    
-                    // Apply scaling but keep minimum reasonable size (400px)
                     let newWidth = Math.max(400, Math.floor(width * scale));
                     let newHeight = Math.max(400, Math.floor(height * scale));
-                    
                     if (onProgress) onProgress(40);
-                    
                     const canvas = document.createElement('canvas');
                     canvas.width = newWidth;
                     canvas.height = newHeight;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                    
                     if (onProgress) onProgress(60);
-                    
-                    // Dynamic quality adjustment - start with 0.75, try to keep under 5MB
                     let quality = 0.75;
                     let attempt = 0;
                     let finalBase64 = '';
-                    
                     const tryCompress = () => {
                         finalBase64 = canvas.toDataURL('image/jpeg', quality);
-                        const approxSize = Math.round((finalBase64.length * 3/4) / 1024); // KB approx
-                        
+                        const approxSize = Math.round((finalBase64.length * 3/4) / 1024);
                         if (onProgress) onProgress(70 + attempt * 10);
-                        
                         if (approxSize > 4800 && quality > 0.45 && attempt < 3) {
-                            // Still too large, reduce quality
                             quality -= 0.1;
                             attempt++;
                             tryCompress();
@@ -534,7 +581,6 @@
                             resolve(finalBase64);
                         }
                     };
-                    
                     tryCompress();
                 };
                 img.onerror = () => reject(new Error("Failed to load image"));
@@ -545,23 +591,13 @@
         });
     }
     
-    // Alternative: If image is already small, preserve it but still compress moderately
     async function processProfileImage(file, onProgress) {
-        // Validate file size first - but we'll handle even 50MB files via compression
         if (!file.type.match('image.*')) {
             throw new Error('Please select a valid image file (JPEG, PNG, etc.)');
         }
-        
-        // Show initial progress
         if (onProgress) onProgress(5);
-        
-        // Always compress to ensure under 5MB with perfect quality/ratio
         const compressedBase64 = await smartCompressImage(file, onProgress);
-        
-        // Final safety check: ensure base64 size is reasonable (max ~5MB = ~6.6 million chars base64)
         if (compressedBase64.length > 7_000_000) {
-            // If somehow still too large, do one more aggressive compression
-            console.warn("Image still large, applying ultra compression");
             const img = new Image();
             const result = await new Promise((resolve) => {
                 img.onload = () => {
@@ -582,9 +618,9 @@
             });
             return result;
         }
-        
         return compressedBase64;
     }
+    // ========== END IMAGE COMPRESSION ==========
     
     function renderProfile(data, emailVerified) {
         const avatarDiv = document.getElementById('avatarDisplay');
@@ -695,12 +731,10 @@
             if(!file) return;
             if(!file.type.match('image.*')) { showToast('Please select an image file (JPEG, PNG, WEBP, etc.)', true); return; }
             
-            // Allow ANY file size - will compress regardless (even 100MB photos)
             statusDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing high-res image... 0%';
             statusDiv.className = 'upload-status status-loading';
             
             try {
-                // Progress callback
                 const updateProgress = (percent) => {
                     statusDiv.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${percent < 30 ? 'Decoding image...' : percent < 70 ? 'Compressing to under 5MB...' : 'Finalizing...'} ${percent}%`;
                 };
@@ -771,9 +805,16 @@
         } catch(e) { showLoading(false); showToast('Logout failed', true); }
     };
     
+    // ========== INIT ==========
     window.onAuthStateChanged(window.auth, async (user) => {
         if(!user) window.location.href = 'login.html';
-        else await loadUser(user);
+        else {
+            await loadUser(user);
+            await loadGlobalBranding();
+            await loadCompanyLogo();
+            listenToGlobalBranding();
+            listenLogoChanges();
+        }
     });
     
     document.addEventListener('DOMContentLoaded', () => {
