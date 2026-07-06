@@ -32,6 +32,7 @@
     </script>
     
     <style>
+        /* (all CSS remains exactly the same as in your original file – no changes) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -1137,8 +1138,8 @@
         <div class="logo-section">
             <div class="logo-icon" id="headerLogo"><span>SP</span></div>
             <div class="logo-text">
-                <h1 id="headerTitle">SP CONSTRUCTION</h1>
-                <p id="headerSubtitle">ADMIN - ATTENDANCE CARD</p>
+                <h1 id="headerTitle"></h1>
+                <p id="headerSubtitle"></p>
             </div>
         </div>
         <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
@@ -1824,9 +1825,9 @@
         });
     }
     
-    // ========== KODULAR FRIENDLY PDF FUNCTIONS ==========
+    // ========== PDF FUNCTIONS - WATERMARK ON CARD CENTER ==========
     
-    async function generatePdfBlob(cardElement, employeeName, employeeId) {
+    async function generatePdfDataUrl(cardElement, employeeName, employeeId) {
         if (!cardElement) { showToast('❌ Card not found', true); return null; }
         try {
             const cloneCard = cardElement.cloneNode(true);
@@ -1855,187 +1856,137 @@
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
             
+            // Calculate card position on PDF
             const imgWidth = 90;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             const cardX = (210 - imgWidth) / 2;
             const cardY = pdfLogoBase64 ? 45 : (297 - imgHeight) / 2;
             
+            // ========== STEP 1: ADD CARD CONTENT FIRST (Bottom layer) ==========
             pdf.addImage(imgData, 'PNG', cardX, cardY, imgWidth, imgHeight);
             
+            // ========== STEP 2: ADD WATERMARK ON CARD CENTER (Top layer) ==========
             if (watermarkLogoBase64 && watermarkLogoBase64.startsWith('data:image')) {
                 try {
-                    const wmWidth = imgWidth * 0.5;
-                    const wmHeight = wmWidth;
+                    // Watermark size - relative to card (50% of card width)
+                    const wmWidth = imgWidth * 0.5; // 45mm
+                    const wmHeight = wmWidth; // Square
+                    
+                    // Position: Center of the card
                     const wmX = cardX + (imgWidth - wmWidth) / 2;
                     const wmY = cardY + (imgHeight - wmHeight) / 2;
+                    
                     pdf.setGState(new pdf.GState({ opacity: 0.25 }));
                     pdf.addImage(watermarkLogoBase64, 'JPEG', wmX, wmY, wmWidth, wmHeight);
                     pdf.setGState(new pdf.GState({ opacity: 1 }));
-                } catch(e) { console.warn("Watermark error:", e); }
+                } catch(e) { 
+                    console.warn("Watermark add error:", e); 
+                }
             }
             
+            // ========== STEP 3: ADD PDF LOGO AT TOP (Optional) ==========
             if (pdfLogoBase64 && pdfLogoBase64.startsWith('data:image')) {
-                try { pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); } catch(e) {}
+                try { 
+                    pdf.addImage(pdfLogoBase64, 'JPEG', 15, 10, 25, 25); 
+                } catch(e) { console.warn(e); }
             }
             
-            return pdf.output('blob');
+            const pdfData = pdf.output('datauristring');
+            return pdfData;
         } catch (error) {
             console.error('PDF generation error:', error);
             return null;
         }
     }
     
-    // ========== OPEN PDF IN NEW TAB ==========
-    async function openPdfInNewTab(cardElement, employeeName, employeeId) {
+    async function showPdfViewer(cardElement, employeeName, employeeId) {
         if (!cardElement) { showToast('❌ Card not found', true); return; }
-        showToast('📄 Generating PDF...');
+        showToast('📄 Generating PDF preview...');
+        const viewerModal = document.getElementById('pdfViewerModal');
+        const viewerBody = document.getElementById('pdfViewerBody');
         
         try {
-            const pdfBlob = await generatePdfBlob(cardElement, employeeName, employeeId);
-            if (!pdfBlob) {
-                showToast('❌ Failed to generate PDF', true);
+            viewerBody.innerHTML = '<p style="color: #94a3b8;"><i class="fas fa-spinner fa-spin"></i> Generating PDF...</p>';
+            viewerModal.classList.add('show');
+            
+            const pdfDataUrl = await generatePdfDataUrl(cardElement, employeeName, employeeId);
+            if (!pdfDataUrl) {
+                viewerBody.innerHTML = '<p style="color: #ef4444;">❌ Failed to generate PDF</p>';
                 return;
             }
+            currentPdfDataUrl = pdfDataUrl;
             
-            const url = URL.createObjectURL(pdfBlob);
-            const win = window.open(url, '_blank');
-            if (!win) {
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('⚠️ Popup blocked. PDF opened in new window.');
-            } else {
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('✅ PDF opened! Use browser Save.');
-            }
+            viewerBody.innerHTML = `
+                <iframe src="${pdfDataUrl}" style="width:100%; height:500px; border:none; border-radius:8px;"></iframe>
+                <div style="margin-top:10px; font-size:0.8rem; color:#64748b;">
+                    <i class="fas fa-info-circle"></i> Watermark on card center - Use Save button to download
+                </div>
+            `;
+            
+            document.getElementById('savePdfBtn').onclick = function() {
+                savePdfToDevice(pdfDataUrl, employeeName, employeeId);
+            };
+            document.getElementById('sharePdfBtn').onclick = function() {
+                sharePdf(pdfDataUrl, employeeName);
+            };
+            
+            showToast('✅ PDF ready! Tap Save to download.');
         } catch (error) {
-            console.error('PDF open error:', error);
-            showToast('❌ Failed to open PDF', true);
+            console.error('PDF viewer error:', error);
+            viewerBody.innerHTML = '<p style="color: #ef4444;">❌ Failed to generate PDF preview</p>';
+            showToast('❌ Failed to generate PDF', true);
         }
     }
     
-    // ========== SHARE PDF ==========
-    async function sharePdfViaIntent(cardElement, employeeName, employeeId) {
-        if (!cardElement) { showToast('❌ Card not found', true); return; }
-        showToast('📄 Preparing for share...');
-        
+    function savePdfToDevice(pdfDataUrl, employeeName, employeeId) {
         try {
-            const pdfBlob = await generatePdfBlob(cardElement, employeeName, employeeId);
-            if (!pdfBlob) {
-                showToast('❌ Failed to generate PDF', true);
-                return;
-            }
-            
-            const file = new File([pdfBlob], `${employeeName}_attencard.pdf`, { type: 'application/pdf' });
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: `Attendance Card - ${employeeName}`,
-                        files: [file]
-                    });
-                    showToast('✅ Shared successfully!');
-                    return;
-                } catch (shareError) {
-                    if (shareError.name === 'AbortError') {
-                        showToast('Share cancelled');
-                        return;
-                    }
-                    console.warn('Share API failed:', shareError);
-                }
-            }
-            
-            // Fallback: Open in new tab
-            const url = URL.createObjectURL(pdfBlob);
-            const win = window.open(url, '_blank');
-            if (!win) {
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${employeeName}_attencard.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('📄 Download started!');
-            } else {
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('📄 PDF opened! Use share option.');
-            }
+            const link = document.createElement('a');
+            link.href = pdfDataUrl;
+            const safeName = employeeName.replace(/[^a-zA-Z0-9]/g, '_');
+            link.download = `${safeName}_${employeeId}_attencard.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('✅ PDF download started! Check your downloads.');
+            closePdfViewer();
         } catch (error) {
-            console.error('Share error:', error);
-            showToast('❌ Failed to share', true);
-        }
-    }
-    
-    // ========== SAVE PDF ==========
-    async function savePdfKodular(cardElement, employeeName, employeeId) {
-        if (!cardElement) { showToast('❌ Card not found', true); return; }
-        showToast('📄 Generating PDF...');
-        
-        try {
-            const pdfBlob = await generatePdfBlob(cardElement, employeeName, employeeId);
-            if (!pdfBlob) {
-                showToast('❌ Failed to generate PDF', true);
-                return;
-            }
-            
-            const url = URL.createObjectURL(pdfBlob);
-            
-            // Try download
-            try {
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${employeeName}_attencard.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('📄 Download started!');
-                return;
-            } catch (downloadError) {
-                console.warn('Download failed:', downloadError);
-            }
-            
-            // Fallback: Open in new tab
-            const win = window.open(url, '_blank');
-            if (!win) {
-                showPdfInViewerModal(pdfBlob, employeeName);
-            } else {
-                setTimeout(() => URL.revokeObjectURL(url), 5000);
-                showToast('📄 PDF opened! Use Save option.');
-            }
-        } catch (error) {
-            console.error('Save error:', error);
+            console.error('Save PDF error:', error);
             showToast('❌ Failed to save PDF', true);
         }
     }
     
-    // ========== SHOW PDF IN VIEWER MODAL ==========
-    function showPdfInViewerModal(pdfBlob, employeeName) {
-        const url = URL.createObjectURL(pdfBlob);
-        const viewerModal = document.getElementById('pdfViewerModal');
-        const viewerBody = document.getElementById('pdfViewerBody');
-        
-        viewerBody.innerHTML = `
-            <iframe src="${url}" style="width:100%; height:500px; border:none; border-radius:8px;"></iframe>
-            <div style="margin-top:10px; text-align:center;">
-                <button onclick="window.open('${url}', '_blank')" style="background:#f59e0b; border:none; padding:10px 25px; border-radius:25px; color:white; font-weight:600; cursor:pointer; font-size:0.9rem;">
-                    <i class="fas fa-download"></i> Open & Save PDF
-                </button>
-            </div>
-        `;
-        viewerModal.classList.add('show');
-        
-        // Clean up when modal closes
-        const closeHandler = () => {
-            URL.revokeObjectURL(url);
-            document.querySelector('#pdfViewerModal .close-pdf-btn')?.removeEventListener('click', closeHandler);
-        };
-        document.querySelector('#pdfViewerModal .close-pdf-btn')?.addEventListener('click', closeHandler);
+    async function sharePdf(pdfDataUrl, employeeName) {
+        try {
+            const response = await fetch(pdfDataUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `${employeeName}_attencard.pdf`, { type: 'application/pdf' });
+            
+            if (navigator.share) {
+                await navigator.share({
+                    title: `Attendance Card - ${employeeName}`,
+                    files: [file]
+                });
+                showToast('✅ Shared successfully!');
+            } else {
+                const link = document.createElement('a');
+                link.href = pdfDataUrl;
+                link.download = `${employeeName}_attencard.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('📄 Download started (Share not supported)');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Share error:', error);
+                showToast('❌ Failed to share', true);
+            }
+        }
+    }
+    
+    function closePdfViewer() {
+        document.getElementById('pdfViewerModal').classList.remove('show');
+        currentPdfDataUrl = null;
     }
     
     // ========== AMOUNT PAID MODAL FUNCTIONS ==========
@@ -2177,12 +2128,6 @@
         document.getElementById('editAmount').value = '';
     }
     
-    function closePdfViewer() {
-        document.getElementById('pdfViewerModal').classList.remove('show');
-        currentPdfDataUrl = null;
-    }
-    
-    // ========== RENDER CARD ==========
     function renderCard(stats, userInfo, profilePic, companyLogo) {
         const container = document.getElementById('cardContainer');
         const monthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -2276,30 +2221,39 @@
             });
         }
         
-        // Preview PDF - opens in new tab
         const viewBtn = document.getElementById('viewPdfBtn');
         if (viewBtn) {
             viewBtn.addEventListener('click', async () => {
                 const cardElement = document.getElementById('mainCard');
-                await openPdfInNewTab(cardElement, userInfo.name, userInfo.id);
+                await showPdfViewer(cardElement, userInfo.name, userInfo.id);
             });
         }
         
-        // Share button
         const shareBtn = document.getElementById('sharePdfBtn');
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
                 const cardElement = document.getElementById('mainCard');
-                await sharePdfViaIntent(cardElement, userInfo.name, userInfo.id);
+                showToast('📄 Generating PDF for sharing...');
+                const pdfDataUrl = await generatePdfDataUrl(cardElement, userInfo.name, userInfo.id);
+                if (pdfDataUrl) {
+                    await sharePdf(pdfDataUrl, userInfo.name);
+                } else {
+                    showToast('❌ Failed to generate PDF', true);
+                }
             });
         }
         
-        // Save/Download button
         const downloadBtn = document.getElementById('downloadPdfBtn');
         if (downloadBtn) {
             downloadBtn.addEventListener('click', async () => {
                 const cardElement = document.getElementById('mainCard');
-                await savePdfKodular(cardElement, userInfo.name, userInfo.id);
+                showToast('📄 Generating PDF for download...');
+                const pdfDataUrl = await generatePdfDataUrl(cardElement, userInfo.name, userInfo.id);
+                if (pdfDataUrl) {
+                    savePdfToDevice(pdfDataUrl, userInfo.name, userInfo.id);
+                } else {
+                    showToast('❌ Failed to generate PDF', true);
+                }
             });
         }
     }
