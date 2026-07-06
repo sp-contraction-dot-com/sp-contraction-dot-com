@@ -30,7 +30,7 @@
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
-        /* (সমস্ত CSS আগের মতো – অপরিবর্তিত) */
+        /* ===== FULL CSS (unchanged from previous working version) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -179,6 +179,11 @@
         }
         .section-title i { font-size: 1.3rem; color: #f59e0b; background: #fef3c7; padding: 10px; border-radius: 14px; }
         .section-title h3 { font-size: 1.1rem; font-weight: 700; color: #1e293b; }
+        
+        /* Hide admin info section as requested */
+        #adminInfoSection {
+            display: none !important;
+        }
         
         .admin-info-section {
             background: #f8fafc;
@@ -456,6 +461,7 @@
     <div class="data-card" id="mainContentCard">
         <div class="section-title"><i class="fas fa-clipboard-list"></i><h3>Tools & Materials Purchase Records</h3></div>
         
+        <!-- Admin info section - now hidden via CSS (display:none) -->
         <div class="admin-info-section" id="adminInfoSection">
             <div class="admin-info-grid">
                 <div class="admin-info-left">
