@@ -10,7 +10,7 @@
         import { firebaseConfig } from './js/firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-        import { getDatabase, ref, get, onValue, set, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, get, onValue, set, update, push, onChildAdded, onChildChanged, onChildRemoved, query, orderByChild, limitToLast, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -23,11 +23,20 @@
         window.ref = ref;
         window.get = get;
         window.set = set;
-        window.onValue = onValue;
+        window.push = push;
         window.update = update;
+        window.remove = remove;
+        window.onValue = onValue;
+        window.onChildAdded = onChildAdded;
+        window.onChildChanged = onChildChanged;
+        window.onChildRemoved = onChildRemoved;
+        window.query = query;
+        window.orderByChild = orderByChild;
+        window.limitToLast = limitToLast;
         window.onAuthStateChanged = onAuthStateChanged;
     </script>
     <style>
+        /* ===== YOUR ORIGINAL CSS (unchanged) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -323,6 +332,10 @@
             border-radius: 20px;
             min-width: 18px;
             text-align: center;
+            transition: all 0.3s;
+        }
+        .notification-badge.hidden {
+            display: none;
         }
 
         @media (max-width: 550px) {
@@ -626,13 +639,20 @@
         .section-title {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
+            align-items: center;
             margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .section-title h2 {
             font-size: 1.1rem;
             font-weight: 700;
             color: #1e293b;
+        }
+        .section-title .btn-group-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         .btn-premium {
             background: linear-gradient(135deg, #f59e0b, #d97706);
@@ -648,6 +668,27 @@
         .btn-premium:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 14px rgba(245,158,11,0.3);
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            width: auto;
+            margin: 0;
+        }
+        .btn-danger-sm {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .btn-danger-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239,68,68,0.3);
         }
         
         /* Footer Styles */
@@ -737,6 +778,237 @@
             cursor: pointer;
             font-weight: 600;
         }
+
+        /* Notification Cards inside dynamic view */
+        .notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 16px;
+        }
+        .notif-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 5px solid #f59e0b;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .notif-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+        .notif-card.unread {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+        .notif-card.read {
+            border-left-color: #94a3b8;
+            opacity: 0.8;
+        }
+        .notif-card .notif-type {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #f59e0b;
+            margin-bottom: 4px;
+        }
+        .notif-card .notif-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+        .notif-card .notif-desc {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        .notif-card .notif-time {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .notif-card .notif-badge-type {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .notif-card .notif-badge-type.added {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .notif-card .notif-badge-type.updated {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .notif-card .notif-badge-type.deleted {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Delete button on notification card */
+        .notif-card .notif-delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+            padding: 4px 6px;
+            border-radius: 8px;
+        }
+        .notif-card .notif-delete-btn:hover {
+            color: #ef4444;
+            background: #fee2e2;
+            transform: scale(1.1);
+        }
+
+        /* Notification Detail Modal */
+        .notif-detail-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .notif-detail-overlay.show {
+            display: flex;
+        }
+        .notif-detail-box {
+            background: white;
+            border-radius: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .notif-detail-box .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .notif-detail-box .close-btn:hover {
+            color: #1e293b;
+            transform: rotate(90deg);
+        }
+        .notif-detail-box .detail-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+        .notif-detail-box .detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+        .notif-detail-box .detail-body {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 0.9rem;
+            color: #1e293b;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .notif-detail-box .detail-body pre {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+        .notif-detail-box .detail-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .notif-detail-box .mark-read-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .notif-detail-box .mark-read-btn:hover {
+            background: #d97706;
+        }
+        .notif-detail-box .delete-detail-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .notif-detail-box .delete-detail-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #94a3b8;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            color: #e2e8f0;
+        }
+        .empty-state h3 {
+            font-size: 1.1rem;
+            color: #475569;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
     </style>
 </head>
 <body>
@@ -744,14 +1016,14 @@
 <!-- LEFT SIDE MENU -->
 <div class="side-menu-left" id="sideMenuLeft">
     <div class="menu-header" id="leftMenuHeader" style="background-image: url('');"></div>
-    <div class="menu-item" onclick="loadPageInIframe('dashboard.html'); closeLeftMenu();"><i class="fas fa-chart-line"></i> <span>Home</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('all-attendance.html'); closeLeftMenu();"><i class="fas fa-calendar-check"></i> <span>User Attendance</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('all-users.html'); closeLeftMenu();"><i class="fas fa-users"></i> <span>User's List</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('all-payments.html'); closeLeftMenu();"><i class="fas fa-money-bill-wave"></i> <span> Company Payment History</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('attendantcard.html'); closeLeftMenu();"><i class="fas fa-building"></i> <span>User Card</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('all-purchases.html'); closeLeftMenu();"><i class="fas fa-cart-shopping"></i> <span>My Purchase</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('work-calendar.html'); closeLeftMenu();"><i class="fas fa-calendar-alt"></i> <span>Work Calendar</span></div>
-    <div class="menu-item" onclick="loadPageInIframe('report-archive.html'); closeLeftMenu();"><i class="fas fa-folder-open"></i> <span>Report Archive</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('dashboard.html'); window.closeLeftMenu();"><i class="fas fa-chart-line"></i> <span>Home</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('all-attendance.html'); window.closeLeftMenu();"><i class="fas fa-calendar-check"></i> <span>User Attendance</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('all-users.html'); window.closeLeftMenu();"><i class="fas fa-users"></i> <span>User's List</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('all-payments.html'); window.closeLeftMenu();"><i class="fas fa-money-bill-wave"></i> <span> Company Payment History</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('attendantcard.html'); window.closeLeftMenu();"><i class="fas fa-building"></i> <span>User Card</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('all-purchases.html'); window.closeLeftMenu();"><i class="fas fa-cart-shopping"></i> <span>My Purchase</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('work-calendar.html'); window.closeLeftMenu();"><i class="fas fa-calendar-alt"></i> <span>Work Calendar</span></div>
+    <div class="menu-item" onclick="window.loadPageInIframe('report-archive.html'); window.closeLeftMenu();"><i class="fas fa-folder-open"></i> <span>Report Archive</span></div>
 </div>
 
 <!-- RIGHT SIDE MENU (now shows name, plan AND email) -->
@@ -762,43 +1034,61 @@
         <p id="rightMenuPlan" style="font-size:0.7rem; margin-top:5px;">Contractor · Premium Plan</p>
         <div class="user-email-in-menu" id="rightMenuEmail">📧 loading@example.com</div>
     </div>
-    <div class="menu-item" onclick="closeRightMenu(); loadPageInIframe('profile.html');"><i class="fas fa-user"></i> <span>Profile</span></div>
-    <div class="menu-item" onclick="closeRightMenu(); openSettingsModal();"><i class="fas fa-cog"></i> <span>Settings</span></div>
-    <div class="menu-item" onclick="closeRightMenu(); loadPageInIframe('logoupload.html');"><i class="fas fa-camera"></i> <span>Logo Upload</span></div>
-    <div class="menu-item" onclick="closeRightMenu(); loadNotificationsPanel();"><i class="fas fa-bell"></i> <span>Notifications</span></div>
-    <div class="menu-item" onclick="closeRightMenu(); loadHelpPanel();"><i class="fas fa-question-circle"></i> <span>Help Center</span></div>
-    <div class="menu-item" onclick="closeRightMenu(); loadAppInfoPanel();"><i class="fas fa-info-circle"></i> <span>App Info</span></div>
-    <div class="menu-item" onclick="closeRightMenu(); handleLogout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.loadPageInIframe('profile.html');"><i class="fas fa-user"></i> <span>Profile</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.openSettingsModal();"><i class="fas fa-cog"></i> <span>Settings</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.loadPageInIframe('logoupload.html');"><i class="fas fa-camera"></i> <span>Logo Upload</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.handleBottomNav('notification');"><i class="fas fa-bell"></i> <span>Notifications</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.loadHelpPanel();"><i class="fas fa-question-circle"></i> <span>Help Center</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.loadAppInfoPanel();"><i class="fas fa-info-circle"></i> <span>App Info</span></div>
+    <div class="menu-item" onclick="window.closeRightMenu(); window.handleLogout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></div>
 </div>
 
-<div class="overlay" id="overlay" onclick="closeAllMenus()"></div>
+<div class="overlay" id="overlay" onclick="window.closeAllMenus()"></div>
 
 <!-- SETTINGS MODAL - all links open in iframe -->
 <div class="settings-modal" id="settingsModal">
     <div class="modal-container">
         <div class="modal-header">
             <h3><i class="fas fa-sliders-h"></i> Settings</h3>
-            <button class="modal-close" onclick="closeSettingsModal()"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="window.closeSettingsModal()"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body">
-            <div class="settings-link-item" onclick="closeSettingsModal(); loadPageInIframe('brand-settings.html');">
+            <div class="settings-link-item" onclick="window.closeSettingsModal(); window.loadPageInIframe('brand-settings.html');">
                 <i class="fas fa-user-edit"></i> <span> Change Name And Logo</span>
             </div>
-            <div class="settings-link-item" onclick="closeSettingsModal(); loadPageInIframe('signature_upload.html');">
+            <div class="settings-link-item" onclick="window.closeSettingsModal(); window.loadPageInIframe('signature_upload.html');">
                 <i class="fas fa-image"></i> <span>company signature</span>
             </div>
-            <div class="settings-link-item" onclick="closeSettingsModal(); loadPageInIframe('logoupload.html');">
+            <div class="settings-link-item" onclick="window.closeSettingsModal(); window.loadPageInIframe('logoupload.html');">
                 <i class="fas fa-building"></i> <span> Change Company Logo</span>
             </div>
-            <div class="settings-link-item" onclick="closeSettingsModal(); loadPageInIframe('personal-data.html');">
+            <div class="settings-link-item" onclick="window.closeSettingsModal(); window.loadPageInIframe('personal-data.html');">
                 <i class="fas fa-id-card"></i> <span>Personal Data Change</span>
             </div>
-            <div class="settings-link-item" onclick="closeSettingsModal(); loadPageInIframe('change-password.html');">
+            <div class="settings-link-item" onclick="window.closeSettingsModal(); window.loadPageInIframe('change-password.html');">
                 <i class="fas fa-lock"></i> <span> Change Password</span>
             </div>
-            <div class="settings-link-item" onclick="closeSettingsModal(); loadPageInIframe('preferences.html');">
+            <div class="settings-link-item" onclick="window.closeSettingsModal(); window.loadPageInIframe('preferences.html');">
                 <i class="fas fa-cog"></i> <span>App Preferences</span>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- NOTIFICATION DETAIL MODAL -->
+<div class="notif-detail-overlay" id="notifDetailOverlay">
+    <div class="notif-detail-box">
+        <button class="close-btn" onclick="window.closeNotifDetail()">&times;</button>
+        <div class="detail-title" id="detailTitle">Notification Title</div>
+        <div class="detail-meta" id="detailMeta">
+            <span><i class="far fa-clock"></i> <span id="detailTime">—</span></span>
+            <span><span id="detailTypeBadge" class="notif-badge-type added">Added</span></span>
+            <span><i class="fas fa-folder"></i> <span id="detailPath">—</span></span>
+        </div>
+        <div class="detail-body" id="detailBody">Loading data...</div>
+        <div class="detail-actions">
+            <button class="mark-read-btn" onclick="window.markCurrentNotificationRead()"><i class="fas fa-check"></i> Mark as Read</button>
+            <button class="delete-detail-btn" onclick="window.deleteCurrentNotification()"><i class="fas fa-trash"></i> Delete</button>
         </div>
     </div>
 </div>
@@ -807,9 +1097,9 @@
 <div class="app-wrapper">
     <div class="top-header" id="topHeader">
         <div class="header-row">
-            <div class="menu-icon" onclick="toggleLeftMenu()"><span></span><span></span><span></span></div>
+            <div class="menu-icon" onclick="window.toggleLeftMenu()"><span></span><span></span><span></span></div>
             <div class="search-wrapper"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search work, worker or project..."></div>
-            <div class="profile-img" id="headerProfileImg" onclick="toggleRightMenu()"><img id="headerAvatar" src="https://placehold.co/44x44?text=SP" alt="Profile"></div>
+            <div class="profile-img" id="headerProfileImg" onclick="window.toggleRightMenu()"><img id="headerAvatar" src="https://placehold.co/44x44?text=SP" alt="Profile"></div>
         </div>
         <div class="greeting">
             <h3 id="greetingText">👷 Welcome, Admin</h3>
@@ -825,20 +1115,33 @@
         <div class="copyright"><i class="far fa-copyright"></i> 2026 SP CONSTRUCTION | All Rights Reserved</div>
     </div>
     <div class="bottom-nav">
-        <div class="nav-item active" data-nav="home" onclick="setActiveNav(this); loadPageInIframe('dashboard.html');"><i class="fas fa-home"></i><div class="nav-label">Home</div></div>
-        <div class="nav-item" data-nav="search" onclick="setActiveNav(this); handleBottomNav('search')"><i class="fas fa-search"></i><div class="nav-label">Search</div></div>
-        <div class="nav-item" data-nav="post" onclick="setActiveNav(this); handleBottomNav('post')"><i class="fas fa-plus-circle"></i><div class="nav-label">Post</div></div>
-        <div class="nav-item" data-nav="support" onclick="setActiveNav(this); handleBottomNav('support')"><i class="fas fa-headset"></i><div class="nav-label">Support</div></div>
-        <div class="nav-item" data-nav="notification" onclick="setActiveNav(this); handleBottomNav('notification')"><i class="fas fa-bell"></i><div class="nav-label">Notifications</div><span class="notification-badge">3</span></div>
+        <div class="nav-item active" data-nav="home" onclick="window.setActiveNav(this); window.loadPageInIframe('dashboard.html');"><i class="fas fa-home"></i><div class="nav-label">Home</div></div>
+        <div class="nav-item" data-nav="search" onclick="window.setActiveNav(this); window.handleBottomNav('search')"><i class="fas fa-search"></i><div class="nav-label">Search</div></div>
+        <div class="nav-item" data-nav="post" onclick="window.setActiveNav(this); window.handleBottomNav('post')"><i class="fas fa-plus-circle"></i><div class="nav-label">Post</div></div>
+        <div class="nav-item" data-nav="support" onclick="window.setActiveNav(this); window.handleBottomNav('support')"><i class="fas fa-headset"></i><div class="nav-label">Support</div></div>
+        <div class="nav-item" data-nav="notification" onclick="window.setActiveNav(this); window.handleBottomNav('notification')"><i class="fas fa-bell"></i><div class="nav-label">Notifications</div><span class="notification-badge hidden" id="notifBadge">0</span></div>
     </div>
 </div>
 
 <script type="module">
-    // Firebase & core admin logic
+    // ============================================================
+    //  YOUR ORIGINAL CODE + NEW NOTIFICATION DELETE FUNCTIONS
+    // ============================================================
+    
     let currentAuthUser = null;
     let isAdminUser = false;
     let adminChecked = false;
+    
+    // ---------- Notification variables ----------
+    let allNotifications = [];
+    let currentDetailNotifId = null;
+    const MONITORED_PATHS = [
+        'projects', 'tasks', 'posts', 'employees', 'workCalendar',
+        'users', 'attendance', 'companyDailyPayments', 'purchases',
+        'companies', 'companyAssets'
+    ];
 
+    // ---------- Existing functions (unchanged) ----------
     async function loadHeaderBackground(user) { 
         if (!user) return;
         try {
@@ -890,7 +1193,6 @@
             const snapshot = await window.get(userRef);
             const data = snapshot.val() || {};
             
-            // Header avatar
             const headerImg = document.getElementById('headerAvatar');
             if (headerImg) {
                 headerImg.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) 
@@ -898,7 +1200,6 @@
                     : 'https://placehold.co/44x44?text=SP';
             }
             
-            // Right menu avatar & name
             const rightAvatar = document.getElementById('rightMenuAvatar');
             if (rightAvatar) {
                 rightAvatar.src = (data.profilePicture && data.profilePicture.startsWith('data:image')) 
@@ -911,16 +1212,13 @@
                 : (data.fullName || user.displayName || user.email?.split('@')[0] || 'Profile');
             document.getElementById('rightMenuName').innerText = fullName;
             
-            // Plan
             let planText = data.plan ? `${data.plan} Plan` : 'Premium Plan';
             document.getElementById('rightMenuPlan').innerText = `Contractor · ${planText}`;
             
-            // Email display
             const userEmail = user.email || data.email || 'No email provided';
             const emailElement = document.getElementById('rightMenuEmail');
             if (emailElement) emailElement.innerText = `📧 ${userEmail}`;
             
-            // Greeting in header
             const greetingH3 = document.getElementById('greetingText');
             if (greetingH3) greetingH3.innerHTML = `👷 Welcome, ${fullName}`;
             
@@ -951,6 +1249,28 @@
             document.getElementById('iframeContainer').style.display = 'flex';
             document.getElementById('dynamicView').style.display = 'none';
             showHomeDashboard();
+            
+            // Start notification listeners after login (only once)
+            if (!window._listenersStarted) {
+                window._listenersStarted = true;
+                startChangeListeners();
+                startNotificationListener();
+                // Load existing notifications for this user
+                const notifRef = window.ref(window.db, 'notifications');
+                const q = window.query(notifRef, window.orderByChild('timestamp'), window.limitToLast(100));
+                const snapshot = await window.get(q);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const temp = [];
+                    for (const [id, val] of Object.entries(data)) {
+                        if (val.userId && val.userId !== user.uid) continue;
+                        temp.push({ id, ...val });
+                    }
+                    temp.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    allNotifications = temp;
+                    updateBadge();
+                }
+            }
         } catch (error) { console.error(error); showAccessDenied(); }
     }
     
@@ -983,7 +1303,7 @@
         });
     }
     
-    // Core navigation: load external page in iframe
+    // ---------- Core navigation (unchanged) ----------
     window.loadPageInIframe = function(pageUrl) { 
         if (!isAdminUser) { showAccessDenied(); return; } 
         const frame = document.getElementById('dashboardFrame');
@@ -992,7 +1312,6 @@
         document.getElementById('dynamicView').style.display = 'none'; 
     };
     
-    // Helper to set iframe content using srcdoc (for dynamic panels)
     function setIframeContent(html) {
         if (!isAdminUser) { showAccessDenied(); return; }
         const frame = document.getElementById('dashboardFrame');
@@ -1001,19 +1320,11 @@
         document.getElementById('dynamicView').style.display = 'none';
     }
     
-    // Notifications rich panel
-    window.loadNotificationsPanel = function() {
-        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:'Segoe UI',sans-serif;background:#f8fafc;padding:24px;margin:0}.notif-card{background:white;border-radius:28px;padding:20px;margin-bottom:16px;box-shadow:0 6px 14px rgba(0,0,0,0.05);border-left:6px solid #f59e0b}.notif-title{font-weight:800;color:#0f172a}.notif-time{font-size:0.7rem;color:#64748b;margin-top:6px}.badge-new{background:#ef4444;color:white;padding:2px 8px;border-radius:30px;font-size:0.7rem}</style></head><body><h2 style="color:#1e293b"><i class="fas fa-bell"></i> Notifications Center</h2><div class="notif-card"><div class="notif-title">🔔 Project Milestone Completed</div><div>Foundation work for RiverSide Villa done on schedule.</div><div class="notif-time">2 hours ago <span class="badge-new">New</span></div></div><div class="notif-card"><div class="notif-title">✅ Payment Received</div><div>Invoice #SP-2401 cleared for March supplies.</div><div class="notif-time">Yesterday</div></div><div class="notif-card"><div class="notif-title">📅 Site Meeting Tomorrow</div><div>10:00 AM at Main Office conference room.</div><div class="notif-time">Jan 14, 2026</div></div></body></html>`;
-        setIframeContent(html);
-    };
-    
-    // Help Center panel
     window.loadHelpPanel = function() {
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:'Segoe UI',sans-serif;background:#f1f5f9;padding:28px;margin:0}.help-card{background:white;border-radius:32px;padding:24px;margin-bottom:20px;box-shadow:0 6px 12px rgba(0,0,0,0.05)}.help-card h3{color:#f59e0b}.contact{background:#1e293b;color:white;border-radius:28px;padding:20px;text-align:center}</style></head><body><h2><i class="fas fa-headset"></i> Help & Support</h2><div class="help-card"><h3>📞 Contractor Support</h3><p>For technical assistance or account issues, reach our team 24/7.</p><p><strong>Email:</strong> support@spconstruction.com</p><p><strong>Hotline:</strong> +1 (800) 555-SP01</p></div><div class="help-card"><h3>📘 Documentation</h3><p>Access user guides, video tutorials and project management walkthroughs.</p><p><a href="#" style="color:#f59e0b;">👉 Open Knowledge Base</a></p></div><div class="contact"><i class="fas fa-life-ring"></i> Emergency Dispatch: *911</div></body></html>`;
         setIframeContent(html);
     };
     
-    // App Info panel
     window.loadAppInfoPanel = function() {
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:'Segoe UI',sans-serif;background:#ffffff;padding:32px;margin:0;text-align:center}.info-card{background:linear-gradient(145deg,#fef9e6,white);border-radius:48px;padding:32px;box-shadow:0 12px 30px rgba(0,0,0,0.1)}.version-badge{background:#f59e0b;color:white;border-radius:60px;padding:4px 20px;display:inline-block;margin:16px 0}</style></head><body><div class="info-card"><i class="fas fa-hard-hat" style="font-size:64px;color:#f59e0b"></i><h1>SP CONSTRUCTION</h1><p>Enterprise Contractor Suite</p><div class="version-badge">Version 2.0.1 (Build 412)</div><p>✅ Premium Admin Dashboard<br>✅ Real-time Project Sync<br>✅ Advanced Report Analytics</p><hr><p style="color:#64748b;">© 2026 SP Build Official. All rights reserved.</p><p>Licensed for Contractor Management</p></div></body></html>`;
         setIframeContent(html);
@@ -1040,19 +1351,377 @@
         dynamicView.style.display = 'block'; 
     }
     
-    function showNotifications() { 
-        const dynamicView = document.getElementById('dynamicView'); 
-        dynamicView.innerHTML = `<div class="post-card"><h3>Notifications</h3><p>No new notifications</p></div>`; 
-        document.getElementById('iframeContainer').style.display = 'none'; 
-        dynamicView.style.display = 'block'; 
+    // ---------- Notification Functions (with DELETE support) ----------
+    function getPathLabel(path) {
+        const map = {
+            'projects': 'Project', 'tasks': 'Task', 'posts': 'Post',
+            'employees': 'Employee', 'workCalendar': 'Work Calendar',
+            'users': 'User', 'attendance': 'Attendance',
+            'companyDailyPayments': 'Payment', 'purchases': 'Purchase',
+            'companies': 'Company', 'companyAssets': 'Company Asset'
+        };
+        return map[path] || path;
     }
-    
+
+    function formatTimestamp(ts) {
+        if (!ts) return 'Just now';
+        const d = new Date(ts);
+        const now = new Date();
+        const diff = (now - d) / 1000;
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+        return d.toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function getItemTitle(data) {
+        if (!data) return 'Item';
+        return data.title || data.name || data.fullName || data.firstName ||
+               data.projectName || data.taskName || data.productName ||
+               data.companyName || data.key || 'Item';
+    }
+
+    async function createNotification(type, path, key, data) {
+        if (!currentAuthUser) return;
+        try {
+            const title = getItemTitle(data);
+            const pathLabel = getPathLabel(path);
+            let actionText = '';
+            if (type === 'added') actionText = 'added';
+            else if (type === 'updated') actionText = 'updated';
+            else if (type === 'deleted') actionText = 'deleted';
+
+            const summary = `${pathLabel} "${title}" was ${actionText}`;
+
+            const notifRef = window.push(window.ref(window.db, 'notifications'));
+            await window.set(notifRef, {
+                type: type,
+                path: path,
+                key: key,
+                data: data || {},
+                title: title,
+                summary: summary,
+                timestamp: Date.now(),
+                read: false,
+                userId: currentAuthUser.uid
+            });
+        } catch (err) {
+            console.warn('Failed to create notification:', err);
+        }
+    }
+
+    function startChangeListeners() {
+        MONITORED_PATHS.forEach(path => {
+            const pathRef = window.ref(window.db, path);
+
+            window.onChildAdded(pathRef, (snapshot) => {
+                const key = snapshot.key;
+                const data = snapshot.val();
+                if (!data || typeof data !== 'object') return;
+                if (path === 'notifications') return;
+                createNotification('added', path, key, data);
+            });
+
+            window.onChildChanged(pathRef, (snapshot) => {
+                const key = snapshot.key;
+                const data = snapshot.val();
+                if (!data || typeof data !== 'object') return;
+                if (path === 'notifications') return;
+                createNotification('updated', path, key, data);
+            });
+
+            window.onChildRemoved(pathRef, (snapshot) => {
+                const key = snapshot.key;
+                const data = snapshot.val();
+                if (!data || typeof data !== 'object') return;
+                if (path === 'notifications') return;
+                createNotification('deleted', path, key, data);
+            });
+        });
+    }
+
+    function startNotificationListener() {
+        const notifRef = window.ref(window.db, 'notifications');
+        const q = window.query(notifRef, window.orderByChild('timestamp'), window.limitToLast(100));
+
+        window.onChildAdded(q, (snapshot) => {
+            const id = snapshot.key;
+            const notif = snapshot.val();
+            if (notif.userId && notif.userId !== currentAuthUser?.uid) return;
+            const existing = allNotifications.find(n => n.id === id);
+            if (!existing) {
+                allNotifications.unshift({ id, ...notif });
+                if (allNotifications.length > 100) allNotifications.pop();
+                updateBadge();
+                const dv = document.getElementById('dynamicView');
+                if (dv && dv.style.display === 'block' && dv.innerHTML.includes('notif-list')) {
+                    renderNotifications();
+                }
+            }
+        });
+
+        window.onChildChanged(q, (snapshot) => {
+            const id = snapshot.key;
+            const notif = snapshot.val();
+            if (notif.userId && notif.userId !== currentAuthUser?.uid) return;
+            const idx = allNotifications.findIndex(n => n.id === id);
+            if (idx !== -1) {
+                allNotifications[idx] = { id, ...notif };
+                updateBadge();
+                const dv = document.getElementById('dynamicView');
+                if (dv && dv.style.display === 'block' && dv.innerHTML.includes('notif-list')) {
+                    renderNotifications();
+                }
+            }
+        });
+
+        window.onChildRemoved(q, (snapshot) => {
+            const id = snapshot.key;
+            allNotifications = allNotifications.filter(n => n.id !== id);
+            updateBadge();
+            const dv = document.getElementById('dynamicView');
+            if (dv && dv.style.display === 'block' && dv.innerHTML.includes('notif-list')) {
+                renderNotifications();
+            }
+        });
+    }
+
+    function updateBadge() {
+        const badge = document.getElementById('notifBadge');
+        if (!badge) return;
+        const unread = allNotifications.filter(n => n.read === false || n.read === undefined).length;
+        if (unread > 0) {
+            badge.textContent = unread;
+            badge.classList.remove('hidden');
+        } else {
+            badge.textContent = '0';
+            badge.classList.add('hidden');
+        }
+    }
+
+    // ---------- DELETE NOTIFICATION FUNCTIONS ----------
+    window.deleteNotification = async function(id, event) {
+        if (event) event.stopPropagation();
+        if (!id) return;
+        if (!confirm('Delete this notification?')) return;
+        try {
+            await window.remove(window.ref(window.db, `notifications/${id}`));
+            allNotifications = allNotifications.filter(n => n.id !== id);
+            updateBadge();
+            // Re-render if notifications view is open
+            const dv = document.getElementById('dynamicView');
+            if (dv && dv.style.display === 'block' && dv.innerHTML.includes('notif-list')) {
+                renderNotifications();
+            }
+            showToast('Notification deleted');
+        } catch (err) {
+            console.warn('Failed to delete notification:', err);
+            showToast('Failed to delete notification', true);
+        }
+    };
+
+    window.deleteAllNotifications = async function() {
+        const unreadCount = allNotifications.filter(n => n.read === false || n.read === undefined).length;
+        const totalCount = allNotifications.length;
+        if (totalCount === 0) {
+            showToast('No notifications to delete');
+            return;
+        }
+        const msg = `Delete all ${totalCount} notifications (${unreadCount} unread)?`;
+        if (!confirm(msg)) return;
+        
+        try {
+            // Delete each notification one by one
+            for (const n of allNotifications) {
+                await window.remove(window.ref(window.db, `notifications/${n.id}`));
+            }
+            allNotifications = [];
+            updateBadge();
+            const dv = document.getElementById('dynamicView');
+            if (dv && dv.style.display === 'block' && dv.innerHTML.includes('notif-list')) {
+                renderNotifications();
+            }
+            showToast('All notifications cleared');
+        } catch (err) {
+            console.warn('Failed to delete all notifications:', err);
+            showToast('Failed to clear notifications', true);
+        }
+    };
+
+    window.deleteCurrentNotification = async function() {
+        if (!currentDetailNotifId) return;
+        const id = currentDetailNotifId;
+        window.closeNotifDetail();
+        await window.deleteNotification(id);
+    };
+
+    // ---------- RENDER NOTIFICATIONS (with delete buttons) ----------
+    window.renderNotifications = function() {
+        const dv = document.getElementById('dynamicView');
+        const iframeContainer = document.getElementById('iframeContainer');
+        if (!dv || !iframeContainer) return;
+
+        if (allNotifications.length === 0) {
+            dv.innerHTML = `
+                <div class="section-title">
+                    <h2><i class="fas fa-bell"></i> Notifications</h2>
+                    <div class="btn-group-actions">
+                        <button class="btn-danger-sm" onclick="window.deleteAllNotifications()" style="display:none;"><i class="fas fa-trash"></i> Clear All</button>
+                    </div>
+                </div>
+                <div class="empty-state">
+                    <i class="fas fa-bell-slash"></i>
+                    <h3>No notifications yet</h3>
+                    <p>When something changes in the database, you'll see it here.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const unreadCount = allNotifications.filter(n => n.read === false || n.read === undefined).length;
+        const listHtml = allNotifications.map(n => {
+            const isRead = n.read === true;
+            const typeClass = n.type || 'updated';
+            const timeStr = formatTimestamp(n.timestamp);
+            const pathLabel = getPathLabel(n.path);
+            const title = n.title || getItemTitle(n.data) || 'Item';
+            const summary = n.summary || `${pathLabel} "${title}" was ${typeClass}`;
+
+            return `
+                <div class="notif-card ${isRead ? 'read' : 'unread'}" onclick="window.openNotifDetail('${n.id}')">
+                    <button class="notif-delete-btn" onclick="window.deleteNotification('${n.id}', event)" title="Delete notification">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                    <div class="notif-type">
+                        <span class="notif-badge-type ${typeClass}">${typeClass.toUpperCase()}</span>
+                        <span style="margin-left:8px; color:#94a3b8; font-weight:400;">${pathLabel}</span>
+                    </div>
+                    <div class="notif-title">${title}</div>
+                    <div class="notif-desc">${summary}</div>
+                    <div class="notif-time">
+                        <i class="far fa-clock"></i> ${timeStr}
+                        ${!isRead ? '<span style="background:#f59e0b; width:8px; height:8px; border-radius:50%; display:inline-block; margin-left:8px;"></span>' : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        dv.innerHTML = `
+            <div class="section-title">
+                <h2><i class="fas fa-bell"></i> Notifications (${allNotifications.length})</h2>
+                <div class="btn-group-actions">
+                    <button class="btn-premium btn-sm" onclick="window.markAllRead()"><i class="fas fa-check-double"></i> Mark all read</button>
+                    <button class="btn-danger-sm" onclick="window.deleteAllNotifications()"><i class="fas fa-trash"></i> Clear All</button>
+                </div>
+            </div>
+            <div class="notif-list">${listHtml}</div>
+        `;
+        iframeContainer.style.display = 'none';
+        dv.style.display = 'block';
+        updateBadge();
+    };
+
+    // ---------- Notification Detail (with delete button) ----------
+    window.openNotifDetail = function(id) {
+        const notif = allNotifications.find(n => n.id === id);
+        if (!notif) return;
+        currentDetailNotifId = id;
+
+        document.getElementById('detailTitle').textContent = notif.title || 'Notification';
+        document.getElementById('detailTime').textContent = formatTimestamp(notif.timestamp);
+        document.getElementById('detailPath').textContent = getPathLabel(notif.path) + ' / ' + (notif.key || '—');
+
+        const badge = document.getElementById('detailTypeBadge');
+        badge.textContent = (notif.type || 'updated').toUpperCase();
+        badge.className = `notif-badge-type ${notif.type || 'updated'}`;
+
+        const body = document.getElementById('detailBody');
+        if (notif.data) {
+            let dataStr = JSON.stringify(notif.data, null, 2);
+            if (dataStr.length > 2000) {
+                dataStr = dataStr.slice(0, 2000) + '\n... (truncated)';
+            }
+            body.innerHTML = `<pre>${dataStr}</pre>`;
+        } else {
+            body.textContent = 'No additional data available.';
+        }
+
+        if (notif.read !== true) {
+            markNotifRead(id);
+        }
+        document.getElementById('notifDetailOverlay').classList.add('show');
+    };
+
+    window.closeNotifDetail = function() {
+        document.getElementById('notifDetailOverlay').classList.remove('show');
+        currentDetailNotifId = null;
+    };
+
+    async function markNotifRead(id) {
+        try {
+            const notifRef = window.ref(window.db, `notifications/${id}`);
+            await window.update(notifRef, { read: true });
+            const n = allNotifications.find(item => item.id === id);
+            if (n) n.read = true;
+            updateBadge();
+            const dv = document.getElementById('dynamicView');
+            if (dv && dv.style.display === 'block' && dv.innerHTML.includes('notif-list')) {
+                renderNotifications();
+            }
+        } catch (err) {
+            console.warn('Failed to mark read:', err);
+        }
+    }
+
+    window.markCurrentNotificationRead = function() {
+        if (currentDetailNotifId) {
+            markNotifRead(currentDetailNotifId);
+            closeNotifDetail();
+        }
+    };
+
+    window.markAllRead = async function() {
+        try {
+            const updates = {};
+            allNotifications.forEach(n => {
+                if (n.read !== true) {
+                    updates[`notifications/${n.id}/read`] = true;
+                    n.read = true;
+                }
+            });
+            if (Object.keys(updates).length > 0) {
+                await window.update(window.ref(window.db), updates);
+            }
+            updateBadge();
+            renderNotifications();
+        } catch (err) {
+            console.warn('Failed to mark all read:', err);
+        }
+    };
+
+    // ---------- Toast notification ----------
+    function showToast(msg, isErr = false) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: ${isErr ? '#dc2626' : '#15803d'}; color: white;
+            padding: 10px 24px; border-radius: 40px; font-family: 'Inter', sans-serif;
+            font-size: 0.8rem; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeUp 0.2s ease;
+        `;
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ---------- Modified handleBottomNav to support notifications ----------
     window.handleBottomNav = function(type) { 
         if (!isAdminUser) { showAccessDenied(); return; } 
         if(type === 'home') showHomeDashboard(); 
         else if(type === 'post') renderPosts(); 
         else if(type === 'support') renderSupport(); 
-        else if(type === 'notification') showNotifications(); 
+        else if(type === 'notification') renderNotifications(); 
         else if(type === 'search') { 
             const dynamicView = document.getElementById('dynamicView'); 
             dynamicView.innerHTML = `<div class="post-card"><h3>Search</h3><p>Use search bar</p></div>`; 
@@ -1060,7 +1729,8 @@
             dynamicView.style.display = 'block'; 
         } 
     };
-    
+
+    // ---------- Existing UI functions (unchanged) ----------
     window.setActiveNav = function(el) { 
         document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); 
         el.classList.add('active'); 
@@ -1095,11 +1765,24 @@
     window.closeSettingsModal = function() { 
         document.getElementById('settingsModal').classList.remove('open'); 
     };
-    
-    // Initial setup
+
+    // ---------- IFRAME POST-MESSAGE (unchanged) ----------
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'NAVIGATE' && event.data.page) {
+            if (typeof window.loadPageInIframe === 'function') {
+                window.loadPageInIframe(event.data.page);
+            }
+        }
+    });
+
+    // ---------- Initial setup (unchanged) ----------
     window.onload = function() { 
         // any additional startup logic
     };
+
+    console.log('🔔 Notification system monitoring ALL admin panel data paths:', MONITORED_PATHS.join(', '));
+    console.log('✅ App initialized. Real-time notifications active.');
+    console.log('🗑️ Delete notifications: Click the ✕ button on any notification or use "Clear All".');
 </script>
 </body>
 </html>
